@@ -1,19 +1,23 @@
+я чисто в App.vue поміняла
 <template>
   <div id="app">
-    <Header /> 
+    <MainHeader /> 
     <HomePage />
+    <FooterComponent />
   </div>
 </template>
 
 <script>
 import HomePage from './components/HomePage.vue'
-import Header from './components/Header.vue'
+import MainHeader from './components/MainHeader.vue'
+import FooterComponent from './components/FooterComponent.vue' 
 
 export default {
   name: 'App',
   components: {
     HomePage,
-    Header 
+    MainHeader,
+    FooterComponent
   }
 }
 </script>
