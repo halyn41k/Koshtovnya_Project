@@ -1,6 +1,6 @@
 # Koshtovnya Website
-Description of the project
-This site offers handmade beadwork, including exclusive necklaces, bracelets, charms and more.
+## Description of the project
+### This site offers handmade beadwork, including exclusive necklaces, bracelets, charms and more.
 
 ## API
 ### Project settings
