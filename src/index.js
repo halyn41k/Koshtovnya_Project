@@ -55,6 +55,26 @@ const routes = [
     path: '/registration',
     name: 'Registration',
     component: () => import('@/components/UserRegistration.vue')
+  },
+  {
+    path: '/productpage',
+    name: 'ProductPage',
+    component: () => import('@/components/ProductPage.vue')
+  },
+  {
+    path: '/wishlist',
+    name: 'UserWishlist',
+    component: () => import('@/components/UserWishlist.vue')
+  },
+  {
+    path: '/account',
+    name: 'AccountInfo',
+    component: () => import('@/components/AccountInfo.vue')
+  },
+  {
+    path:'/cart',
+    name: 'CartShop',
+    component: () => import('@/components/CartShopPage.vue')
   }
 ];
 

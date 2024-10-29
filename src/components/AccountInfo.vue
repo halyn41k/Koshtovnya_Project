@@ -44,7 +44,7 @@
   import PersonalInfo from './PersonalInfo.vue';
   import Addresses from './UserAddresses.vue';
   import OrderHistory from './OrderHistory.vue';
-  import Wishlist from './Wishlist.vue';
+  import Wishlist from './UserWishlist.vue';
   
   export default {
     name: 'AccountInfo',
