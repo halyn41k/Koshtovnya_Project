@@ -29,9 +29,14 @@
 
     <div class="main-header">
       <div class="search-bar">
-        <input type="text" v-model="searchQuery" placeholder="Пошук в нашому каталозі">
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Пошук в нашому каталозі"
+          @keyup.enter="search"
+        />
         <div class="search-icon" @click="search">
-          <img src="@/assets/magnifying-glass-svgrepo-com.svg" alt="Search Icon">
+          <img src="@/assets/magnifying-glass-svgrepo-com.svg" alt="Search Icon" />
         </div>
       </div>
 
@@ -42,11 +47,11 @@
 
       <div class="user-cart" @mouseenter="showMiniCart" @mouseleave="hideMiniCart">
         <router-link to="/account" class="user-icon">
-          <img src="@/assets/user-svgrepo-com (1).svg" alt="User Icon" class="icon">
+          <img src="@/assets/user-svgrepo-com (1).svg" alt="User Icon" class="icon" />
         </router-link>
 
         <router-link to="/cart" class="cart-icon">
-          <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon">
+          <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon" />
         </router-link>
 
         <MiniCart v-if="isMiniCartVisible" :items="cartItems" :total="total" />
@@ -63,11 +68,25 @@
         <li><router-link to="/belts">Пояси</router-link></li>
       </ul>
     </nav>
+
+    <!-- Розділ для відображення результатів пошуку -->
+    <div v-if="searchResults.length > 0" class="search-results">
+      <h2>Результати пошуку:</h2>
+      <ul>
+        <li v-for="product in searchResults" :key="product.id" class="search-result-item">
+          <img :src="product.image_url" alt="Product Image" />
+          <div class="product-details">
+            <h3>{{ product.name }}</h3>
+            <p>Ціна: {{ product.price }} ₴</p>
+          </div>
+        </li>
+      </ul>
+    </div>
   </header>
 </template>
 
 <script>
-
+import axios from 'axios'; // імпорт бібліотеки axios
 
 export default {
   data() {
@@ -81,6 +100,7 @@ export default {
         { id: 2, name: 'Сережки', price: 150, quantity: 2, imageSrc: '@/assets/earrings.png' },
       ],
       total: 400,
+      searchResults: [], // Додано для зберігання результатів пошуку
     };
   },
   computed: {
@@ -98,7 +118,22 @@ export default {
       this.isMiniCartVisible = false;
     },
     search() {
-      console.log('Searching for:', this.searchQuery);
+  if (this.searchQuery.trim() === '') {
+    return; // Не виконувати запит, якщо поле пошуку порожнє
+  }
+
+  const apiUrl = `http://192.168.1.44:8080/api/products/search/${this.searchQuery}`;
+
+  axios.get(apiUrl)
+    .then(response => {
+      this.searchResults = response.data.data; // Оновлення результатів пошуку
+    })
+    .catch(error => {
+      console.error('Error fetching search results:', error);
+      this.searchResults = []; // Очистка результатів у випадку помилки
+    });
+
+
     },
   },
   mounted() {
@@ -108,7 +143,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Montserrat:wght@400&display=swap');
@@ -319,5 +353,77 @@ body {
 }
 
 
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 250px;
+  background-color: #FFF7F6; /* Змінено на FFF7F6 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px; /* Додано для відступів */
+}
+
+.search-results h2 {
+  margin: 0 0 10px; /* Відступи для заголовка */
+  text-align: center; /* Вирівняно по центру */
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold; /* Bold для заголовка */
+}
+
+.search-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #EAEAEA;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-results img {
+  width: 50px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.product-details {
+  flex-grow: 1; /* Залишити простір для деталей продукту */
+  text-align: center; /* Центрування тексту */
+}
+
+.product-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold; /* Bold для назви товару */
+}
+
+.product-price {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: normal; /* Regular для ціни */
+}
+
+/* Тонший скролер */
+.search-results::-webkit-scrollbar {
+  width: 6px; /* Товщина скролера */
+}
+
+.search-results::-webkit-scrollbar-thumb {
+  background: #ccc; /* Колір скролера */
+  border-radius: 10px; /* Закруглення країв */
+}
+
+.search-results::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Колір фону скролера */
+}
 
 </style>

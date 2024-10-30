@@ -54,6 +54,8 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-size: 16px;
+    font-family: 'Merriweather', sans-serif;
   }
   
   .change-password-button:hover {

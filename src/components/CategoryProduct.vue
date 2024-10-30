@@ -3,69 +3,25 @@
       <h2 class="section-title">Придбайте за категорією</h2>
       <div class="category-container">
         <div class="category-grid">
-          <!-- Category Item 1: Bracelets -->
-          <router-link to="/bracelets" class="category-item with-squares">
+          <!-- Динамічне завантаження категорій -->
+          <router-link
+            v-for="category in categories"
+            :key="category.id"
+            :to="`/category/${category.id}`" 
+            class="category-item with-squares"
+          >
             <div class="square light-square"></div>
             <div class="square dark-square"></div>
             <div class="image-wrapper">
-              <img loading="lazy" src="@/assets/bracelet.png" alt="Браслети" class="category-image" />
+              <img
+                loading="lazy"
+                :src="category.image_url"
+                :alt="category.name"
+                class="category-image"
+              />
             </div>
             <div class="category-title-wrapper">
-              <h2 class="category-title">Браслети</h2>
-              <span class="arrow">→</span>
-            </div>
-          </router-link>
-          <!-- Category Item 2: Necklaces -->
-          <router-link to="/herdany" class="category-item">
-            <div class="image-wrapper">
-              <img loading="lazy" src="@/assets/gerdan.png" alt="Гердани" class="category-image" />
-            </div>
-            <div class="category-title-wrapper">
-              <h2 class="category-title">Гердани</h2>
-              <span class="arrow">→</span>
-            </div>
-          </router-link>
-          <!-- Category Item 3: Silyanki -->
-          <router-link to="/sylyanky" class="category-item with-squares">
-            <div class="square light-square"></div>
-            <div class="square dark-square"></div>
-            <div class="image-wrapper">
-              <img loading="lazy" src="@/assets/sylyanka.png" alt="Силянки" class="category-image" />
-            </div>
-            <div class="category-title-wrapper">
-              <h2 class="category-title">Силянки</h2>
-              <span class="arrow">→</span>
-            </div>
-          </router-link>
-          <!-- Category Item 4: Dukaty -->
-          <router-link to="/dukats" class="category-item">
-            <div class="image-wrapper">
-              <img loading="lazy" src="@/assets/ducaty.png" alt="Дукати" class="category-image" />
-            </div>
-            <div class="category-title-wrapper">
-              <h2 class="category-title">Дукати</h2>
-              <span class="arrow">→</span>
-            </div>
-          </router-link>
-          <!-- Category Item 5: Earrings -->
-          <router-link to="/earrings" class="category-item with-squares">
-            <div class="square light-square"></div>
-            <div class="square dark-square"></div>
-            <div class="image-wrapper">
-              <img loading="lazy" src="@/assets/earing.png" alt="Сережки" class="category-image" />
-            </div>
-            <div class="category-title-wrapper">
-              <h2 class="category-title">Сережки</h2>
-              <span class="arrow">→</span>
-            </div>
-          </router-link>
-          <!-- Category Item 6: Belts -->
-          <router-link to="/belts" class="category-item">
-            <div class="image-wrapper">
-              <img loading="lazy" src="@/assets/poyas.png" alt="Пояси" class="category-image" />
-            </div>
-            <div class="category-title-wrapper">
-              <h2 class="category-title">Пояси</h2>
+              <h2 class="category-title">{{ category.name }}</h2>
               <span class="arrow">→</span>
             </div>
           </router-link>
@@ -73,6 +29,54 @@
       </div>
     </section>
   </template>
+  
+  <script>
+  export default {
+    data() {
+      return {
+        categories: [], // Масив для зберігання категорій
+      };
+    },
+    methods: {
+  async fetchCategories() {
+    try {
+      const response = await fetch("http://192.168.1.44:8080/api/categories");
+
+      // Перевіряємо, чи відповідь типу JSON
+      if (!response.ok) {
+        throw new Error(`HTTP помилка: ${response.status}`); // Виправлено шаблонний рядок
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Сервер не повернув JSON");
+      }
+
+      const data = await response.json();
+
+      // Перевірка, чи є data масивом
+      if (!Array.isArray(data.data)) {
+        throw new Error("Очікував масив категорій з API");
+      }
+
+      // Тепер правильне присвоєння categories
+      this.categories = data.data.map((category) => ({
+        id: category.id,
+        name: category.name,
+        image_url: category.image_url,
+      }));
+    } catch (error) {
+      console.error("Помилка при отриманні категорій:", error.message);
+      console.error("Повна інформація про помилку:", error);
+    }
+  },
+},
+    mounted() {
+      // Викликаємо метод отримання категорій після рендеру компонента
+      this.fetchCategories();
+    },
+  };
+  </script>
   
   
   <style scoped>
@@ -156,68 +160,66 @@
       font-weight: 900;
       margin-right: 10px;
     }
-  
-  /* Стилі для квадратів */
-  .square {
-    position: absolute;
-    width: 300px;
-    height: 340px;
-    z-index: 1;
-    pointer-events: none;
-    transition: transform 0.5s ease; /* Додає плавний перехід для анімації */
+    /* Стилі для квадратів */
+.square {
+  position: absolute;
+  width: 300px;
+  height: 340px;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 0.5s ease; /* Додає плавний перехід для анімації */
+}
+
+.light-square {
+  background-color: #EADCDB;
+  top: -20px;
+  left: -50px;
+}
+
+.dark-square {
+  background-color: #C4AEAC;
+  top: 20px;
+  right: -50px;
+}
+
+/* Анімація при наведенні */
+.category-item:hover .light-square {
+  transform: translate(-10px, -10px); /* Розсування світлого квадрата вгору та вліво */
+}
+
+.category-item:hover .dark-square {
+  transform: translate(10px, 10px); /* Розсування темного квадрата вниз та вправо */
+}
+
+
+  .category-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 2;
   }
-  
-  .light-square {
-    background-color: #EADCDB;
-    top: -20px;
-    left: -50px;
+
+  .arrow {
+    font-size: 24px;
+    transition: transform 0.3s ease;
   }
-  
-  .dark-square {
-    background-color: #C4AEAC;
-    top: 20px;
-    right: -50px;
+
+  .category-item:hover .arrow {
+    transform: translateX(10px);
   }
-  
-  /* Анімація при наведенні */
-  .category-item:hover .light-square {
-    transform: translate(-10px, -10px); /* Розсування світлого квадрата вгору та вліво */
+
+  @media (max-width: 768px) {
+    .category-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
   }
-  
-  .category-item:hover .dark-square {
-    transform: translate(10px, 10px); /* Розсування темного квадрата вниз та вправо */
+
+  @media (max-width: 480px) {
+    .category-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
   }
-  
-  
-    .category-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: relative;
-      z-index: 2;
-    }
-  
-    .arrow {
-      font-size: 24px;
-      transition: transform 0.3s ease;
-    }
-  
-    .category-item:hover .arrow {
-      transform: translateX(10px);
-    }
-  
-    @media (max-width: 768px) {
-      .category-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-      }
-    }
-  
-    @media (max-width: 480px) {
-      .category-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-    }
-  </style>
-  
+</style>

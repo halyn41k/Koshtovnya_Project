@@ -1,190 +1,143 @@
 <template>
-    <div class="main-container">
-      <!-- Welcome Section -->
-      <div class="welcome-image"></div>
-  
-      <!-- Header Text -->
-      <div class="text-container">
-        <span class="handmade-beaded-products">Вироби ручної роботи з бісеру</span>
-        <span class="exclusive-necklaces-bracelets-earrings">
-          Ексклюзивні гердани, браслети, силянки та інше
-        </span>
+  <div class="main-container">
+    <!-- Welcome Section -->
+    <div class="welcome-image"></div>
+
+    <!-- Header Text -->
+    <div class="text-container">
+      <span class="handmade-beaded-products">Вироби ручної роботи з бісеру</span>
+      <span class="exclusive-necklaces-bracelets-earrings">
+        Ексклюзивні гердани, браслети, силянки та інше
+      </span>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-container">
+      <div class="left-image-container">
+        <div class="girl-image"></div>
+        <div class="pattern-image"></div>
       </div>
-  
-      <!-- Content Section -->
-      <div class="content-container">
-        <div class="left-image-container">
-          <div class="girl-image"></div>
-          <div class="pattern-image"></div>
+      <div class="right-text-container">
+        <div class="quote-text">
+          <span class="ukrainian-heritage">
+            Українське етно – це голос предків, вишитий на полотні душі, вплетений у музику вітрів і відлуння карпатських вершин. Це нескінченне джерело сили та краси, яке живить наше сьогодення...
+          </span>
         </div>
-        <div class="right-text-container">
-          <div class="quote-text">
-            <span class="ukrainian-heritage">
-              Українське етно – це голос предків, вишитий на полотні душі, вплетений у музику вітрів і відлуння карпатських вершин. Це нескінченне джерело сили та краси, яке живить наше сьогодення...
-            </span>
-          </div>
-          <span class="gnat-khotkevich">Гнат Хоткевич</span>
-        </div>
+        <span class="gnat-khotkevich">Гнат Хоткевич</span>
       </div>
-  
-      <!-- Popular Goods Section -->
-      <section class="popular-goods">
-        <h2 class="section-title">Популярні товари</h2>
-  
-        <div class="arrow-container">
-          <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
-          <div class="product-grid">
-            <div class="product-row">
-              <div v-for="(product, index) in visibleProducts" :key="index" class="product-column">
-                <article class="product-card">
-                  <img :src="product.image" :alt="product.title" class="product-main-image" />
-                  <div class="product-details">
-                    <h3 class="product-title">{{ product.title }}</h3>
-                    <p class="product-price">{{ product.price }}₴</p>
-                    <div class="product-info">
-                      <p>{{ product.material }}</p>
-                      <svg
-                        v-if="isInWishlist(product.title)"
-                        @click="toggleHeart(product.title)"
-                        class="wishlist-icon filled-heart"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                      </svg>
-                      <svg
-                        v-else
-                        @click="toggleHeart(product.title)"
-                        class="wishlist-icon empty-heart"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      >
-                        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                      </svg>
-                    </div>
-                    <button class="buy-button">
-                      <span>Купити</span>
-                      <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-                    </button>
-                  </div>
-                </article>
-              </div>
+    </div>
+
+    <!-- Popular Goods Section -->
+    <section class="popular-goods">
+      <h2 class="section-title">Популярні товари</h2>
+
+      <div class="arrow-container">
+        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
+        <div class="product-grid">
+          <div class="product-row">
+            <div v-for="product in visibleProducts" :key="product.id" class="product-column">
+              <article class="product-card">
+                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
+                <div class="product-details">
+                  <h3 class="product-title">{{ product.name }}</h3>
+                  <p class="product-price">{{ product.price }}₴</p>
+                  <p class="product-info">{{ product.country_of_manufacture }}</p>
+                  <button class="buy-button">
+                    <span>Купити</span>
+                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+                  </button>
+                </div>
+              </article>
             </div>
           </div>
-          <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
         </div>
-  
-        <div class="dots-container">
-          <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
-        </div>
-      </section>
-      <CategoryProduct />
-    </div>
-  </template>
-  
-  <script>
-  import CategoryProduct from "@/components/CategoryProduct.vue";
-  
-  export default {
-    components: {
-      CategoryProduct
-    },
-    data() {
-      return {
-        wishlist: [],
-        products: [
-          {
-            title: "Гердан 'Квітка папороті'",
-            price: 1500,
-            material: "Чеський бісер",
-            image: require("@/assets/Квітка папороті.png")
-          },
-          {
-            title: "Гердан 'Гуцулка'",
-            price: 1200,
-            material: "Чеський бісер",
-            image: require("@/assets/Гуцулка.png")
-          },
-          {
-            title: "Браслет 'Український мотив'",
-            price: 750,
-            material: "Китайський бісер",
-            image: require("@/assets/Український мотив.png")
-          },
-          {
-            title: "Браслет 'Українські візерунки'",
-            price: 450,
-            material: "Китайський бісер",
-            image: "@/assets/Українські візерунки.jpg"
-          },
-          {
-            title: "Браслет 'Розмаїття кольорів'",
-            price: 750,
-            material: "Чеський бісер",
-            image: "@/assets/Розмаїття кольорів.jpg"
-          },
-          {
-            title: "Браслет 'Чорно-білий розмай'",
-            price: 650,
-            material: "Чеський бісер",
-            image: "@/assets/Чорно-білий розмай.jpg"
-          }
-        ],
-        visibleProducts: [], // Продукти, що відображаються на поточній сторінці
-        currentPage: 0, // Номер поточної сторінки
-        productsPerPage: 3 // Скільки продуктів відображати на сторінці
-      };
-    },
-    computed: {
-      totalPages() {
-        return Math.ceil(this.products.length / this.productsPerPage);
-      }
-    },
-    methods: {
-      toggleHeart(productTitle) {
-        if (this.isInWishlist(productTitle)) {
-          this.wishlist = this.wishlist.filter(item => item !== productTitle);
-          alert(`${productTitle} видалено зі списку бажаного!`);
-        } else {
-          this.wishlist.push(productTitle);
-          alert(`${productTitle} додано до списку бажаного!`);
-        }
-      },
-      isInWishlist(productTitle) {
-        return this.wishlist.includes(productTitle);
-      },
-      showNextProducts() {
-        if (this.currentPage < this.totalPages - 1) {
-          this.currentPage++; // Переходимо на наступну сторінку
-          this.updateVisibleProducts();
-        }
-      },
-      showPreviousProducts() {
-        if (this.currentPage > 0) {
-          this.currentPage--; // Переходимо на попередню сторінку
-          this.updateVisibleProducts();
-        }
-      },
-      updateVisibleProducts() {
-        // Логіка для оновлення видимих продуктів
-        const start = this.currentPage * this.productsPerPage;
-        const end = start + this.productsPerPage;
-        this.visibleProducts = this.products.slice(start, end); // Оновлюємо видимі продукти
-      }
-    },
-    mounted() {
-      this.updateVisibleProducts(); // Ініціалізація при завантаженні
+        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
+      </div>
+
+      <div class="dots-container">
+        <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
+      </div>
+    </section>
+
+    <!-- Category Product Component -->
+    <CategoryProduct />
+  </div>
+</template>
+
+<script>
+import CategoryProduct from '@/components/CategoryProduct.vue'; // Імпорт компонента
+
+export default {
+  components: {
+    CategoryProduct // Реєстрація компонента
+  },
+  data() {
+    return {
+      products: [], // Масив для зберігання популярних товарів з API
+      visibleProducts: [], // Товари, які відображаються на поточній сторінці
+      currentPage: 0, // Номер поточної сторінки
+      productsPerPage: 3 // Кількість товарів, що відображаються на сторінці
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.products.length / this.productsPerPage);
     }
-  };
-  </script>
-  
-  
+  },
+  methods: {
+    async fetchPopularProducts() {
+      try {
+        const response = await fetch("http://192.168.1.44:8080/api/popular-products");
+
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Сервер не повернув JSON");
+        }
+
+        const data = await response.json();
+
+        // Логування отриманих даних
+        console.log("Отримані дані з API:", data);
+
+        // Перевірка, чи є data масивом
+        if (!Array.isArray(data.data)) {  // Змінено на data.data
+          throw new Error("Очікував масив з API");
+        }
+
+        this.products = data.data; // Змінено на data.data
+        this.updateVisibleProducts();
+      } catch (error) {
+        console.error("Помилка при отриманні популярних товарів:", error.message);
+      }
+    },
+    showNextProducts() {
+      if (this.currentPage < this.totalPages - 1) {
+        this.currentPage++;
+        this.updateVisibleProducts();
+      }
+    },
+    showPreviousProducts() {
+      if (this.currentPage > 0) {
+        this.currentPage--;
+        this.updateVisibleProducts();
+      }
+    },
+    updateVisibleProducts() {
+      const start = this.currentPage * this.productsPerPage;
+      const end = start + this.productsPerPage;
+      this.visibleProducts = this.products.slice(start, end);
+    }
+  },
+  mounted() {
+    this.fetchPopularProducts();
+  }
+};
+</script>
+
   
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Podkova:wght@400..800&family=Inter:wght@600&display=swap');

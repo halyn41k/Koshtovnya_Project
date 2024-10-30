@@ -1,44 +1,46 @@
 <template>
-    <header class="account-header">
-      <!-- Account Title with Side Lines and Custom Font Style -->
-      <h1 class="account-title-container">
-        <div class="line"></div>
-        <span class="account-title">Ваш аккаунт</span>
-        <div class="line"></div>
-      </h1>
-    </header>
-    <main class="account-page">
-      <section class="account-content">
-        <!-- Sidebar menu -->
-        <div class="account-sidebar">
-          <nav class="profile-menu">
-            <ul class="menu-list">
-              <li
-                class="menu-item"
-                v-for="(menuItem, index) in menuItems"
-                :key="index"
-                @click="selectTab(index)"
-                :class="{ active: activeTab === index }"
-              >
-                <img :src="menuItem.icon" class="menu-icon" 
-                     :class="{ 'user-icon': menuItem.title === 'Інформація', 'heart-icon': menuItem.title === 'Список бажаного' }" 
-                     alt="Icon" />
-                <h2 class="section-title">{{ menuItem.title }}</h2>
-              </li>
-            </ul>
-          </nav>
-        </div>
-  
-        <!-- Account information content -->
-        <div class="account-details">
-          <component :is="activeTabContent" 
-                     :firstName="firstName" 
-                     :lastName="lastName" 
-                     :email="email" />
-        </div>
-      </section>
-    </main>
-  </template>
+  <header class="account-header">
+    <h1 class="account-title-container">
+      <div class="line"></div>
+      <span class="account-title">Ваш аккаунт</span>
+      <div class="line"></div>
+    </h1>
+  </header>
+  <main class="account-page">
+    <section class="account-content">
+      <!-- Sidebar menu -->
+      <div class="account-sidebar">
+        <nav class="profile-menu">
+          <ul class="menu-list">
+            <li
+              class="menu-item"
+              v-for="(menuItem, index) in menuItems"
+              :key="index"
+              @click="selectTab(index)"
+              :class="{ active: activeTab === index }"
+            >
+              <img :src="menuItem.icon" class="menu-icon" 
+                   :class="{ 'user-icon': menuItem.title === 'Інформація', 'heart-icon': menuItem.title === 'Список бажаного' }" 
+                   alt="Icon" />
+              <h2 class="section-title">{{ menuItem.title }}</h2>
+            </li>
+            <li v-if="index < menuItems.length - 1" class="divider"></li> <!-- Рисочка між пунктами меню -->
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Account information content -->
+      <div class="account-details">
+        <component :is="activeTabContent" 
+                   :firstName="firstName" 
+                   :lastName="lastName" 
+                   :email="email" />
+      </div>
+    </section>
+  </main>
+</template>
+
+
   
   <script>
   import PersonalInfo from './PersonalInfo.vue';
@@ -222,6 +224,13 @@
     padding-left: 20px;
     padding-bottom: 50px;
   }
+
+  .divider {
+  height: 1px; /* Висота рисочки */
+  background-color: #ddd; /* Колір рисочки */
+  margin: 5px 0; /* Відступи зверху і знизу */
+}
+
   
   @media (max-width: 768px) {
     .account-content {

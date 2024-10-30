@@ -1,16 +1,18 @@
 <template>
     <main class="cart">
+      <!-- Заголовок з боковими лініями -->
       <header class="cart-header">
-        <div class="header-line"></div>
-        <h1 class="cart-title">Кошик</h1>
-        <div class="header-line"></div>
+        <div class="line"></div>
+        <h1 class="main-title">Кошик</h1>
+        <div class="line"></div>
       </header>
+      <!-- Весь вміст кошика -->
       <div class="cart-content">
         <section class="cart-items">
           <CartItem
             :itemNumber="1"
             imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-            title="Браслет &quot;Розмаїття кольорів&quot;"
+            title="Браслет 'Розмаїття кольорів'"
             price="750₴"
             quantity="2"
             totalPrice="1500₴"
@@ -18,7 +20,7 @@
           <CartItem
             :itemNumber="2"
             imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-            title="Гердан &quot;Гуцулка&quot;"
+            title="Гердан 'Гуцулка'"
             price="1200₴"
             quantity="1"
             totalPrice="1200₴"
@@ -41,6 +43,7 @@
     </main>
   </template>
   
+  
   <script>
   import CartItem from './CartItem.vue';
   
@@ -53,124 +56,80 @@
   </script>
   
   <style scoped>
-  .cart {
-    display: flex;
-    flex-direction: column;
+@font-face {
+    font-family: 'KyivType Medium';
+    src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeSans-Medium2.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
   }
-  
-  .cart-header {
-    display: flex;
-    align-items: center;
-    gap: 20px; /* Reduced gap */
-    color: var(--Grays-Black, #000);
-    letter-spacing: -1px;
-    font: 700 20px/1.3 'Kyiv * Type Titling', -apple-system, Roboto, Helvetica, sans-serif;
-    flex-wrap: wrap;
-  }
-  
-  .header-line {
-    flex-grow: 1;
-    height: 30px; /* Reduced height */
-  }
-  
-  .cart-title {
-    font-feature-settings: "liga" off, "clig" off;
-    text-shadow: 0px 2px 2px rgba(99, 2, 2, 0.22);
-    margin-top: 15px; /* Reduced margin */
-    font-size: 20px; /* Reduced font size */
-  }
-  
-  .cart-content {
-    display: flex;
-    gap: 10px; /* Reduced gap */
-    margin-top: 24px; /* Reduced margin */
-  }
-  
-  .cart-items {
-    width: 50%; /* Narrower width */
-  }
-  
-  .cart-summary {
-    width: 30%; /* Narrower width */
-    border-radius: 16px; /* Reduced border radius */
-    background-color: rgba(255, 247, 246, 1);
-    border: 1px solid rgba(230, 230, 230, 1);
-    padding: 24px 12px; /* Reduced padding */
-  }
-  
-  .summary-content {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .summary-header {
-    font-family: Merriweather, sans-serif;
-    color: var(--Grays-Black, #000);
-  }
-  
-  .summary-title {
-    font-feature-settings: "liga" off, "clig" off;
-    font-size: 20px; /* Reduced font size */
-    font-weight: 600; /* Adjusted weight */
-  }
-  
-  .summary-subtitle {
-    font-feature-settings: "liga" off, "clig" off;
-    font-size: 14px; /* Reduced font size */
-    font-weight: 400;
-    margin-top: 12px; /* Reduced margin */
-  }
-  
-  .summary-total {
-    color: rgba(160, 18, 18, 1);
-    text-align: right;
-    align-self: flex-end;
-    font: 500 16px Inter, sans-serif; /* Reduced font size */
-  }
-  
-  .checkout-button {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    border-radius: 6px; /* Reduced border radius */
-    background-color: rgba(107, 31, 31, 1);
-    color: #fff;
-    padding: 6px 15px; /* Reduced padding */
-    font: 600 14px Merriweather, sans-serif; /* Reduced font size */
-    margin-top: 15px; /* Reduced margin */
-    border: none;
-    cursor: pointer;
-  }
-  
-  .checkout-icon {
-    width: 24px; /* Reduced icon size */
-    height: 24px; /* Reduced icon size */
-  }
-  
-  @media (max-width: 991px) {
-    .cart-header {
-      white-space: initial;
-    }
-  
-    .cart-content {
-      flex-direction: column;
-      margin-top: 20px;
-    }
-  
-    .cart-items,
-    .cart-summary {
-      width: 100%;
-    }
-  
-    .cart-summary {
-      margin-top: 20px; /* Reduced margin */
-      padding: 15px; /* Reduced padding */
-    }
-  
-    .summary-total {
-      margin-top: 20px; /* Reduced margin */
-    }
-  }
-  
-  </style>
+.cart {
+  display: flex;
+  flex-direction: column;
+  padding-top: 150px; /* Відступ для опускання всього вмісту */
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: grey;
+}
+
+.main-title {
+  /* Скопіюйте тут стиль заголовка з About Us */
+  color: #333; /* Приклад кольору */
+  font-family: 'KyivType Titling Heavy', sans-serif;
+  font-weight: 900;
+  text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
+  letter-spacing: -2px;
+  text-align: center;
+  margin-top: 50px;
+  font-size: 30px;
+  margin-bottom: 40px;
+}
+
+.cart-content {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cart-items {
+  width: 50%;
+}
+
+.cart-summary {
+  width: 30%;
+  border-radius: 8px;
+  background-color: rgba(255, 247, 246, 1);
+  border: 1px solid rgba(230, 230, 230, 1);
+  padding: 12px 6px;
+}
+
+/* Зменшені розміри текстів та елементів */
+.summary-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.summary-total {
+  font-size: 14px;
+}
+
+.checkout-button {
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.checkout-icon {
+  width: 12px;
+  height: 12px;
+}
+</style>

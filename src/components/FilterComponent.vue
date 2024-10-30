@@ -212,12 +212,15 @@
   
   /* Section Titles */
   .section-title,
-  .subsection-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 15px;
-    color:#333;
-  }
+.subsection-title {
+  text-align: center; /* Центрує заголовки */
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0; /* Зменшує відстань зверху і знизу */
+  color: #333;
+  align-items: center;
+}
+
   
   /* Divider: thin 10px wide line */
   .divider {
