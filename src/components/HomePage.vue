@@ -12,7 +12,9 @@
         <br>Ексклюзивні гердани, браслети, <br> силянки та інше
       </div>
       <!-- New Button to View Products -->
+      <router-link to="/allproduct" class="view-products-button">
       <button class="view-products-button">Дивитися вироби</button>
+      </router-link>
     </div>
 
     <!-- Content Section -->
