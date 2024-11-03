@@ -1,97 +1,109 @@
 <template>
-    <div class="login-container">
-      <header class="login-header">
-        <div class="header-line"></div>
-      </header>
-      <h1 class="section-title-container">
-        <div class="line"></div>
-        <span class="section-title">Вхід</span>
-        <div class="line"></div>
-      </h1>
-      <main class="login-main">
-        <div class="login-background-image"></div>
-        <form class="login-form" @submit.prevent="submitLogin">
-          <div class="form-group">
-            <div class="form-labels">
-              <label for="email" class="form-label">Email:</label>
-              <label for="password" class="form-label">Пароль:</label>
-            </div>
-            <div class="form-inputs">
+  <div class="login-container">
+    <header class="login-header">
+      <div class="header-line"></div>
+    </header>
+    <h1 class="section-title-container">
+      <div class="line"></div>
+      <span class="section-title">Вхід</span>
+      <div class="line"></div>
+    </h1>
+    <main class="login-main">
+      <div class="login-background-image"></div>
+      <form class="login-form" @submit.prevent="submitLogin">
+        <div class="form-group">
+          <div class="form-labels">
+            <label for="email" class="form-label">Email:</label>
+            <label for="password" class="form-label">Пароль:</label>
+          </div>
+          <div class="form-inputs">
+            <input 
+              type="email" 
+              id="email" 
+              class="form-input" 
+              v-model="email" 
+              aria-label="Email" 
+              placeholder="Введіть ваш email" 
+              required
+            />
+            <div class="password-input-container">
               <input 
-                type="email" 
-                id="email" 
+                :type="showPassword ? 'text' : 'password'" 
+                id="password" 
                 class="form-input" 
-                v-model="email" 
-                aria-label="Email" 
-                placeholder="Введіть ваш email" 
+                v-model="password" 
+                aria-label="Пароль" 
+                placeholder="Введіть пароль" 
                 required
               />
-              <div class="password-input-container">
-                <input 
-                  :type="showPassword ? 'text' : 'password'" 
-                  id="password" 
-                  class="form-input" 
-                  v-model="password" 
-                  aria-label="Пароль" 
-                  placeholder="Введіть пароль" 
-                  required
-                />
-                <button type="button" @click="togglePasswordVisibility" class="toggle-password-button">
-                  <img :src="showPassword ? eyeOpenIcon : eyeClosedIcon" alt="Toggle password visibility" />
-                </button>
-              </div>
+              <button type="button" @click="togglePasswordVisibility" class="toggle-password-button">
+                <span v-if="showPassword" v-html="eyeOpenIcon"></span>
+                <span v-else v-html="eyeClosedIcon"></span>
+              </button>
             </div>
           </div>
-          <p class="signup-prompt">
-            Немає облікового запису?
-            <a href="/registration" class="signup-link">Створіть його тут</a>
-          </p>
-          <button type="button" class="google-login-button">
-            <span>Увійти за допомогою</span>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/08aa0f49547eb61ccbdd8f240faf33e528e6a75140fa2fd508211e78b31846db?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Google logo" class="google-icon" />
-          </button>
-          <button type="submit" class="login-button">
-            <span>Увійти</span>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="login-icon" />
-          </button>
-        </form>
-      </main>
-    </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        email: '',
-        password: '',
-        showPassword: false,
-        eyeOpenIcon: '@/assets/eye.png',
-        eyeClosedIcon: '@/assets/hide.png'
-      };
-    },
-    methods: {
-      submitLogin() {
-        if (this.email && this.password) {
-          console.log('Email:', this.email);
-          console.log('Password:', this.password);
-        } else {
-          alert('Будь ласка, введіть ваші дані.');
-        }
-      },
-      togglePasswordVisibility() {
-        this.showPassword = !this.showPassword;
+        </div>
+        <p class="signup-prompt">
+          Немає облікового запису?
+          <a href="/registration" class="signup-link">Створіть його тут</a>
+        </p>
+        <button type="button" class="google-login-button">
+          <span>Увійти за допомогою</span>
+          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/08aa0f49547eb61ccbdd8f240faf33e528e6a75140fa2fd508211e78b31846db?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Google logo" class="google-icon" />
+        </button>
+        <button type="submit" class="login-button">
+          <span>Увійти</span>
+          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="login-icon" />
+        </button>
+      </form>
+    </main>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      email: '',
+      password: '',
+      showPassword: false,
+      eyeOpenIcon: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5z" stroke="#555" stroke-width="2"/>
+          <circle cx="12" cy="12" r="3" fill="#555"/>
+        </svg>`,
+      eyeClosedIcon: `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3m5.87-2.8c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5m0 0l6.57 6.57M16.87 16.87c1.9-1.02 3.37-2.77 4.13-4.87-1.73-4.39-6-7.5-11-7.5-1.08 0-2.13.14-3.13.4" stroke="#555" stroke-width="2"/>
+        </svg>`
+    };
+  },
+  methods: {
+    submitLogin() {
+      if (this.email && this.password) {
+        console.log('Email:', this.email);
+        console.log('Password:', this.password);
+      } else {
+        alert('Будь ласка, введіть ваші дані.');
       }
+    },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
     }
-  };
-  </script>
+  }
+};
+</script>
+
   
   <style scoped>
   .login-container {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-width: 100vw; /* Limit width to the viewport */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
   
   .login-background-image {
     background-image: url('@/assets/logins.png');
@@ -196,6 +208,7 @@
     margin: auto 0;
     padding: 0 1px 6px;
     font: 400 18px/1.3 Merriweather, sans-serif;
+    margin-left: 100px;
   }
   
   .form-input {
@@ -221,10 +234,9 @@
   }
   
   .password-input-container {
-    position: relative;
-    width: 900px;
-  }
-  
+  position: relative;
+  width: 100%; /* Ширина контейнера відповідає ширині поля вводу */
+}
   .toggle-password-button {
     position: absolute;
     right: 10px;

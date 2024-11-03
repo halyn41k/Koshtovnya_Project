@@ -45,7 +45,7 @@
         <h1>Коштовня</h1>
       </router-link>
 
-      <div class="user-cart" @mouseenter="showMiniCart" @mouseleave="hideMiniCart">
+      <div class="user-cart">
         <router-link to="/account" class="user-icon">
           <img src="@/assets/user-svgrepo-com (1).svg" alt="User Icon" class="icon" />
         </router-link>

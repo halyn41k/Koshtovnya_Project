@@ -81,6 +81,16 @@ const routes = [
     name: 'AllProductsPage',
     component: () => import('@/components/AllProductsPage.vue')
   },
+  {
+    path:'/changepassword',
+    name:'ChangePassword',
+    component: () => import('@/components/ChangePassword.vue')
+  },
+  {
+    path:'/payment',
+    name:'PaymentComponent',
+    component: () => import('@/components/PaymentComponent.vue')
+  }
 ];
 
 const router = createRouter({

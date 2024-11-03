@@ -1,145 +1,162 @@
-<template>
-    <article class="wishlist-item">
-      <span class="item-number">{{ itemNumber }}.</span>
-      <div class="item-content">
-        <img :src="imageSrc" :alt="itemName" class="item-image" />
-        <div class="item-details">
-          <div class="item-header">
-            <h3 class="item-name">{{ itemName }}</h3>
-            <button class="remove-button" @click="removeItem" aria-label="Remove item">X</button>
+<template> 
+  <div class="wishlist">
+    <h2 class="wishlist-title">Список бажань</h2>
+    <div v-if="items.length === 0" class="no-items">
+      Ваш список бажань порожній :(
+    </div>
+    <div v-else>
+      <div v-for="(item, index) in items" :key="index" class="wishlist-item">
+        <span class="item-number">{{ index + 1 }}.</span>
+        <div class="item-content">
+          <img :src="item.imageSrc" alt="Product Image" class="item-image"/>
+          <div class="item-details">
+            <div class="item-header">
+              <h3 class="item-name">{{ item.title }}</h3>
+              <button class="remove-button" @click="removeItem(index)" aria-label="Remove item">X</button>
+            </div>
+            <p class="item-price">{{ item.price }}₴ / за штуку</p>
+            <button class="buy-button" @click="buyItem">Купити</button>
           </div>
-          <p class="item-price">{{ price }}₴ / за штуку</p>
-          <button class="buy-button" @click="buyItem">Купити</button>
         </div>
       </div>
-    </article>
-  </template>
-  
-  <script>
-  export default {
-    name: 'WishlistItem',
-    props: {
-      itemNumber: {
-        type: Number,
-        required: true
-      },
-      imageSrc: {
-        type: String,
-        required: true
-      },
-      itemName: {
-        type: String,
-        required: true
-      },
-      price: {
-        type: Number,
-        required: true
-      }
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'UserWishlist',
+  data() {
+    return {
+      items: [
+        { title: 'Товар 1', price: '750', imageSrc: 'path_to_image' },
+        { title: 'Товар 2', price: '150', imageSrc: 'path_to_image' },
+      ],
+    };
+  },
+  methods: {
+    removeItem(index) {
+      this.items.splice(index, 1); // Remove item from wishlist
     },
-    methods: {
-      removeItem() {
-        // Додати логіку для видалення елементу
-      },
-      buyItem() {
-        // Додати логіку для покупки елементу
-      }
-    }
-  };
-  </script>
-  
-  <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Merriweather:wght@400;700&display=swap');
-  
-  .wishlist-item {
-    display: flex;
-    gap: 16px;
-    width: 100%;
-    max-width: 500px;
-    position: relative;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 12px;
-    background-color: #F5EAE9;
-  }
-  
-  .item-number {
-    font: 700 18px Merriweather, serif;
-    color: #333;
-  }
-  
-  .item-content {
-    display: flex;
-    gap: 16px;
-  }
-  
-  .item-image {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    border-radius: 6px;
-  }
-  
-  .item-details {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-  }
-  
-  .item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .item-name {
-    font: 700 16px Merriweather, serif;
-    color: #333;
-  }
-  
-  .item-price {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: #A01212;
-  }
-  
-  .remove-button {
-    background-color: transparent;
-    border: 1px solid #A01212;
-    color: #A01212;
-    font-size: 14px;
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .buy-button {
-    background-color: #6B1F1F;
-    color: #fff;
-    font-family: 'Merriweather', serif;
-    font-size: 14px;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .buy-button:hover {
-    background-color: #8B0E0E;
-  }
-  
-  @media (max-width: 991px) {
-    .wishlist-item {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  
-    .item-content {
-      flex-direction: row;
-      align-items: center;
-    }
-  }
-  </style>
-  
+    buyItem() {
+      this.$router.push('/cart'); // Redirect to cart
+    },
+  },
+};
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Merriweather:wght@400;700&family=Montserrat:wght@600&display=swap');
+
+* {
+  font-family: 'Merriweather', serif;
+}
+
+.wishlist {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.wishlist-title {
+  font-size: 20px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.no-items {
+  font-size: 16px;
+  color: #666;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.wishlist-item {
+  display: flex;
+  align-items: flex-start;
+  background-color: #F5EAE9;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.item-number {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 50px;
+  font-weight: 600;
+  color: #333;
+  margin-right: 20px;
+  margin-top: 50px;
+  margin-left: -80px;
+}
+
+.item-content {
+  display: flex;
+  gap: 20px;
+}
+
+.item-image {
+  width: 180px;
+  height: 180px;
+  margin-right: 20px;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-name {
+  font-size: 20px;
+  font-family: 'Merriweather', serif;
+  font-weight: 700;
+  color: #333;
+}
+
+.item-price {
+  font-family: 'Inter', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #A01212;
+  margin-bottom: 10px;
+}
+
+.buy-button {
+  background-color: #6B1F1F;
+  color: #fff;
+  font-family: 'Merriweather', sans-serif;
+  font-size: 16px;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-left: 450px;
+}
+
+.buy-button:hover {
+  background-color: #8B0E0E;
+}
+
+.remove-button {
+  background-color: #6B1F1F;
+  color: #C4AEAC;
+  font-size: 16px;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>

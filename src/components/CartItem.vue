@@ -57,135 +57,152 @@
   </script>
   
   <style scoped>
+.cart-item {
+  display: flex;
+  border-radius: 16px;
+  background-color: rgba(255, 247, 246, 1);
+  border: 1px solid rgba(230, 230, 230, 1);
+  overflow: hidden;
+  margin-bottom: 40px;
+  padding: 15px;
+  height: auto;
+  max-width: 800px;
+  margin-left: 100px;
+}
+
+.item-number {
+  font-feature-settings: "liga" off, "clig" off;
+  color: #333;
+  font: 600 32px/1.3 Montserrat, sans-serif;
+  padding: 20px;
+  margin: 0;
+  margin-top: 60px;
+}
+
+.item-content {
+  display: flex;
+  flex-grow: 1;
+  padding: 10px;
+  align-items: center;
+}
+
+.item-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+.item-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-title {
+  color: #000;
+  font-family: Merriweather, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.item-price {
+  color: rgba(160, 18, 18, 1);
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.remove-button {
+  border-radius: 5px;
+  background-color: rgba(107, 31, 31, 1);
+  color: #fff;
+  padding: 5px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-quantity {
+  color: rgba(160, 18, 18, 0.5);
+  font-size: 20px;
+}
+
+.quantity-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.quantity-button {
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 18px;
+  border: none;
+  cursor: pointer;
+}
+
+.increase {
+  background-color: rgba(107, 31, 31, 1);
+  color: #fff;
+}
+
+.decrease {
+  background-color: rgba(230, 230, 230, 1);
+  color: rgba(107, 31, 31, 1);
+}
+
+.item-total {
+  color: rgba(160, 18, 18, 1);
+  font-size: 20px;
+  font-family: Inter, sans-serif;
+  font-weight: 600;
+}
+
+@media (max-width: 991px) {
   .cart-item {
-    display: flex;
-    border-radius: 24px;
-    background-color: rgba(255, 247, 246, 1);
-    border: 2px solid rgba(230, 230, 230, 1);
-    overflow: hidden;
-    margin-bottom: 55px;
-  }
-  
-  .item-number {
-    font-feature-settings: "liga" off, "clig" off;
-    text-shadow: 0px 4px 4px rgba(99, 2, 2, 0.22);
-    letter-spacing: -2.5px;
-    color: var(--Grays-Black, #000);
-    font: 600 50px/1.3 Montserrat, sans-serif;
-    padding: 71px 20px;
-  }
-  
-  .item-content {
-    height: 50px;
-    display: flex;
-    flex-grow: 1;
-    padding: 20px;
-  }
-  
-  .item-image {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-  }
-  
-  .item-details {
-    flex-grow: 1;
+    flex-direction: column;
+    padding: 10px;
     margin-left: 20px;
+    max-width: 100%;
   }
-  
-  .item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+
+  .item-number {
+    font-size: 24px;
+    padding: 10px 0;
   }
-  
-  .item-info {
-    font-size: 20px;
-  }
-  
-  .item-title {
-    color: var(--Grays-Black, #000);
-    font-family: Merriweather, sans-serif;
-    font-weight: 700;
-  }
-  
-  .item-price {
-    color: rgba(160, 18, 18, 1);
-    font-family: Inter, sans-serif;
-    font-weight: 600;
-    margin-top: 4px;
-  }
-  
-  .remove-button {
-    border-radius: 8px;
-    background-color: rgba(107, 31, 31, 1);
-    color: rgba(196, 174, 172, 1);
-    padding: 2px 11px;
-    font: 600 22px Inter, sans-serif;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .item-controls {
-    display: flex;
-    justify-content: space-between;
+
+  .item-content {
+    flex-direction: column;
     align-items: center;
-    margin-top: 19px;
-    font-family: Inter, sans-serif;
-    font-weight: 600;
+    padding: 10px 0;
   }
-  
-  .item-quantity {
-    color: rgba(160, 18, 18, 0.5);
-    font: 700 20px Merriweather, sans-serif;
+
+  .item-image {
+    margin: 10px 0;
   }
-  
-  .quantity-controls {
-    display: flex;
-    gap: 10px;
+
+  .item-details {
+    margin: 0;
+    text-align: center;
   }
-  
-  .quantity-button {
-    border-radius: 8px;
-    padding: 2px 11px;
-    font-size: 22px;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .increase {
-    background-color: rgba(107, 31, 31, 1);
-    color: rgba(196, 174, 172, 1);
-  }
-  
-  .decrease {
-    background-color: rgba(107, 31, 31, 0.2);
-    color: rgba(107, 31, 31, 1);
-    font-size: 30px;
-  }
-  
-  .item-total {
-    color: rgba(160, 18, 18, 1);
-    font-size: 20px;
-  }
-  
-  @media (max-width: 991px) {
-    .item-number {
-      font-size: 40px;
-      margin-top: 40px;
-    }
-  
-    .item-content {
-      flex-direction: column;
-    }
-  
-    .item-image {
-      margin-top: 15px;
-    }
-  
-    .item-details {
-      margin-left: 0;
-      margin-top: 20px;
-    }
-  }
-  </style>
+}
+</style>

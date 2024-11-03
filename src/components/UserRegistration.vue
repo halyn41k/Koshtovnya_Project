@@ -48,19 +48,23 @@
                 required
               />
               <div class="password-input-container">
-                <input 
-                  :type="showPassword ? 'text' : 'password'" 
-                  id="password" 
-                  class="form-input" 
-                  v-model="password" 
-                  aria-label="Пароль" 
-                  placeholder="Введіть пароль" 
-                  required
-                />
-                <button type="button" @click="togglePasswordVisibility" class="toggle-password-button">
-                  <img :src="showPassword ? eyeOpenIcon : eyeClosedIcon" alt="Toggle password visibility" />
-                </button>
-              </div>
+                          <input 
+                          :type="showPassword ? 'text' : 'password'" 
+                          id="password" 
+                          class="form-input" 
+                          v-model="password" 
+                          aria-label="Пароль" 
+                          placeholder="Введіть пароль" 
+                          required
+                        />
+                        <button 
+                          type="button" 
+                          @click="togglePasswordVisibility" 
+                          class="toggle-password-button"
+                        >
+                          <span v-html="showPassword ? eyeOpenIcon : eyeClosedIcon"></span>
+                        </button>
+                      </div>
             </div>
           </div>
           <p class="login-prompt">
@@ -87,8 +91,15 @@
         email: '',
         password: '',
         showPassword: false,
-        eyeOpenIcon: '@/assets/eye.png',
-        eyeClosedIcon: '@/assets/hide.png'
+        eyeOpenIcon: `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5z" stroke="#555" stroke-width="2"/>
+            <circle cx="12" cy="12" r="3" fill="#555"/>
+          </svg>`,
+        eyeClosedIcon: `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3m5.87-2.8c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5m0 0l6.57 6.57M16.87 16.87c1.9-1.02 3.37-2.77 4.13-4.87-1.73-4.39-6-7.5-11-7.5-1.08 0-2.13.14-3.13.4" stroke="#555" stroke-width="2"/>
+          </svg>`
       };
     },
     methods: {
@@ -111,10 +122,12 @@
   
   <style scoped>
   .registration-container {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-  }
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-width: 100vw; /* Limit width to the viewport */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
   
   .registration-background-image {
     background-image: url('@/assets/logins.png');
@@ -233,14 +246,17 @@
   }
   
   .toggle-password-button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
+  position: absolute;
+  right: 110px; /* Зміщення на 300 пікселів ліворуч від початкової позиції */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  width: 24px; /* Розмір кнопки */
+  height: 24px; /* Розмір кнопки */
+}
   
   .login-prompt {
     color: var(--Schemes-On-Error-Container, #852221);

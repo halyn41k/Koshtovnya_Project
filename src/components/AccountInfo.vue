@@ -37,7 +37,7 @@
                    :email="email" />
       </div>
     </section>
-  </main>
+  </main>y
 </template>
 
 
@@ -144,7 +144,7 @@
     flex-direction: column;
     max-width: 1300px;
     margin: 0 auto;
-    height: 450px;
+    height: 650px;
     background-color: #FFF7F6;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -216,7 +216,7 @@
     font-weight: 500;
     margin: 0;
     cursor: pointer;
-    color: #6b1f1f;
+    color: #040404;
   }
   
   .account-details {
