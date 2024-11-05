@@ -10,24 +10,19 @@
     <div class="cart-content">
       <section class="cart-items">
         <CartItem
-          :itemNumber="1"
-          imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-          title="Браслет 'Розмаїття кольорів'"
-          price="750₴"
-          quantity="2"
-          totalPrice="1500₴"
-        />
-        <CartItem
-          :itemNumber="2"
-          imageSrc="https://cdn.builder.io/api/v1/image/assets/TEMP/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-          title="Гердан 'Гуцулка'"
-          price="1200₴"
-          quantity="1"
-          totalPrice="1200₴"
+          v-for="(item, index) in cartItems"
+          :key="index"
+          :item-number="index + 1"
+          :image-src="item.imageSrc"
+          :title="item.title"
+          :price="item.price"
+          :quantity="item.quantity"
+          @change-quantity="updateQuantity(index, $event)"
+          @remove-item="removeItem(index)"
         />
       </section>
       <!-- Підключаємо компонент Summary -->
-      <Summary />
+      <Summary :cartItems="cartItems" />
     </div>
   </main>
 </template>
@@ -42,6 +37,32 @@ export default {
     CartItem,
     Summary,
   },
+  data() {
+    return {
+      cartItems: [
+        {
+          imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5",
+          title: "Браслет 'Розмаїття кольорів'",
+          price: 750,
+          quantity: 2
+        },
+        {
+          imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5",
+          title: "Гердан 'Гуцулка'",
+          price: 1200,
+          quantity: 1
+        }
+      ]
+    };
+  },
+  methods: {
+    updateQuantity(index, newQuantity) {
+      this.cartItems[index].quantity = newQuantity;
+    },
+    removeItem(index) {
+      this.cartItems.splice(index, 1);
+    }
+  }
 };
 </script>
 
@@ -56,7 +77,8 @@ export default {
 .cart {
   display: flex;
   flex-direction: column;
-  padding-top: 200px;
+  padding: 0 46.67px;
+  margin-top: 180px;
   background-image: url('@/assets/cartpattern.png'); /* Додаємо фон */
   background-size: cover;
 }

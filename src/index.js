@@ -90,6 +90,11 @@ const routes = [
     path:'/payment',
     name:'PaymentComponent',
     component: () => import('@/components/PaymentComponent.vue')
+  },
+  {
+    path:'/admin',
+    name:'AdminPanel',
+    component: () => import('@/components/AdminPanel.vue')
   }
 ];
 
