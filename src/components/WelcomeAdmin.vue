@@ -24,15 +24,17 @@
     display: flex;
     flex-direction: column;
     font-family: 'Montserrat', sans-serif;
+    height: 400px;
   }
   
   .welcome-title {
     font-size: 30px;
     font-weight: 700;
-    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
+    margin-left: 20px;
+    margin-top: -40px;
   }
   
   /* Adjust logo-wrapper for close alignment */
@@ -49,6 +51,8 @@
   
   .welcome-description {
     font-size: 20px;
+    margin-left: 20px;
+    margin-top: -40px;
   }
   </style>
   

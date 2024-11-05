@@ -332,8 +332,7 @@ export default {
       max-width: 100%;
     }
   }
-  </style>
-    <style scoped>
+
     .payment-header {
       margin-top: 200px;
       display: flex;
@@ -512,7 +511,7 @@ export default {
     font-family: 'Montserrat', sans-serif;
   }
   
-.order-summary {
+  .order-summary {
   position: fixed;
   top: 300px;
   right: 120px;
@@ -522,13 +521,15 @@ export default {
   border-radius: 16px;
   background-color: rgba(255, 247, 246, 1);
   border: 1px solid rgba(230, 230, 230, 1);
-  
-  /* Додаємо межу для скролінгу */
-  max-height: 400px; /* Задайте потрібну висоту */
-  overflow-y: auto; /* Дозволяє прокрутку по вертикалі, якщо контент перевищує max-height */
+  max-height: 400px;
+  overflow-y: auto;
+  transition: position 0.3s ease; /* Додаємо плавний перехід */
 }
-
-
+.order-summary.sticky {
+  position: absolute;
+  top: auto;
+  bottom: 00px; /* Межа, після якої зупиняється прокрутка */
+}
 
 .summary-title {
   color: #000;

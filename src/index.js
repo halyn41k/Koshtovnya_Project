@@ -95,11 +95,6 @@ const routes = [
     path:'/admin',
     name:'AdminPanel',
     component: () => import('@/components/AdminPanel.vue')
-  },
-  {
-    path:'/productlist',
-    name:'ProductList',
-    component: () => import('@/components/ProductList.vue')
   }
 ];
 

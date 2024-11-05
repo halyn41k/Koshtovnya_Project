@@ -1,55 +1,79 @@
 <template>
-    <main class="admin-panel">
-      <aside class="sidebar">
-        <h1 class="sidebar-title">Адмін панель</h1>
-        <nav class="sidebar-nav">
-          <ul class="nav-list">
-            <li class="nav-item" @click="navigateTo('/productlist')">
-              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/7181c9bf4b4c01167bf72b6c144c4c944ddbe136464c136ce8292404d489d3ec?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="nav-icon" />
-              <span class="nav-text">Товари</span>
-            </li>
-            <li class="nav-item" @click="navigateTo('/employees')">
-              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/9bf1ac47245a9e955f3f57b5046a0b41f975a8b5881c99813f7d320c07ad4d13?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="nav-icon" />
-              <span class="nav-text">Працівники</span>
-            </li>
-            <li class="nav-item" @click="navigateTo('/orders')">
-              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/6f2400e8432da65be7178de6d0b28df24e5fc8f2421e9cfb6eb4d8a5d5fbe9d6?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="nav-icon" />
-              <span class="nav-text">Замовлення</span>
-            </li>
-            <li class="nav-item" @click="navigateTo('/reports')">
-              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/b4c605bb7958f5fb3c6d59ab4fa1fcc481aee339b429dd95028d85577d5470f9?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="nav-icon" />
-              <span class="nav-text">Звіти</span>
-            </li>
-            <li class="nav-item" @click="navigateTo('/clients')">
-              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/9a4f172895eba5cbc5f110e9159a0e8aa830e6248464d7be32e26b4ae15bf13c?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="nav-icon" />
-              <span class="nav-text">Клієнти</span>
-            </li>
-            <li class="nav-item" @click="navigateTo('/settings')">
-              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d4fb741b5e72963905659fa5cf56396242a520a2f03afe2e006869f4327d7922?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="nav-icon" />
-              <span class="nav-text">Налаштування</span>
-            </li>
-          </ul>
-        </nav>
-      </aside>
-      <section class="content">
-        
-        <router-view />
-        
-      </section>
-    </main>
-  </template>
-  
+  <main class="admin-panel">
+    <aside class="sidebar">
+      <h1 class="sidebar-title">Адмін панель</h1>
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li
+            class="nav-item"
+            v-for="(menuItem, index) in menuItems"
+            :key="index"
+            @click="selectTab(index)"
+            :class="{ active: activeTab === index }"
+          >
+            <img :src="menuItem.icon" alt="" class="nav-icon" />
+            <span class="nav-text">{{ menuItem.title }}</span>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <section class="content">
+      <!-- Dynamically load the active component or WelcomeAdmin by default -->
+      <component :is="activeComponent" />
+    </section>
+  </main>
+</template>
 
 <script>
-
+import WelcomeAdmin from './WelcomeAdmin.vue';
+import ProductList from './ProductList.vue';
+import Employees from './Employees.vue';
+import Orders from './Orders.vue';
+import Reports from './Reports.vue';
+import Clients from './Clients.vue';
+import Settings from './Settings.vue';
 
 export default {
+  name: 'AdminPanel',
   components: {
-
+    WelcomeAdmin,
+    ProductList,
+    Employees,
+    Orders,
+    Reports,
+    Clients,
+    Settings,
+  },
+  data() {
+    return {
+      activeTab: -1, // Set to -1 to show WelcomeAdmin by default
+      menuItems: [
+        { title: 'Товари', icon: require('@/assets/arrowadmin.png') },
+        { title: 'Працівники', icon: require('@/assets/arrowadmin.png') },
+        { title: 'Замовлення', icon: require('@/assets/arrowadmin.png') },
+        { title: 'Звіти', icon: require('@/assets/arrowadmin.png') },
+        { title: 'Клієнти', icon: require('@/assets/arrowadmin.png') },
+        { title: 'Налаштування', icon: require('@/assets/arrowadmin.png') },
+      ],
+    };
+  },
+  computed: {
+    activeComponent() {
+      if (this.activeTab === -1) return 'WelcomeAdmin'; // Show WelcomeAdmin by default
+      switch (this.activeTab) {
+        case 0: return 'ProductList';
+        case 1: return 'Employees';
+        case 2: return 'Orders';
+        case 3: return 'Reports';
+        case 4: return 'Clients';
+        case 5: return 'Settings';
+        default: return 'ProductList';
+      }
+    },
   },
   methods: {
-    navigateTo(path) {
-      this.$router.push(path);
+    selectTab(index) {
+      this.activeTab = index;
     },
   },
 };
@@ -59,9 +83,8 @@ export default {
 /* Main admin panel container */
 .admin-panel {
   font-family: 'Montserrat', sans-serif;
-  margin-top: 180px;
   display: flex;
-  gap: 20px;
+  margin-top: 180px;
 }
 
 /* Sidebar styling */
@@ -71,12 +94,21 @@ export default {
   flex-direction: column;
   padding: 40px 20px;
   width: 20%;
+  position:fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+
+  margin-top: 180px;
+  z-index: 1;
 }
 
 .sidebar-title {
   font-size: 30px;
   font-weight: 700;
   margin-bottom: 20px;
+  margin-left: 45px;
 }
 
 .nav-list {
@@ -94,25 +126,17 @@ export default {
   cursor: pointer;
   position: relative;
   transition: color 0.3s ease;
+  margin-left: 15px;
 }
 
 .nav-item:hover {
   color: #333;
 }
 
-.nav-item::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  height: 2px;
-  width: 0;
-  background-color: #333;
-  transition: width 0.3s ease;
-}
-
-.nav-item:hover::after {
-  width: 200px;
+.nav-item.active {
+  background-color: #EADCDC;
+  border-radius: 8px;
+  height: 35px;
 }
 
 .nav-icon {
@@ -122,9 +146,9 @@ export default {
 
 /* Content section styling */
 .content {
-  display: flex;
-  flex-direction: column;
-  margin-top: 40px;
-  width: 70%;
+  margin-left: 20%; /* Offset by sidebar width */
+  padding: 40px;
+  width: 80%;
+  overflow-y: auto;
 }
 </style>
