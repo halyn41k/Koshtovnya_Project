@@ -9,7 +9,8 @@
     "doc:build": "npx vuedoc.md --section API --output ./README.md ./src/components/HomePage.vue",
     "prepublishOnly": "npm run lint && npm run build && npm run styleguide:build && npm run doc:build",
     "styleguide": "vue-styleguidist server",
-    "styleguide:build": "vue-styleguidist build"
+    "styleguide:build": "vue-styleguidist build",
+    "test:unit": "jest"
   },
   "main": "dist/koshtovnya.umd.js",
   "module": "dist/koshtovnya.common.min.js",
@@ -46,13 +47,18 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
+    "@vue/test-utils": "^2.4.6",
     "@vuedoc/md": "^1.5.0",
     "babel-eslint": "^10.1.0",
     "component-fixture": "^1.12.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.7.1",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "26",
+    "jest-transform-stub": "^2.0.0",
     "lint-staged": "^11.1.2",
     "vue-cli-plugin-component": "~1.12.2",
+    "vue-jest": "^5.0.0-alpha.10",
     "vue-styleguidist": "^1.7.13"
   },
   "gitHooks": {
