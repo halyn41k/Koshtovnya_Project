@@ -2,7 +2,8 @@ module.exports = {
   root: true,
   env: {
     node: true,
-    browser: true // Додаємо середовище браузера
+    browser: true, // Додаємо середовище браузера
+    jest: true      // Додаємо середовище Jest для тестових функцій
   },
   extends: [
     'plugin:vue/vue3-essential',
@@ -13,6 +14,6 @@ module.exports = {
   },
   rules: {
     // Додати правило для дозволу непомічених імпортів
-
+    'no-unused-vars': 'warn',  // Попередження замість помилки для невикористаних змінних
   },
 };
