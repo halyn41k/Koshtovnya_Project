@@ -96,7 +96,7 @@ export default {
     },
     async fetchBracelets() {  // Додайте цей метод
       try {
-        const response = await axios.get('http://192.168.1.44:8080/api/categories/2/products'); // Вставте правильний endpoint
+        const response = await axios.get('http://192.168.1.44:8080/api/categories/3/products'); // Вставте правильний endpoint
         this.bracelets = response.data; // Заповніть масив bracelets отриманими даними
       } catch (error) {
         console.error('Помилка при отриманні браслетів:', error);

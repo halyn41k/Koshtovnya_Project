@@ -1,82 +1,82 @@
 <template>
-    <section class="buy-by-category">
-      <h2 class="section-title">Придбайте за категорією</h2>
-      <div class="category-container">
-        <div class="category-grid">
-          <!-- Динамічне завантаження категорій -->
-          <router-link
-            v-for="category in categories"
-            :key="category.id"
-            :to="`/category/${category.id}`" 
-            class="category-item with-squares"
-          >
+  <section class="buy-by-category">
+    <h2 class="section-title">Придбайте за категорією</h2>
+    <div class="category-container">
+      <div class="category-grid">
+        <!-- Динамічне завантаження категорій -->
+        <router-link
+          v-for="(category, index) in categories"
+          :key="category.id"
+          :to="`/category/${category.id}`"
+          class="category-item with-squares"
+        >
+          <!-- Only display squares on 1st, 3rd, and 5th items -->
+          <template v-if="index === 0 || index === 2 || index === 4">
             <div class="square light-square"></div>
             <div class="square dark-square"></div>
-            <div class="image-wrapper">
-              <img
-                loading="lazy"
-                :src="category.image_url"
-                :alt="category.name"
-                class="category-image"
-              />
-            </div>
-            <div class="category-title-wrapper">
-              <h2 class="category-title">{{ category.name }}</h2>
-              <span class="arrow">→</span>
-            </div>
-          </router-link>
-        </div>
+          </template>
+          <div class="image-wrapper">
+            <img
+              loading="lazy"
+              :src="category.image_url"
+              :alt="category.name"
+              class="category-image"
+            />
+          </div>
+          <div class="category-title-wrapper">
+            <h2 class="category-title">{{ category.name }}</h2>
+            <span class="arrow">→</span>
+          </div>
+        </router-link>
       </div>
-    </section>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        categories: [], // Масив для зберігання категорій
-      };
-    },
-    methods: {
-  async fetchCategories() {
-    try {
-      const response = await fetch("http://192.168.1.44:8080/api/categories");
+    </div>
+  </section>
+</template>
 
-      // Перевіряємо, чи відповідь типу JSON
-      if (!response.ok) {
-        throw new Error(`HTTP помилка: ${response.status}`); // Виправлено шаблонний рядок
-      }
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Сервер не повернув JSON");
-      }
-
-      const data = await response.json();
-
-      // Перевірка, чи є data масивом
-      if (!Array.isArray(data.data)) {
-        throw new Error("Очікував масив категорій з API");
-      }
-
-      // Тепер правильне присвоєння categories
-      this.categories = data.data.map((category) => ({
-        id: category.id,
-        name: category.name,
-        image_url: category.image_url,
-      }));
-    } catch (error) {
-      console.error("Помилка при отриманні категорій:", error.message);
-      console.error("Повна інформація про помилку:", error);
-    }
+<script>
+export default {
+  data() {
+    return {
+      categories: [], // Масив для зберігання категорій
+    };
   },
-},
-    mounted() {
-      // Викликаємо метод отримання категорій після рендеру компонента
-      this.fetchCategories();
+  methods: {
+    async fetchCategories() {
+      try {
+        const response = await fetch("http://192.168.1.44:8080/api/categories");
+
+        // Перевіряємо, чи відповідь типу JSON
+        if (!response.ok) {
+          throw new Error(`HTTP помилка: ${response.status}`);
+        }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error("Сервер не повернув JSON");
+        }
+
+        const data = await response.json();
+
+        // Перевірка, чи є data масивом
+        if (!Array.isArray(data.data)) {
+          throw new Error("Очікував масив категорій з API");
+        }
+
+        this.categories = data.data.map((category) => ({
+          id: category.id,
+          name: category.name,
+          image_url: category.image_url,
+        }));
+      } catch (error) {
+        console.error("Помилка при отриманні категорій:", error.message);
+      }
     },
-  };
-  </script>
+  },
+  mounted() {
+    this.fetchCategories();
+  },
+};
+</script>
   
   
   <style scoped>
@@ -161,13 +161,13 @@
       margin-right: 10px;
     }
     /* Стилі для квадратів */
-.square {
+    .square {
   position: absolute;
   width: 300px;
   height: 340px;
   z-index: 1;
   pointer-events: none;
-  transition: transform 0.5s ease; /* Додає плавний перехід для анімації */
+  transition: transform 0.5s ease;
 }
 
 .light-square {
@@ -182,15 +182,45 @@
   right: -50px;
 }
 
-/* Анімація при наведенні */
+/* Hover animations for squares */
 .category-item:hover .light-square {
-  transform: translate(-10px, -10px); /* Розсування світлого квадрата вгору та вліво */
+  transform: translate(-10px, -10px);
 }
 
 .category-item:hover .dark-square {
-  transform: translate(10px, 10px); /* Розсування темного квадрата вниз та вправо */
+  transform: translate(10px, 10px);
 }
 
+/* Ensure only the first, third, and fifth items have squares */
+.category-grid .category-item:nth-child(1) .light-square,
+.category-grid .category-item:nth-child(1) .dark-square,
+.category-grid .category-item:nth-child(3) .light-square,
+.category-grid .category-item:nth-child(3) .dark-square,
+.category-grid .category-item:nth-child(5) .light-square,
+.category-grid .category-item:nth-child(5) .dark-square {
+  display: block;
+}
+
+/* Hide squares for other items */
+.category-item .light-square,
+.category-item .dark-square {
+  display: none;
+}
+
+/* Existing responsive styles */
+@media (max-width: 768px) {
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
 
   .category-image {
     width: 100%;

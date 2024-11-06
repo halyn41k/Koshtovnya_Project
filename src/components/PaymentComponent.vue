@@ -35,48 +35,46 @@
                 <!-- Особиста інформація -->
                 <template v-if="step.title === 'Особиста інформація'">
                   <div class="input-container">
-                    <input
-                      class="input-field"
-                      v-model="formData.firstName"
-                      placeholder="Ім'я"
-                    />
+                    <input class="input-field" v-model="formData.firstName" placeholder="Ім'я" />
                     <span v-if="errors.firstName" class="error">{{ errors.firstName }}</span>
                     
-                    <input
-                      class="input-field"
-                      v-model="formData.lastName"
-                      placeholder="Прізвище"
-                    />
+                    <input class="input-field" v-model="formData.lastName" placeholder="Прізвище" />
                     <span v-if="errors.lastName" class="error">{{ errors.lastName }}</span>
                     
-                    <input
-                      class="input-field"
-                      v-model="formData.email"
-                      placeholder="Електронна пошта"
-                    />
+                    <input class="input-field" v-model="formData.email" placeholder="Електронна пошта" />
                     <span v-if="errors.email" class="error">{{ errors.email }}</span>
                     
-                    <input
-                      class="input-field"
-                      v-model="formData.phone"
-                      placeholder="Номер телефону"
-                    />
+                    <input class="input-field" v-model="formData.phone" placeholder="Номер телефону" />
                     <span v-if="errors.phone" class="error">{{ errors.phone }}</span>
                   </div>
                 </template>
+                
                 <!-- Поштове відділення -->
                 <template v-else-if="step.title === 'Поштове відділення'">
                   <div class="input-container">
                     <input class="input-field" v-model="formData.city" placeholder="Місто" />
                     <span v-if="errors.city" class="error">{{ errors.city }}</span>
                     
-                    <input class="input-field" v-model="formData.postalOffice" placeholder="Відділення пошти" />
+                    <div class="postal-service-select">
+                      <label>Пошта:</label>
+                      <select v-model="formData.postalService" class="input-field">
+                        <option disabled value="">Оберіть пошту</option>
+                        <option value="Укрпошта">Укрпошта</option>
+                        <option value="Нова Пошта">Нова Пошта</option>
+                      </select>
+                      <span v-if="errors.postalService" class="error">{{ errors.postalService }}</span>
+                    </div>
+
+                    <input
+                      class="input-field"
+                      v-if="formData.postalService"
+                      v-model="formData.postalOffice"
+                      :placeholder="`Відділення ${formData.postalService}`"
+                    />
                     <span v-if="errors.postalOffice" class="error">{{ errors.postalOffice }}</span>
-                    
-                    <input class="input-field" v-model="formData.phoneDelivery" placeholder="Номер телефону" />
-                    <span v-if="errors.phoneDelivery" class="error">{{ errors.phoneDelivery }}</span>
                   </div>
                 </template>
+                
                 <!-- Оплата -->
                 <template v-else-if="step.title === 'Оплата'">
                   <div class="payment-options">
@@ -93,11 +91,14 @@
                     <span v-if="errors.paymentOption" class="error">{{ errors.paymentOption }}</span>
                   </div>
                 </template>
+                
                 <button v-if="canProceedToNextStep" @click="validateAndProceed" class="next-button">Далі</button>
               </div>
             </div>
           </div>
         </section>
+        
+        <!-- Підсумок та оплата -->
         <section class="payment-summary">
           <div class="order-summary">
             <h2 class="summary-title">Сума до оплати</h2>
@@ -122,39 +123,44 @@
           </div>
         </section>
       </div>
+      
       <p class="payment-notice">Будь ласка, перевірте своє замовлення перед оплатою</p>
-        <section class="order-items">
-          <div class="item">
-            <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Браслет 'Розмаїття кольорів'" class="item-image" />
-            <div class="item-details">
-              <h3 class="item-title">Браслет "Розмаїття кольорів"</h3>
-              <p class="item-price">750₴ / за штуку</p>
-              <p class="item-quantity">Кількість: 2</p>
-            </div>
+      <section class="order-items">
+        <div class="item">
+          <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Браслет 'Розмаїття кольорів'" class="item-image" />
+          <div class="item-details">
+            <h3 class="item-title">Браслет "Розмаїття кольорів"</h3>
+            <p class="item-price">750₴ / за штуку</p>
+            <p class="item-quantity">Кількість: 2</p>
           </div>
-          <div class="item">
-            <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Гердан 'Гуцулка'" class="item-image" />
-            <div class="item-details">
-              <h3 class="item-title">Гердан "Гуцулка"</h3>
-              <p class="item-price">1200₴ / за штуку</p>
-              <p class="item-quantity">Кількість: 1</p>
-            </div>
+        </div>
+        <div class="item">
+          <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Гердан 'Гуцулка'" class="item-image" />
+          <div class="item-details">
+            <h3 class="item-title">Гердан "Гуцулка"</h3>
+            <p class="item-price">1200₴ / за штуку</p>
+            <p class="item-quantity">Кількість: 1</p>
           </div>
-        </section>
+        </div>
+      </section>
+
       <div class="order-details">
         <section class="delivery-address">
           <h2 class="address-title">Ваша адреса доставки:</h2>
           <div class="address-box">
-            <p><strong>Ім'я:</strong> {{ addressData.name }}</p>
-            <p><strong>Телефон:</strong> {{ addressData.phone }}</p>
-            <p><strong>Місто:</strong> {{ addressData.city }}</p>
-            <p><strong>Відділення пошти:</strong> {{ addressData.postalOffice }}</p>
+            <p><strong>Ім'я:</strong> {{ formData.firstName }} {{ formData.lastName }}</p>
+            <p><strong>Телефон:</strong> {{ formData.phoneDelivery || formData.phone }}</p>
+            <p><strong>Місто:</strong> {{ formData.city }}</p>
+            <p><strong>Пошта:</strong> {{ formData.postalService }}</p>
+            <p><strong>Відділення:</strong> {{ formData.postalOffice }}</p>
           </div>
         </section>
       </div>
     </main>
   </section>
 </template>
+
+
 
 <script>
 export default {
@@ -173,6 +179,7 @@ export default {
         email: '',
         phone: '',
         city: '',
+        postalService: '', // поле для зберігання вибраної поштової служби
         postalOffice: '',
         phoneDelivery: '',
       },
@@ -182,12 +189,6 @@ export default {
         'Оплата за допомогою PayPal',
         'Банківський переказ',
       ],
-      addressData: {
-        name: '',
-        phone: '',
-        city: '',
-        postalOffice: '',
-      },
       errors: {},
     };
   },
@@ -199,7 +200,7 @@ export default {
   methods: {
     validateAndProceed() {
       this.errors = {};
-      
+
       if (this.currentStep === 0) {
         if (!this.formData.firstName) this.errors.firstName = 'Ім\'я обов\'язкове';
         if (!this.formData.lastName) this.errors.lastName = 'Прізвище обов\'язкове';
@@ -207,14 +208,15 @@ export default {
         if (!this.formData.phone) this.errors.phone = 'Номер телефону обов\'язковий';
       } else if (this.currentStep === 1) {
         if (!this.formData.city) this.errors.city = 'Місто обов\'язкове';
+        if (!this.formData.postalService) this.errors.postalService = 'Оберіть поштову службу';
         if (!this.formData.postalOffice) this.errors.postalOffice = 'Відділення обов\'язкове';
         if (!this.formData.phoneDelivery) this.errors.phoneDelivery = 'Телефон обов\'язковий';
       } else if (this.currentStep === 2) {
         if (!this.selectedPaymentOption) this.errors.paymentOption = 'Оберіть спосіб оплати';
       }
-      
+
       if (!Object.keys(this.errors).length) {
-        this.completeStepAndUpdateAddress();
+        this.completeStep();
       }
     },
     validateEmail(email) {
@@ -226,12 +228,6 @@ export default {
         this.steps[index].isExpanded = !this.steps[index].isExpanded;
       }
     },
-    completeStepAndUpdateAddress() {
-      this.completeStep();
-      if (this.currentStep === 1) {
-        this.updateAddressData();
-      }
-    },
     completeStep() {
       this.steps[this.currentStep].completed = true;
       this.steps[this.currentStep].isExpanded = false;
@@ -240,15 +236,10 @@ export default {
         this.steps[this.currentStep].isExpanded = true;
       }
     },
-    updateAddressData() {
-      this.addressData.name = `${this.formData.firstName} ${this.formData.lastName}`;
-      this.addressData.phone = this.formData.phoneDelivery || this.formData.phone;
-      this.addressData.city = this.formData.city;
-      this.addressData.postalOffice = this.formData.postalOffice;
-    },
   },
 };
 </script>
+
 
   
   <style scoped>
@@ -512,9 +503,9 @@ export default {
   }
   
   .order-summary {
-  position: fixed;
+  position:absolute;
   top: 300px;
-  right: 120px;
+  right: 100px;
   z-index: 100;
   width: 300px;
   padding: 20px;
@@ -524,7 +515,9 @@ export default {
   max-height: 400px;
   overflow-y: auto;
   transition: position 0.3s ease; /* Додаємо плавний перехід */
+  z-index: 10;
 }
+
 .order-summary.sticky {
   position: absolute;
   top: auto;

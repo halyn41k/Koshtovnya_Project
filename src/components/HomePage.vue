@@ -35,61 +35,64 @@
 
     <!-- Popular Goods Section -->
     <section class="popular-goods">
-      <h2 class="section-title">Популярні товари</h2>
-      <div class="arrow-container">
-        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
-        <div class="product-grid">
-          <div class="product-row">
-            <div v-for="product in visibleProducts" :key="product.id" class="product-column">
-              <article class="product-card">
-                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
-                <div class="product-details">
-                  <h3 class="product-title">{{ product.name }}</h3>
-                  <p class="product-price">{{ product.price }}₴</p>
-                  <p class="product-info">{{ product.country_of_manufacture }}</p>
-                  <button class="buy-button">
-                    <span>Купити</span>
-                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-                  </button>
-                </div>
-              </article>
+  <h2 class="section-title">Популярні товари</h2>
+  <div class="arrow-container">
+    <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
+    <div class="product-grid">
+      <div class="product-row">
+        <div v-for="product in visibleProducts" :key="product.id" class="product-column">
+          <article class="product-card">
+            <img :src="product.image_url" :alt="product.name" class="product-main-image" />
+            <div class="product-details">
+              <h3 class="product-title">{{ product.name }}</h3>
+              <p class="product-price">{{ product.price }}₴</p>
+              <p class="product-bead-producer">{{ product.bead_producer_name || "Чешський бісер" }}</p> <!-- Added line -->
+              <p class="product-info">{{ product.country_of_manufacture }}</p>
+              <button class="buy-button">
+                <span>Купити</span>
+                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+              </button>
             </div>
-          </div>
+          </article>
         </div>
-        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
       </div>
+    </div>
+    <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
+  </div>
 
-      <div class="dots-container">
-        <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
-      </div>
-    </section>
+  <div class="dots-container">
+    <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
+  </div>
+</section>
+
 
     <!-- New Arrivals Section -->
     <section class="new-arrivals">
-      <h2 class="section-title">Новинки</h2>
-      <div class="arrow-container">
-        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousNewArrivals" />
-        <div class="product-grid">
-          <div class="product-row">
-            <div v-for="product in visibleNewArrivals" :key="product.id" class="product-column">
-              <article class="product-card">
-                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
-                <div class="product-details">
-                  <h3 class="product-title">{{ product.name }}</h3>
-                  <p class="product-price">{{ product.price }}₴</p>
-                  <p class="product-info">{{ product.country_of_manufacture }}</p>
-                  <button class="buy-button">
-                    <span>Купити</span>
-                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-                  </button>
-                </div>
-              </article>
+  <h2 class="section-title">Новинки</h2>
+  <div class="arrow-container">
+    <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousNewArrivals" />
+    <div class="product-grid">
+      <div class="product-row">
+        <div v-for="product in visibleNewArrivals" :key="product.id" class="product-column">
+          <article class="product-card">
+            <img :src="product.image_url" :alt="product.name" class="product-main-image" />
+            <div class="product-details">
+              <h3 class="product-title">{{ product.name }}</h3>
+              <p class="product-price">{{ product.price }}₴</p>
+              <p class="product-bead-producer">{{ product.bead_producer_name || "Чешський бісер" }}</p> <!-- Added line -->
+              <p class="product-info">{{ product.country_of_manufacture }}</p>
+              <button class="buy-button">
+                <span>Купити</span>
+                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+              </button>
             </div>
-          </div>
+          </article>
         </div>
-        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextNewArrivals" />
       </div>
-    </section>
+    </div>
+    <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextNewArrivals" />
+  </div>
+</section>
 
     <div class="instagram-section">
   <div class="instagram-text-container">

@@ -42,58 +42,73 @@
 
 
   
-  <script>
-  import PersonalInfo from './PersonalInfo.vue';
-  import Addresses from './UserAddresses.vue';
-  import OrderHistory from './OrderHistory.vue';
-  import Wishlist from './UserWishlist.vue';
-  
-  export default {
-    name: 'AccountInfo',
-    components: {
-      PersonalInfo,
-      Addresses,
-      OrderHistory,
-      Wishlist,
+<script>
+import PersonalInfo from './PersonalInfo.vue';
+import Addresses from './UserAddresses.vue';
+import OrderHistory from './OrderHistory.vue';
+import Wishlist from './UserWishlist.vue';
+
+export default {
+  name: 'AccountInfo',
+  components: {
+    PersonalInfo,
+    Addresses,
+    OrderHistory,
+    Wishlist,
+  },
+  data() {
+    return {
+      activeTab: 0,
+      firstName: 'Ім’я', // Заповніть фактичними значеннями
+      lastName: 'Прізвище', // Заповніть фактичними значеннями
+      email: 'email@example.com', // Заповніть фактичними значеннями
+      menuItems: [
+        { title: 'Інформація', icon: require('@/assets/user.png') },
+        { title: 'Адреси', icon: require('@/assets/location.png') },
+        { title: 'Історія замовлень', icon: require('@/assets/history.png') },
+        { title: 'Список бажаного', icon: require('@/assets/heart.png') },
+        { title: 'Вийти', icon: require('@/assets/exit.png') },
+      ],
+    };
+  },
+  computed: {
+    activeTabContent() {
+      switch (this.activeTab) {
+        case 0: return 'PersonalInfo';
+        case 1: return 'Addresses';
+        case 2: return 'OrderHistory';
+        case 3: return 'Wishlist';
+        case 4: return 'Logout';
+        default: return 'PersonalInfo';
+      }
     },
-    data() {
-      return {
-        activeTab: 0,
-        firstName: 'Ім’я', // Fill with actual values
-        lastName: 'Прізвище', // Fill with actual values
-        email: 'email@example.com', // Fill with actual values
-        menuItems: [
-          { title: 'Інформація', icon: require('@/assets/user.png') },
-          { title: 'Адреси', icon: require('@/assets/location.png') },
-          { title: 'Історія замовлень', icon: require('@/assets/history.png') },
-          { title: 'Список бажаного', icon: require('@/assets/heart.png') },
-          { title: 'Вийти', icon: require('@/assets/exit.png') },
-        ],
-      };
+  },
+  methods: {
+    selectTab(index) {
+      if (index === 4) { // Перевіряє, чи обрано "Вийти"
+        this.$router.push('/login');
+      } else {
+        this.activeTab = index;
+      }
     },
-    computed: {
-      activeTabContent() {
-        switch (this.activeTab) {
-          case 0: return 'PersonalInfo';
-          case 1: return 'Addresses';
-          case 2: return 'OrderHistory';
-          case 3: return 'Wishlist';
-          case 4: return 'Logout';
-          default: return 'PersonalInfo';
-        }
-      },
+  },
+  mounted() {
+    // Перевіряє наявність параметра "tab" у запиті
+    const tab = this.$route.query.tab;
+    if (tab === 'wishlist') {
+      this.activeTab = 3; // Індекс вкладки "Список бажаного"
+    }
+  },
+  watch: {
+    '$route.query.tab'(newTab) {
+      if (newTab === 'wishlist') {
+        this.activeTab = 3;
+      }
     },
-    methods: {
-      selectTab(index) {
-        if (index === 4) { // Assuming "Вийти" is the last tab
-          this.$router.push('/login');
-        } else {
-          this.activeTab = index;
-        }
-      },
-    },
-  };
-  </script>
+  },
+};
+</script>
+
   
   <style scoped>
   @font-face {

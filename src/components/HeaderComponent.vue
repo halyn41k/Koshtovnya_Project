@@ -21,7 +21,7 @@
             <option value="USD">USD $</option>
           </select>
         </div>
-        <router-link to="/wishlist" class="wishlist">Список бажаного</router-link>
+        <router-link :to="{ path: '/account', query: { tab: 'wishlist' } }" class="wishlist">Список бажаного</router-link>
       </div>
     </div>
 
@@ -178,6 +178,7 @@ body {
 
 .search-bar {
   margin-left: 40px;
+  font-family: 'Montserrat', serif;
 }
 
 .header {
