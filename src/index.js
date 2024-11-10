@@ -95,7 +95,12 @@ const routes = [
     path:'/admin',
     name:'AdminPanel',
     component: () => import('@/components/AdminPanel.vue')
-  }
+  },
+  {
+    path:'/updateproduct',
+    name:'ProductUpdate',
+    component: () => import('@/components/ProductUpdate.vue')
+  },
 ];
 
 const router = createRouter({

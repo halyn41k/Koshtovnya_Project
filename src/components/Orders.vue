@@ -8,9 +8,7 @@
       <form class="search-form" @submit.prevent="handleSearch">
         <label for="searchInput" class="visually-hidden">Пошук</label>
         <input type="text" id="searchInput" class="search-input" placeholder="Пошук" aria-label="Пошук" />
-        <button type="submit" class="search-button">
           <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Search icon" class="search-icon" />
-        </button>
       </form>
       <section class="order-header">
         <div class="order-header-left">
@@ -156,34 +154,32 @@
     object-fit: contain;
   }
   
+
   .search-form {
-    display: flex;
-    align-items: center;
-    margin-top: 22px;
-    max-width: 410px;
-    border-radius: 8px;
-    background-color: rgba(107, 31, 31, 0.1);
-    padding: 5px 23px;
-  }
-  
-  .search-input {
-    flex-grow: 1;
-    border: none;
-    background: transparent;
-    font-size: 17px;
-    color: #000;
-  }
-  
-  .search-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .search-icon {
-    width: 40px;
-    height: 40px;
-  }
+  display: flex;
+  align-items: center;
+  background-color: #F1E9E9;
+  border-radius: 8px;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  width: 400px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+  color: #000;
+  outline: none;
+}
+
+.search-icon {
+  width: 30px; /* Розмір іконки */
+  height: 30px;
+  margin-left: 8px;
+}
   
   .order-header {
     display: flex;

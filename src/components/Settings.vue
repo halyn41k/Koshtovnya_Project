@@ -14,15 +14,15 @@
           <h3 class="contact-info-title">Контактна Інформація</h3>
           <form class="contact-form">
             <div class="form-group">
-              <label for="address" class="form-label">Адреса (поточна: вул. Степана Бандери 22, Коломия)</label>
+              <label for="address" class="form-label">Адреса</label>
               <input type="text" id="address" class="form-input" value="вул. Степана Бандери 22, Коломия" />
             </div>
             <div class="form-group">
-              <label for="phone" class="form-label">Телефон (поточний: +380123456789)</label>
+              <label for="phone" class="form-label">Телефон</label>
               <input type="tel" id="phone" class="form-input" value="+380123456789" />
             </div>
             <div class="form-group">
-              <label for="email" class="form-label">Електронна пошта (поточна: koshtovnya@mail.com)</label>
+              <label for="email" class="form-label">Електронна пошта</label>
               <input type="email" id="email" class="form-input" value="koshtovnya@mail.com" />
             </div>
             <button type="submit" class="submit-button">Зберегти зміни</button>
@@ -101,6 +101,8 @@ export default {
   }
   
   .upload-button, .submit-button {
+    font-family: Montserrat, sans-serif;
+    font-weight: 500;
     border-radius: 8px;
     background-color: #6b1f1f;
     color: #fff;
@@ -173,7 +175,7 @@ export default {
   .form-input {
     border-radius: 5px;
     background-color: #eee3e3;
-    width: 100%;
+    width: 770px;
     color: #757575;
     padding: 16px 13px;
     font: 400 17px Inter, sans-serif;

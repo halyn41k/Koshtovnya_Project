@@ -1,77 +1,75 @@
 <template>
-    <main class="employee-management">
-      <h1 class="page-title">Працівники</h1>
-      <div class="filter-section">
-        <span class="filter-label">Фільтр</span>
-        <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Filter icon" class="filter-icon" />
-      </div>
-      <div class="action-section">
-        <form class="search-form" @submit.prevent="handleSearch">
-      
-          <button type="submit" class="search-button">
-            <span>Пошук</span>
-            <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="search-icon" />
-          </button>
-        </form>
-        <button class="add-button" @click="handleAddEmployee">
-          <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/580b8f10bc1ad9769a3aed213267f4211a64a8cc50c1c93efc50ca7ae69c8da2?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="add-icon" />
-          <span>Додати</span>
-        </button>
-      </div>
-      <section class="employee-list">
-        <header class="list-header">
-          <div class="header-group">
-            <span class="header-item">ID</span>
-            <span class="header-item">Ім'я/Email</span>
-          </div>
-          <div class="header-group">
-            <span class="header-item">Роль</span>
-            <span class="header-item">Телефон</span>
-            <span class="header-item">Додано</span>
-            <span class="header-item">Керування</span>
-          </div>
-        </header>
-        <ul class="employee-items">
-          <li v-for="employee in employees" :key="employee.id" class="employee-item">
-            <div class="employee-info">
-              <div class="employee-primary">
-                <span class="employee-id">{{ employee.id }}.</span>
-                <div class="employee-name-email">
-                  <img :src="employee.avatar" :alt="`${employee.name}'s avatar`" class="employee-avatar" />
-                  <div>
-                    <h2 class="employee-name">{{ employee.name }}</h2>
-                    <p class="employee-email">{{ employee.email }}</p>
-                  </div>
+  <main class="employee-management">
+    <h1 class="page-title">Працівники</h1>
+    <div class="filter-section">
+      <span class="filter-label">Фільтр</span>
+      <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Filter icon" class="filter-icon" />
+    </div>
+    <div class="action-section">
+      <form class="search-form" @submit.prevent="handleSearch">
+        <input type="text" v-model="searchQuery" class="search-input" placeholder="Пошук" />
+          <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="search-icon" />
+      </form>
+      <button class="add-button" @click="handleAddEmployee">
+        <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/580b8f10bc1ad9769a3aed213267f4211a64a8cc50c1c93efc50ca7ae69c8da2?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="add-icon" />
+        <span>Додати</span>
+      </button>
+    </div>
+    <section class="employee-list">
+      <header class="list-header">
+        <div class="header-group">
+          <span class="header-item">ID</span>
+          <span class="header-item">Ім'я/Email</span>
+        </div>
+        <div class="header-group">
+          <span class="header-item">Роль</span>
+          <span class="header-item">Телефон</span>
+          <span class="header-item">Додано</span>
+          <span class="header-item">Керування</span>
+        </div>
+      </header>
+      <ul class="employee-items">
+        <li v-for="employee in filteredEmployees" :key="employee.id" class="employee-item">
+          <div class="employee-info">
+            <div class="employee-primary">
+              <span class="employee-id">{{ employee.id }}.</span>
+              <div class="employee-name-email">
+                <img :src="employee.avatar" :alt="`${employee.name}'s avatar`" class="employee-avatar" />
+                <div>
+                  <h2 class="employee-name">{{ employee.name }}</h2>
+                  <p class="employee-email">{{ employee.email }}</p>
                 </div>
               </div>
-              <div class="employee-secondary">
-                <span class="employee-role">{{ employee.role }}</span>
-                <span class="employee-phone">{{ employee.phone }}</span>
-                <span class="employee-added">{{ employee.added }}</span>
-              </div>
             </div>
-            <div class="employee-actions">
-              <button class="action-button delete-button" @click="handleDelete(employee.id)">
-                <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/ba078f16c37c9f7f4a38bffc3903a0783959b7a0f9fc95368926f1c2df1ef2a7?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="action-icon" />
-                <span>Видалити</span>
-              </button>
-              <button class="action-button update-button" @click="handleUpdate(employee.id)">
-                <img :src="employee.updateIcon" alt="" class="action-icon" />
-                <span>Оновити</span>
-              </button>
+            <div class="employee-secondary">
+              <span class="employee-role">{{ employee.role }}</span>
+              <span class="employee-phone">{{ employee.phone }}</span>
+              <span class="employee-added">{{ employee.added }}</span>
             </div>
-          </li>
-        </ul>
-      </section>
-    </main>
-  </template>
-  
-  <script>
-  export default {
-    name: 'EmployeeList',
-    data() {
-      return {
-        employees: [
+          </div>
+          <div class="employee-actions">
+            <button class="action-button delete-button" @click="handleDelete(employee.id)">
+              <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/ba078f16c37c9f7f4a38bffc3903a0783959b7a0f9fc95368926f1c2df1ef2a7?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="action-icon" />
+              <span>Видалити</span>
+            </button>
+            <button class="action-button update-button" @click="handleUpdate(employee.id)">
+              <img :src="employee.updateIcon" alt="" class="action-icon" />
+              <span>Оновити</span>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </main>
+</template>
+
+<script>
+export default {
+  name: 'EmployeeList',
+  data() {
+    return {
+      searchQuery: '',
+      employees: [
           {
             id: 1,
             name: 'Степан Мельник',
@@ -133,26 +131,37 @@
             updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/a918f9e236a7c940b080f1c59822fcb78b12dd36417dc4e3f0491b30f0ad34bf?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
           }
         ]
-      }
+    };
+  },
+  computed: {
+    filteredEmployees() {
+      return this.employees.filter(employee => {
+        const searchTerm = this.searchQuery.toLowerCase();
+        return (
+          employee.name.toLowerCase().includes(searchTerm) ||
+          employee.email.toLowerCase().includes(searchTerm)
+        );
+      });
+    }
+  },
+  methods: {
+    handleSearch() {
+      // Пошук вже обробляється через filteredEmployees, тому метод може бути порожнім
     },
-    methods: {
-  handleSearch() {
-    // Implement search functionality
-  },
-  handleAddEmployee() {
-    // Implement add employee functionality
-  },
-  // eslint-disable-next-line no-unused-vars
-  handleDelete(id) {
-    // Implement delete functionality
-  },
-  // eslint-disable-next-line no-unused-vars
-  handleUpdate(id) {
-    // Implement update functionality
-  }
+    handleAddEmployee() {
+      // Реалізуйте функціональність для додавання працівника
+    },
+    handleDelete(id) {
+      // Реалізуйте функціональність для видалення працівника
+      this.employees = this.employees.filter(employee => employee.id !== id);
+    },
+    handleUpdate(id) {
+      // Реалізуйте функціональність для оновлення працівника
     }
   }
-  </script>
+};
+</script>
+
   
   <style scoped>
 .employee-management {
@@ -180,8 +189,8 @@
   }
   
   .filter-label {
-    flex-grow: 1;
-    margin: auto 0;
+    margin-left: 0px;
+
   }
   
   .filter-icon {
@@ -199,41 +208,32 @@
     flex-wrap: wrap;
   }
   
-  .search-form {
-    flex-grow: 1;
-  }
-  
-  .search-input {
-    border-radius: 8px;
-    background-color: rgba(107, 31, 31, 0.1);
-    padding: 5px 23px;
-    font-size: 17px;
-    color: #000;
-    line-height: 1.3;
-    width: 100%;
-  }
-  
-  .search-button {
-    border-radius: 8px;
-    background-color: rgba(107, 31, 31, 0.1);
-    display: flex;
-    gap: 40px;
-    overflow: hidden;
-    font-size: 17px;
-    color: #000;
-    line-height: 1.3;
-    padding: 5px 23px;
-    align-items: center;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .search-icon {
-    aspect-ratio: 1;
-    object-fit: contain;
-    object-position: center;
-    width: 40px;
-  }
+   
+.search-form {
+  display: flex;
+  align-items: center;
+  background-color: #F1E9E9;
+  border-radius: 8px;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  width: 400px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+  color: #000;
+  outline: none;
+}
+
+.search-icon {
+  width: 30px; /* Розмір іконки */
+  height: 30px;
+  margin-left: 8px;
+}
   
   .add-button {
     border-radius: 12px;

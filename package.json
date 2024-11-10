@@ -27,6 +27,7 @@
     "cors": "^2.8.5",
     "css": "^3.0.0",
     "express": "^4.19.2",
+    "jspdf": "^2.5.2",
     "loader": "^2.1.1",
     "msal": "^1.4.18",
     "mysql": "^2.18.1",
@@ -39,7 +40,8 @@
     "vue-range-slider": "^0.6.0",
     "vue-router": "^4.3.2",
     "vue3-google-oauth2": "^1.0.7",
-    "vue3-slider": "^1.10.1"
+    "vue3-slider": "^1.10.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

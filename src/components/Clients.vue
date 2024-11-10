@@ -6,10 +6,10 @@
           <span class="filter__text">Фільтр</span>
           <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Filter icon" class="filter__icon" />
         </div>
-        <div class="search-add">
-          <div class="search-button">
+        <div class="search-form">
+          <div class="search-input">
             <span class="search-button__text">Пошук</span>
-            <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Search icon" class="search-button__icon" />
+            <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Search icon" class="search-icon" />
           </div>
           <button class="add-button">
             <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/a27ea7f8a293148ec591123dc3120b25f531a1f574adc4774e1503c5d2772fcb?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Add icon" class="add-button__icon" />
@@ -117,27 +117,32 @@
     object-fit: contain;
   }
   
-  .search-add {
-    display: flex;
-    gap: 40px;
-  }
-  
-  .search-button {
-    display: flex;
-    align-items: center;
-    gap: 100px;
-    padding: 5px 23px;
-    border-radius: 8px;
-    background-color: rgba(107, 31, 31, 0.1);
-    font-size: 17px;
-    color: #000;
-  }
-  
-  .search-button__icon {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-  }
+ 
+  .search-form {
+  display: flex;
+  align-items: center;
+  background-color: #F1E9E9;
+  border-radius: 8px;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  width: 400px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+  color: #000;
+  outline: none;
+}
+
+.search-icon {
+  width: 30px; /* Розмір іконки */
+  height: 30px;
+  margin-left: 8px;
+}
   
   .add-button {
     display: flex;

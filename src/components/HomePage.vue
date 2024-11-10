@@ -92,6 +92,9 @@
     </div>
     <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextNewArrivals" />
   </div>
+  <div class="dots-container">
+    <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
+  </div>
 </section>
 
     <div class="instagram-section">
