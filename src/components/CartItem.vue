@@ -9,13 +9,13 @@
             <h3 class="item-title">{{ title }}</h3>
             <p class="item-price">{{ price }} / за штуку</p>
           </div>
-          <button class="remove-button" aria-label="Видалити товар">Х</button>
+          <button @click="removeItem" class="remove-button" aria-label="Видалити товар">Х</button>
         </div>
         <div class="item-controls">
           <p class="item-quantity">Кількість: {{ quantity }}</p>
           <div class="quantity-controls">
-            <button class="quantity-button increase" aria-label="Збільшити кількість">+</button>
-            <button class="quantity-button decrease" aria-label="Зменшити кількість">-</button>
+            <button @click="increaseQuantity" class="quantity-button increase" aria-label="Збільшити кількість">+</button>
+            <button @click="decreaseQuantity" class="quantity-button decrease" aria-label="Зменшити кількість">-</button>
           </div>
           <p class="item-total">{{ totalPrice }}</p>
         </div>
@@ -41,20 +41,35 @@ export default {
       required: true
     },
     price: {
-      type: String,
+      type: Number,
       required: true
     },
     quantity: {
-      type: String,
+      type: Number,
       required: true
+    }
+  },
+  computed: {
+    totalPrice() {
+      return this.price * this.quantity;
+    }
+  },
+  methods: {
+    increaseQuantity() {
+      this.$emit('change-quantity', this.quantity + 1);
     },
-    totalPrice: {
-      type: String,
-      required: true
+    decreaseQuantity() {
+      if (this.quantity > 1) {
+        this.$emit('change-quantity', this.quantity - 1);
+      }
+    },
+    removeItem() {
+      this.$emit('remove-item');
     }
   }
 };
 </script>
+
 
 <style scoped>
 .cart-item {

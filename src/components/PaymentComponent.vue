@@ -56,7 +56,6 @@
                     <span v-if="errors.city" class="error">{{ errors.city }}</span>
                     
                     <div class="postal-service-select">
-                      <label>Пошта:</label>
                       <select v-model="formData.postalService" class="input-field">
                         <option disabled value="">Оберіть пошту</option>
                         <option value="Укрпошта">Укрпошта</option>
@@ -179,9 +178,9 @@ export default {
         email: '',
         phone: '',
         city: '',
-        postalService: '', // поле для зберігання вибраної поштової служби
+        postalService: '',
         postalOffice: '',
-        phoneDelivery: '',
+        phoneDelivery: '', // щоб не заважало переходу, буде автоматично заповнене
       },
       selectedPaymentOption: '',
       paymentOptions: [
@@ -210,11 +209,14 @@ export default {
         if (!this.formData.city) this.errors.city = 'Місто обов\'язкове';
         if (!this.formData.postalService) this.errors.postalService = 'Оберіть поштову службу';
         if (!this.formData.postalOffice) this.errors.postalOffice = 'Відділення обов\'язкове';
+        // Якщо phoneDelivery порожнє, використовуємо phone
+        if (!this.formData.phoneDelivery) this.formData.phoneDelivery = this.formData.phone;
         if (!this.formData.phoneDelivery) this.errors.phoneDelivery = 'Телефон обов\'язковий';
       } else if (this.currentStep === 2) {
         if (!this.selectedPaymentOption) this.errors.paymentOption = 'Оберіть спосіб оплати';
       }
 
+      // Якщо немає помилок, завершити крок
       if (!Object.keys(this.errors).length) {
         this.completeStep();
       }

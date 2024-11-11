@@ -7,18 +7,18 @@
       <h1 class="section-title">Всі вироби</h1>
       <div class="products-grid">
         <article
-          v-for="(product, index) in products"
-          :key="index"
+          v-for="product in products"
+          :key="product.id"
           :class="['product-card', { 'special-background': product.id === 3 || product.id === 5 }]"
         >
           <div class="image-container">
-            <img :src="product.image" :alt="product.name" class="product-image" />
+            <img :src="product.image_url" :alt="product.name" class="product-image" />
           </div>
           <div class="product-info">
             <h2 class="product-name">{{ product.name }}</h2>
-            <p class="product-price">{{ product.price }}</p>
+            <p class="product-price">{{ product.price }} грн</p>
             <div class="material-wishlist">
-              <p class="product-material">{{ product.material }}</p>
+              <p class="product-material">{{ product.bead_producer_name }}</p>
               <div class="wishlist-icon" @click="toggleWishlist(product)">
                 <svg
                   v-if="isInWishlist(product.name)"
@@ -51,526 +51,57 @@
           </div>
         </article>
       </div>
+      <div class="pagination">
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="changePage(page)"
+          :class="{ 'active': currentPage === page }"
+        >
+          {{ page }}
+        </button>
+      </div>
     </main>
   </section>
   <section class="category-product-section">
     <CategoryProduct />
   </section>
 </template>
-
 <script>
+import axios from 'axios';
 import { defineAsyncComponent } from 'vue';
 
 export default {
   name: 'AllProducts',
   components: {
-    FilterComponent: defineAsyncComponent(() =>
-      import('./FilterComponent.vue')
-    ),
-    CategoryProduct: defineAsyncComponent(() =>
-      import('./CategoryProduct.vue')
-    ),
+    FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')),
+    CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')),
   },
   data() {
     return {
-      products: [
-      {
-            id: 1,
-            name: 'Браслет "Розмаїття кольорів"',
-            price: '750₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Розмаїття кольорів.jpg'),
-          },
-          {
-            id: 2,
-            name: 'Браслет "Українські візерунки"',
-            price: '450₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Українські візерунки.jpg'),
-          },
-          {
-            id: 3,
-            name: 'Браслет "Чорно-білий розмай"',
-            price: '650₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Чорно-білий розмай.jpg'),
-          },
-          {
-            id: 4,
-            name: 'Браслет "Український мотив"',
-            price: '750₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Український мотив.png'),
-          },
-          {
-            id: 5,
-            name: 'Браслет "Квіти України"',
-            price: '390₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Квіти України.png'),
-          },
-          {
-            id: 6,
-            name: 'Браслет "Теплий соняшник"',
-            price: '1280₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Теплий соняшник.png'),
-          },
-          {
-            id: 7,
-            name: 'Браслет "Три кольори"',
-            price: '1060₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Три кольори.jpg'),
-          },
-          {
-            id: 8,
-            name: 'Браслет "Національні мотиви"',
-            price: '590₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Національні мотиви.jpg'),
-          },
-          {
-            id: 9,
-            name: 'Браслет "Золота квітка"',
-            price: '620₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Золота квітка.png'),
-          },
-          {
-            id: 10,
-            name: 'Браслет "Гуцульський"',
-            price: '1025₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Гуцульський.png'),
-          },
-          {
-            id: 11,
-            name: 'Браслет "Вишиванка"',
-            price: '560₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Вишиванка.png'),
-          },
-          {
-            id: 12,
-            name: 'Браслет "Червоні троянди"',
-            price: '1300₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Червоні троянди.png'),
-          },
-          {
-            id: 1,
-            name: 'Дукат "Блакитна симфонія"',
-            price: 1180,
-            material: 'Китайський бісер',
-            image: require('@/assets/Блакитна симфонія.png'),
-          },
-          {
-            id: 2,
-            name: 'Дукат "Лісовий оберіг"',
-            price: 1520,
-            material: 'Чеський бісер',
-            image: require('@/assets/Лісовий оберіг.png'),
-          },
-          {
-            id: 3,
-            name: 'Дукат "Золотий світанок"',
-            price: 1590,
-            material: 'Чеський бісер',
-            image: require('@/assets/Золотий світанок.png'),
-          },
-          {
-            id: 5,
-            name: 'Дукат "Зоряний танець"',
-            price: 1210,
-            material: 'Китайський бісер',
-            image: require('@/assets/Зоряний танець.png'),
-          },
-          {
-            id: 6,
-            name: 'Дукат "Жар серця"',
-            price: 1940,
-            material: 'Японський бісер',
-            image: require('@/assets/Жар серця.png'),
-          },
-          {
-            id: 7,
-            name: 'Дукат "Смарагд у ночі"',
-            price: 1480,
-            material: 'Чеський бісер',
-            image: require('@/assets/Смарагд у ночі.png'),
-          },
-          {
-            id: 8,
-            name: 'Дукат "Морська глибина"',
-            price: 1200,
-            material: 'Чеський бісер',
-            image: require('@/assets/Морська глибина.png'),
-          },
-          {
-            id: 9,
-            name: 'Дукат "Калиновий жар"',
-            price: 960,
-            material: 'Китайський бісер',
-            image: require('@/assets/Калиновий жар.png'),
-          },
-          {
-            id: 10,
-            name: 'Дукат "Сніжний квіт"',
-            price: 910,
-            material: 'Японський бісер',
-            image: require('@/assets/Сніжний квіт.png'),
-          },
-          {
-            id: 11,
-            name: 'Дукат "Лазурне небо"',
-            price: 420,
-            material: 'Китайський бісер',
-            image: require('@/assets/Лазурне небо.png'),
-          },
-          {
-            id: 12,
-            name: 'Дукат "Багряний захід"',
-            price: 960,
-            material: 'Японський бісер',
-            image: require('@/assets/Багряний захід.png'),
-          },
-          {
-            id: 1,
-            name: 'Пояс "Маковий сплеск"',
-            price: 1500,
-            material: 'Чеський бісер',
-            image: require('@/assets/Маковий сплеск.png'),
-          },
-          {
-            id: 2,
-            name: 'Пояс "Сині мрії"',
-            price: 750,
-            material: 'Китайський бісер',
-            image: require('@/assets/Сині мрії.png'),
-          },
-          {
-            id: 3,
-            name: 'Пояс "Золота симфонія маків"',
-            price: 760,
-            material: 'Китайський бісер',
-            image: require('@/assets/Золота симфонія маків.png'),
-          },
-          {
-            id: 4,
-            name: 'Пояс "Квітковий акорд"',
-            price: 1490,
-            material: 'Японський бісер',
-            image: require('@/assets/Квітковий акорд.png'),
-          },
-          {
-            id: 5,
-            name: 'Пояс "Ромбове мереживо"',
-            price: 1120,
-            material: 'Чеський бісер',
-            image: require('@/assets/Ромбове мереживо.png'),
-          },
-          {
-            id: 6,
-            name: 'Пояс "Гуцульський"',
-            price: 1580,
-            material: 'Японський бісер',
-            image: require('@/assets/Гуцульський2.png'),
-          },
-          {
-            id: 7,
-            name: 'Пояс "Різнобарвна симфонія"',
-            price: 1160,
-            material: 'Чеський бісер',
-            image: require('@/assets/Різнобарвна симфонія.png'),
-          },
-          {
-            id: 8,
-            name: 'Пояс "Ромбові відблиски"',
-            price: 700,
-            material: 'Китайський бісер',
-            image: require('@/assets/Ромбові відблиски.png'),
-          },
-          {
-            id: 9,
-            name: 'Пояс "Квітковий стиль"',
-            price: 1680,
-            material: 'Японський бісер',
-            image: require('@/assets/Квітковий стиль.png'),
-          },
-          {
-            id: 10,
-            name: 'Пояс "Контрастні ромби"',
-            price: 1400,
-            material: 'Японський бісер',
-            image: require('@/assets/Контрастні ромби.png'),
-          },
-          {
-            id: 11,
-            name: 'Пояс "Сині зорі"',
-            price: 790,
-            material: 'Китайський бісер',
-            image: require('@/assets/Сині зорі.png'),
-          },
-          {
-            id: 12,
-            name: 'Пояс "Сніжні ромби"',
-            price: 1080,
-            material: 'Чеський бісер',
-            image: require('@/assets/Сніжні ромби.png'),
-          },
-          {
-            id: 1,
-            name: 'Сережки "Орнамент"',
-            price: 120,
-            material: 'Чеський бісер',
-            image: require('@/assets/Орнамент.png'),
-          },
-          {
-            id: 2,
-            name: 'Сережки "Танок вогню і світла"',
-            price: 75,
-            material: 'Китайський бісер',
-            image: require('@/assets/Танок вогню і світла.png'),
-          },
-          {
-            id: 3,
-            name: 'Сережки "Маки"',
-            price: 310,
-            material: 'Японський бісер',
-            image: require('@/assets/Маки.png'),
-          },
-          {
-            id: 4,
-            name: 'Сережки "Вишиванка"',
-            price: 290,
-            material: 'Японський бісер',
-            image: require('@/assets/Вишиванка.png'),
-          },
-          {
-            id: 5,
-            name: 'Сережки "Сонячний спалах"',
-            price: 185,
-            material: 'Чеський бісер',
-            image: require('@/assets/Сонячний спалах.png'),
-          },
-          {
-            id: 6,
-            name: 'Сережки "Рубінові квіти"',
-            price: 150,
-            material: 'Чеський бісер',
-            image: require('@/assets/Рубінові квіти.png'),
-          },
-          {
-            id: 7,
-            name: 'Сережки "Небесне натхнення"',
-            price: 80,
-            material: 'Китайський бісер',
-            image: require('@/assets/Небесне натхнення.png'),
-          },
-          {
-            id: 8,
-            name: 'Сережки "Сонячна хвиля"',
-            price: 240,
-            material: 'Японський бісер',
-            image: require('@/assets/Сонячна хвиля.png'),
-          },
-          {
-            id: 9,
-            name: 'Сережки "Смарагдова тінь"',
-            price: 90,
-            material: 'Китайський бісер',
-            image: require('@/assets/Смарагдова тінь.png'),
-          },
-          {
-            id: 10,
-            name: 'Сережки "Поле трояндів"',
-            price: 90,
-            material: 'Китайський бісер',
-            image: require('@/assets/Поле трояндів.png'),
-          },
-          {
-            id: 11,
-            name: 'Сережки "Сонячний обрі́й"',
-            price: 145,
-            material: 'Чеський бісер',
-            image: require('@/assets/Сонячний обрі́й.png'),
-          },
-          {
-            id: 12,
-            name: 'Сережки "Сніжний мак"',
-            price: 240,
-            material: 'Японський бісер',
-            image: require('@/assets/Сніжний мак.png'),
-          },
-          {
-            id: 1,
-            name: 'Гердан "Квітка папороті"',
-            price: '1500₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Квітка папороті.png'),
-          },
-          {
-            id: 2,
-            name: 'Гердан "Гуцулка"',
-            price: '1200₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Гуцулка.png'),
-          },
-          {
-            id: 3,
-            name: 'Гердан "Українська вишиванка"',
-            price: '2100₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Українська вишиванка.png'),
-          },
-          {
-            id: 4,
-            name: 'Гердан "Фіалковий"',
-            price: '800₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Фіалковий.png'),
-          },
-          {
-            id: 5,
-            name: 'Гердан "Теплі спогади"',
-            price: '1900₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Теплі спогади.png'),
-          },
-          
-          {
-            id: 7,
-            name: 'Гердан "Макове диво"',
-            price: '850₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Макове диво.png'),
-          },
-          {
-            id: 8,
-            name: 'Гердан "Червоно-білий"',
-            price: '750₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Червоно-Білий.png'),
-          },
-          {
-            id: 9,
-            name: 'Гердан "Калина"',
-            price: '2320₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Калина.png'),
-          },
-          {
-            id: 10,
-            name: 'Гердан "Прозорий"',
-            price: '1650₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Прозорий.png'),
-          },
-          {
-            id: 11,
-            name: 'Гердан "Мереживо"',
-            price: '1300₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Мереживо.png'),
-          },
-          {
-            id: 12,
-            name: 'Гердан "Петрівський розпис"',
-            price: '1100₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Петрівський розпис.png'),
-          },
-          {
-            id: 1,
-            name: 'Силянка "Гуцулка"',
-            price: 1000,
-            material: 'Чеський бісер',
-            image: require('@/assets/Гуцулка2.png'),
-          },
-          {
-            id: 2,
-            name: 'Силянка "Лемківська"',
-            price: 1600,
-            material: 'Японський бісер',
-            image: require('@/assets/Лемківська.png'),
-          },
-          {
-            id: 3,
-            name: 'Силянка "Темна ніч"',
-            price: 800,
-            material: 'Чеський бісер',
-            image: require('@/assets/Темна ніч.png'),
-          },
-          {
-            id: 4,
-            name: 'Силянка "Класична"',
-            price: 650,
-            material: 'Китайський бісер',
-            image: require('@/assets/Класична.png'),
-          },
-          {
-            id: 5,
-            name: 'Силянка "Хризантеми"',
-            price: 550,
-            material: 'Китайський бісер',
-            image: require('@/assets/Хризантеми.png'),
-          },
-          {
-            id: 6,
-            name: 'Силянка "Готична"',
-            price: 1480,
-            material: 'Японський бісер',
-            image: require('@/assets/Готична.png'),
-          },
-          {
-            id: 7,
-            name: 'Силянка "Гуцульська"',
-            price: 1100,
-            material: 'Чеський бісер',
-            image: require('@/assets/Гуцульська.png'),
-          },
-          {
-            id: 8,
-            name: 'Силянка "Традиційна"',
-            price: 1530,
-            material: 'Японський бісер',
-            image: require('@/assets/Традиційна.png'),
-          },
-          {
-            id: 9,
-            name: 'Силянка "Веселка"',
-            price: 1030,
-            material: 'Китайський бісер',
-            image: require('@/assets/Веселка.png'),
-          },
-          {
-            id: 10,
-            name: 'Силянка "Прозора"',
-            price: 1450,
-            material: 'Чеський бісер',
-            image: require('@/assets/Прозора.png'),
-          },
-          {
-            id: 11,
-            name: 'Силянка "Червоні квіти"',
-            price: 1390,
-            material: 'Японський бісер',
-            image: require('@/assets/Червоні квіти.png'),
-          },
-          {
-            id: 12,
-            name: 'Силянка "Білосніжна"',
-            price: 550,
-            material: 'Китайський бісер',
-            image: require('@/assets/Білосніжна.png'),
-          },
-
-      ],
+      products: [],
+      currentPage: 1,
+      totalPages: 1,
+      itemsPerPage: 15,
       wishlist: [],
     };
   },
   methods: {
+    async fetchProducts(page = 1) {
+      try {
+        const response = await axios.get(`http://192.168.1.44:8080/api/products?page=${page}`);
+        this.products = response.data.data; // Отримуємо масив продуктів
+        this.totalPages = response.data.meta.last_page; // Визначаємо кількість сторінок
+        this.currentPage = response.data.meta.current_page; // Оновлюємо поточну сторінку
+      } catch (error) {
+        console.error('Помилка завантаження продуктів:', error);
+      }
+    },
+    changePage(page) {
+      if (page > 0 && page <= this.totalPages) {
+        this.fetchProducts(page);
+      }
+    },
     isInWishlist(productName) {
       return this.wishlist.includes(productName);
     },
@@ -583,6 +114,9 @@ export default {
         alert(`${product.name} додано до списку бажаного!`);
       }
     },
+  },
+  mounted() {
+    this.fetchProducts();
   },
 };
 </script>
@@ -769,4 +303,35 @@ export default {
   height: 10px;
   margin-right: 5px;
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  transition: all 0.3s ease; /* Додаємо плавний перехід */
+}
+
+.pagination button:hover {
+  background-color: #6b1f1f; /* Колір фону при ховері */
+  color: white; /* Колір тексту при ховері */
+  transform: scale(1.1); /* Збільшення кнопки */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+}
+
+.pagination button.active {
+  background-color: #6b1f1f;
+  color: white;
+}
+
 </style>
