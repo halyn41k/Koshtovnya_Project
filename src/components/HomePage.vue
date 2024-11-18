@@ -147,94 +147,107 @@ export default {
   components: {
     CategoryProduct
   },
-  data() {
-    return {
-      products: [],
-      newArrivals: [],
-      visibleProducts: [],
-      visibleNewArrivals: [],
-      currentPage: 0,
-      newArrivalsPage: 0,
-      productsPerPage: 3,
-      instagramImages: [
-        { id: 1, src: "@/assets/instagram1.png", alt: "Instagram Image 1" },
-        { id: 2, src: "@/assets/instagram2.png", alt: "Instagram Image 2" },
-        { id: 3, src: "@/assets/instagram3.png", alt: "Instagram Image 3" },
-        { id: 4, src: "@/assets/instagram4.png", alt: "Instagram Image 4" },
-      ]
-    };
-  },
-  computed: {
-    totalPages() {
-      return Math.ceil(this.products.length / this.productsPerPage);
-    },
-    newArrivalsTotalPages() {
-      return Math.ceil(this.newArrivals.length / this.productsPerPage);
-    }
-  },
-  methods: {
-    async fetchPopularProducts() {
-      try {
-        const response = await fetch("http://192.168.1.44:8080/api/popular-products");
-        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-        const data = await response.json();
-        this.products = data.data;
-        this.updateVisibleProducts();
-      } catch (error) {
-        console.error("Помилка при отриманні популярних товарів:", error.message);
-      }
-    },
-    async fetchNewArrivals() {
-      try {
-        const response = await fetch("http://192.168.1.44:8080/api/new-arrivals");
-        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-        const data = await response.json();
-        this.newArrivals = data.data;
-        this.updateVisibleNewArrivals();
-      } catch (error) {
-        console.error("Помилка при отриманні новинок:", error.message);
-      }
-    },
-    showNextProducts() {
-      if (this.currentPage < this.totalPages - 1) {
-        this.currentPage++;
-        this.updateVisibleProducts();
-      }
-    },
-    showPreviousProducts() {
-      if (this.currentPage > 0) {
-        this.currentPage--;
-        this.updateVisibleProducts();
-      }
-    },
-    showNextNewArrivals() {
-      if (this.newArrivalsPage < this.newArrivalsTotalPages - 1) {
-        this.newArrivalsPage++;
-        this.updateVisibleNewArrivals();
-      }
-    },
-    showPreviousNewArrivals() {
-      if (this.newArrivalsPage > 0) {
-        this.newArrivalsPage--;
-        this.updateVisibleNewArrivals();
-      }
-    },
-    updateVisibleProducts() {
-      const start = this.currentPage * this.productsPerPage;
-      const end = start + this.productsPerPage;
-      this.visibleProducts = this.products.slice(start, end);
-    },
-    updateVisibleNewArrivals() {
-      const start = this.newArrivalsPage * this.productsPerPage;
-      const end = start + this.productsPerPage;
-      this.visibleNewArrivals = this.newArrivals.slice(start, end);
-    }
-  },
   mounted() {
-    this.fetchPopularProducts();
-    this.fetchNewArrivals();
-  }
-};
+  this.fetchPopularProducts();
+  this.fetchNewArrivals();
+},
+
+  data() {
+  return {
+    products: [], // Дані з API
+    newArrivals: [], // Дані з API
+    visibleProducts: [],
+    visibleNewArrivals: [],
+    currentPage: 0,
+    newArrivalsPage: 0,
+    productsPerPage: 3,
+    testPopularProducts: [
+      {
+        id: 1,
+        name: "Браслет",
+        price: 250,
+        image_url: "@/assets/testpicture.png",
+        bead_producer_name: "Чешський бісер",
+      },
+      {
+        id: 2,
+        name: "Гердан",
+        price: 450,
+        image_url: "@/assets/testpicture.png",
+        bead_producer_name: "Чешський бісер",
+      },
+      {
+        id: 3,
+        name: "Сережки",
+        price: 200,
+        image_url: "@/assets/testpicture.png",
+        bead_producer_name: "Чешський бісер",
+      },
+    ],
+    testNewArrivals: [
+      {
+        id: 4,
+        name: "Силянка",
+        price: 300,
+        image_url: "@/assets/testpicture.png",
+        bead_producer_name: "Чешський бісер",
+      },
+      {
+        id: 5,
+        name: "Дукати",
+        price: 550,
+        image_url: "@/assets/testpicture.png",
+        bead_producer_name: "Чешський бісер",
+      },
+      {
+        id: 6,
+        name: "Пояс",
+        price: 600,
+        image_url: "@/assets/testpicture.png",
+        bead_producer_name: "Чешський бісер",
+      },
+    ],
+  };
+},
+methods: {
+  async fetchPopularProducts() {
+    try {
+      const response = await fetch("http://192.168.1.44:8080/api/popular-products");
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      const data = await response.json();
+      this.products = data.data;
+    } catch (error) {
+      console.error("Помилка при отриманні популярних товарів:", error.message);
+      this.products = this.testPopularProducts; // Використовуємо тестові дані
+
+      this.updateVisibleProducts();
+    }
+  },
+  async fetchNewArrivals() {
+    try {
+      const response = await fetch("http://192.168.1.44:8080/api/new-arrivals");
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+      const data = await response.json();
+      this.newArrivals = data.data;
+    } catch (error) {
+      console.error("Помилка при отриманні новинок:", error.message);
+      this.newArrivals = this.testNewArrivals; // Використовуємо тестові дані
+    } finally {
+      this.updateVisibleNewArrivals();
+    }
+  },
+  updateVisibleProducts() {
+    const start = this.currentPage * this.productsPerPage;
+    const end = start + this.productsPerPage;
+    this.visibleProducts = this.products.slice(start, end);
+  },
+  updateVisibleNewArrivals() {
+    const start = this.newArrivalsPage * this.productsPerPage;
+    const end = start + this.productsPerPage;
+    this.visibleNewArrivals = this.newArrivals.slice(start, end);
+  },
+},
+}
 </script>
 
   

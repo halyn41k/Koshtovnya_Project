@@ -57,9 +57,9 @@ const routes = [
     component: () => import('@/components/UserRegistration.vue')
   },
   {
-    path: '/productpage',
+    path: '/productpage/:id',
     name: 'ProductPage',
-    component: () => import('@/components/ProductPage.vue')
+    component: () => import('./components/ProductPage.vue'),
   },
   {
     path: '/wishlist',

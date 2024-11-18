@@ -1,140 +1,88 @@
 <template>
-    <main class="product-content">
-      <section class="product-section">
-        <div class="product-layout">
-          <article class="product-image-container">
-            <!-- Product Images -->
-            <img
-              loading="lazy"
-              src="@/assets/example1.png"
-              alt="Браслет Українські візерунки - детальне фото"
-              class="product-image"
-            />
-            <img src="@/assets/changesize.png" alt="Icon indicating size change" class="size-icon" />
-          </article>
-  
-          <article class="product-info-container">
-            <div class="product-info-wrapper">
-              <!-- Product Card -->
-              <section class="product-card">
-                <div class="product-header">
-                  <h1 class="product-title">Браслет "Українські візерунки"</h1>
-                  <hr class="thin-divider" />
-                  <p class="product-price">450₴</p>
-                  <div class="availability-badge">
-                    <span>В наявності</span>
-                    <img
-                      loading="lazy"
-                      src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/2fa8a5e3fb0d7f4e50d013c3be62239c979ad941450aa2d98464c4a0f5433aad?apiKey=c3e46d0a629546c7a48302a5db3297d5"
-                      alt="Availability icon"
-                      class="availability-icon"
-                    />
-                  </div>
-                  <p class="delivery-time">Приблизний час доставки: 1-7 днів</p>
-                </div>
+  <main class="product-content">
+    <section class="product-section">
+      <div class="product-layout">
+        <article class="product-image-container">
+          <!-- Зображення товару -->
+          <img
+            loading="lazy"
+            :src="product.image_url"
+            alt="Фото товару"
+            class="product-image"
+          />
+        </article>
+
+        <article class="product-info-container">
+          <div class="product-info-wrapper">
+            <section class="product-card">
+              <div class="product-header">
+                <h1 class="product-title">{{ product.name }}</h1>
                 <hr class="thin-divider" />
-                <label for="size-select" class="size-label">Розмір</label>
-                <div class="size-selector">
-                  <select id="size-select" class="size-dropdown">
-                    <option value="16">16 см</option>
-                    <option value="17">17 см</option>
-                    <option value="18">18 см</option>
-                  </select>
+                <p class="product-price">{{ product.price }}₴</p>
+                <div class="availability-badge" :class="{ 'available': product.is_available, 'unavailable': !product.is_available }">
+                  <span>{{ product.is_available ? 'В наявності' : 'Немає в наявності' }}</span>
                 </div>
-                <div class="purchase-controls">
-                  <!-- Quantity Selector -->
-                  <div class="quantity-selector">
-                    <input type="number" value="1" min="1" class="quantity-input" />
-                    <div class="quantity-arrows">
-                      <span class="arrow-up"></span>
-                      <span class="arrow-down"></span>
-                    </div>
-                  </div>
-                  <!-- Buy Button -->
-                  <button class="buy-button">
-                    <span class="buy-text">Купити</span>
-                    <img
-                      loading="lazy"
-                      src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?apiKey=c3e46d0a629546c7a48302a5db3297d5"
-                      alt="Cart icon"
-                      class="cart-icon"
-                    />
-                  </button>
-                  <!-- Wishlist Icon -->
-                  <span class="wishlist-square" @click="toggleWishlist(bracelet)">
-                    <img src="@/assets/hearting.png" alt="Heart icon" class="heart-icon" />
-                  </span>
+                <p class="delivery-time">Приблизний час доставки: 1-7 днів</p>
+              </div>
+              <hr class="thin-divider" />
+              <label for="size-select" class="size-label">Розмір</label>
+              <div class="size-selector">
+                <select id="size-select" class="size-dropdown">
+                  <option v-for="size in product.sizes" :key="size" :value="size">{{ size }} см</option>
+                </select>
+              </div>
+              <div class="purchase-controls">
+                <!-- Кількість товару -->
+                <div class="quantity-selector">
+                  <input type="number" v-model="quantity" :max="product.quantity" min="1" class="quantity-input" />
                 </div>
-                <hr class="divider" />
-              </section>
-            </div>
-          </article>
-        </div>
-      </section>
-  
-      <!-- Updated Specifications Section -->
-      <h2 class="specifications-title">Характеристики</h2>
-      <section class="specifications-list wider-centered-section">
-        <dl class="spec-grid">
-          <div class="spec-item" v-for="(spec, index) in specifications" :key="index">
-            <dt class="spec-term">{{ spec.term }}</dt>
-            <dd class="spec-description">{{ spec.description }}</dd>
-            <hr class="spec-divider" />
+                <button class="buy-button" :disabled="!product.is_available">
+                  <span class="buy-text">Купити</span>
+                </button>
+              </div>
+            </section>
           </div>
-        </dl>
-      </section>
-  
-      <!-- Updated Reviews Section -->
-      <h2 class="reviews-title">Відгуки</h2>
-      <section class="reviews-section wider-centered-section">
-        <div class="reviews-container">
-          <p class="no-reviews">Немає відгуків</p>
-          <button class="review-button">
-            <img
-              loading="lazy"
-              src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/01a58c2e65db623b654e6b388e9515e71e2ea4163c809a8be5054260f63327b7?apiKey=c3e46d0a629546c7a48302a5db3297d5"
-              alt="Review icon"
-              class="review-icon"
-            />
-            <span>Написати відгук</span>
-          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- Характеристики товару -->
+    <h2 class="specifications-title">Характеристики</h2>
+    <section class="specifications-list">
+      <dl class="spec-grid">
+        <div class="spec-item" v-for="(spec, index) in product.specifications" :key="index">
+          <dt class="spec-term">{{ spec.term }}</dt>
+          <dd class="spec-description">{{ spec.description }}</dd>
         </div>
-      </section>
-    </main>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        wishlist: [],
-        bracelet: { name: 'Браслет Українські візерунки' },
-        specifications: [
-          { term: 'Країна виробник товару', description: 'Україна' },
-          { term: 'Матеріал', description: 'Бісер, метал' },
-          { term: 'Вага', description: '25 г' },
-          { term: 'Розмір', description: '16 см' },
-          { term: 'Колір', description: 'Білий, голубий, жовтий' },
-          { term: 'Виробник бісеру', description: 'Китай' },
-        ],
-      };
-    },
-    methods: {
-      isInWishlist(productName) {
-        return this.wishlist.includes(productName);
-      },
-      toggleWishlist(bracelet) {
-        if (this.isInWishlist(bracelet.name)) {
-          this.wishlist = this.wishlist.filter((item) => item !== bracelet.name);
-          alert(`${bracelet.name} видалено зі списку бажаного!`);
-        } else {
-          this.wishlist.push(bracelet.name);
-          alert(`${bracelet.name} додано до списку бажаного!`);
-        }
-      },
-    },
-  };
-  </script>
+      </dl>
+    </section>
+  </main>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      product: {},
+      quantity: 1,
+    };
+  },
+  created() {
+    // Отримуємо ID товару з URL
+    const productId = this.$route.params.id;
+    
+    // Запит до API для отримання даних про товар
+    fetch(`http://192.168.1.44:8080/api/products/${productId}`)
+      .then(response => response.json())
+      .then(data => {
+        this.product = data.data;
+      })
+      .catch(error => {
+        console.error("Помилка при завантаженні даних про товар:", error);
+      });
+  },
+};
+</script>
   
   <style scoped>
   @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Montserrat:wght@700&family=Inter:wght@600&display=swap');

@@ -38,6 +38,38 @@ export default {
   data() {
     return {
       categories: [], // Масив для зберігання категорій
+      fallbackCategories: [
+        {
+          id: 1,
+          name: 'Браслети',
+          image_url: require('@/assets/testpicture.png'),
+        },
+        {
+          id: 2,
+          name: 'Гердани',
+          image_url: require('@/assets/testpicture.png'),
+        },
+        {
+          id: 3,
+          name: 'Силянки',
+          image_url: require('@/assets/testpicture.png'),
+        },
+        {
+          id: 4,
+          name: 'Дукати',
+          image_url: require('@/assets/testpicture.png'),
+        },
+        {
+          id: 5,
+          name: 'Сережки',
+          image_url: require('@/assets/testpicture.png'),
+        },
+        {
+          id: 6,
+          name: 'Пояси',
+          image_url: require('@/assets/testpicture.png'),
+        },
+      ],
     };
   },
   methods: {
@@ -45,7 +77,6 @@ export default {
       try {
         const response = await fetch("http://192.168.1.44:8080/api/categories");
 
-        // Перевіряємо, чи відповідь типу JSON
         if (!response.ok) {
           throw new Error(`HTTP помилка: ${response.status}`);
         }
@@ -57,7 +88,6 @@ export default {
 
         const data = await response.json();
 
-        // Перевірка, чи є data масивом
         if (!Array.isArray(data.data)) {
           throw new Error("Очікував масив категорій з API");
         }
@@ -69,6 +99,8 @@ export default {
         }));
       } catch (error) {
         console.error("Помилка при отриманні категорій:", error.message);
+        // Якщо API недоступне, використовуємо fallback-дані
+        this.categories = this.fallbackCategories;
       }
     },
   },

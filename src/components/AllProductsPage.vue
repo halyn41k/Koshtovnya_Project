@@ -1,4 +1,4 @@
-<template>
+<template> 
   <section class="products-section">
     <aside class="sidebar">
       <FilterComponent />
@@ -9,46 +9,48 @@
         <article
           v-for="product in products"
           :key="product.id"
-          :class="['product-card', { 'special-background': product.id === 3 || product.id === 5 }]"
-        >
-          <div class="image-container">
-            <img :src="product.image_url" :alt="product.name" class="product-image" />
-          </div>
-          <div class="product-info">
-            <h2 class="product-name">{{ product.name }}</h2>
-            <p class="product-price">{{ product.price }} грн</p>
-            <div class="material-wishlist">
-              <p class="product-material">{{ product.bead_producer_name }}</p>
-              <div class="wishlist-icon" @click="toggleWishlist(product)">
-                <svg
-                  v-if="isInWishlist(product.name)"
-                  class="filled-heart"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                <svg
-                  v-else
-                  class="empty-heart"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                </svg>
-              </div>
+          :class="['product-card', { 'special-background': product.id === 3 || product.id === 5 }]">
+          <!-- Використовуємо router-link для створення переходу на сторінку продукту -->
+          <router-link :to="`/productpage/${product.id}`" class="product-card-link">
+            <div class="image-container">
+              <img :src="product.image_url" :alt="product.name" class="product-image" />
             </div>
-            <button class="buy-button">
-              <span>Купити</span>
-              <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-            </button>
-          </div>
+            <div class="product-info">
+              <h2 class="product-name">{{ product.name }}</h2>
+              <p class="product-price">{{ product.price }} грн</p>
+              <div class="material-wishlist">
+                <p class="product-material">{{ product.bead_producer_name }}</p>
+                <div class="wishlist-icon" @click="toggleWishlist(product)">
+                  <svg
+                    v-if="isInWishlist(product.name)"
+                    class="filled-heart"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <svg
+                    v-else
+                    class="empty-heart"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                  </svg>
+                </div>
+              </div>
+              <button class="buy-button">
+                <span>Купити</span>
+                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+              </button>
+            </div>
+          </router-link>
         </article>
       </div>
       <div class="pagination">
@@ -67,6 +69,8 @@
     <CategoryProduct />
   </section>
 </template>
+
+
 <script>
 import axios from 'axios';
 import { defineAsyncComponent } from 'vue';
@@ -203,7 +207,6 @@ export default {
   transform: scale(1.05);
 }
 
-/* Product details */
 .product-info {
   color: #333;
   padding: 10px;
@@ -213,41 +216,46 @@ export default {
   justify-content: space-between;
   height: 100%;
   text-align: left;
+  text-decoration: none;
+  color: inherit;
+  gap: 10px; /* Збільшити відступи між елементами */
+  position: relative; /* Додаємо для позиціонування серця */
 }
 
 .product-name {
   font-size: 18px;
   font-weight: bold;
+  margin-bottom: 5px; /* Зменшуємо відступ між назвою і ціною */
 }
 
 .product-price {
-  align-items: baseline;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 20px;
   color: #a01212;
-  margin-top: -5px;
+  margin-top: -90px; /* Забираємо зайвий відступ */
 }
 
 .product-material {
   font-size: 16px;
   color: #808080;
-  margin-top: -20px;
+  margin-top: -210px; /* Забираємо зайвий відступ */
 }
 
-/* Wishlist and material section */
 .material-wishlist {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: absolute; /* Позиціонуємо в середині card */
+  top: 15px; /* Відступ від верхньої частини */
+  width: 100%;
 }
-
 .wishlist-icon {
   width: 30px;
   height: 30px;
   cursor: pointer;
   transition: transform 0.3s ease;
-  margin-top: -30px;
+  
 }
 
 .wishlist-icon:hover {
@@ -263,6 +271,7 @@ export default {
   stroke-width: 2;
   fill: none;
 }
+
 
 /* Buy button styling */
 .buy-button {
@@ -281,6 +290,7 @@ export default {
   text-transform: none;
   padding-left: 15px;
   transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: -190px; 
 }
 
 .buy-button:hover {
@@ -333,5 +343,11 @@ export default {
   background-color: #6b1f1f;
   color: white;
 }
+.product-card-link {
+  text-decoration: none; /* Прибираємо підкреслення */
+  color: inherit; /* Забираємо зміни кольору тексту */
+}
+
+/* При фокусі або наведенні */
 
 </style>
