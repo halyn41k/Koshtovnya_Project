@@ -37,11 +37,10 @@
                    :email="email" />
       </div>
     </section>
-  </main>y
+  </main>⠀
 </template>
 
 
-  
 <script>
 import PersonalInfo from './PersonalInfo.vue';
 import Addresses from './UserAddresses.vue';

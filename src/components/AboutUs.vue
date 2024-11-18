@@ -222,21 +222,28 @@ export default {
 }
 
 .about-us__description {
-  font: 500 18px/32px 'KyivType Titling', sans-serif;
+  font: 500 20px 'KyivType Titling', sans-serif;
   color: #111111;
   margin-top: -50px;
+  line-height: 2.4;
+  max-width: 1000px;
+  margin-right: 300px;
 }
 
 .about-us__text {
   margin-left: 40px;
   font: 500 18px/27px 'KyivType Titling', sans-serif;
   color: #111111;
+  line-height: 2.4;
 }
 
 .about-us__conclusion {
-  font: 500 18px/27px 'KyivType Titling', sans-serif;
+  font: 500 20px 'KyivType Titling', sans-serif;
   color: #111111;
+  max-width: 1000px;
   text-align: center;
+  line-height: 1.8;
+  margin-left: 200px;
 }
 
 .about-us__image {
@@ -260,8 +267,8 @@ export default {
 }
 
 .about-us__background-image {
-  width: 100%;
-  max-height: 100%;
+  width: 500px;
+  max-height: 700px;
   object-fit: cover;
 }
 
@@ -320,7 +327,7 @@ export default {
   font-weight: 600;
   font-family: 'KyivType Medium2', sans-serif;
   text-align: left;
-  color: #a01212;
+  color: #6B1F1F;
   background: none;
   border: none;
   cursor: pointer;
@@ -400,7 +407,7 @@ export default {
 
 .form-submit {
   margin-top: 20px;
-  background-color: #a01212;
+  background-color: #6B1F1F;
   color: white;
   padding: 10px 20px;
   border: none;
