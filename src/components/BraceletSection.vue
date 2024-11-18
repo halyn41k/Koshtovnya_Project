@@ -7,12 +7,12 @@
       <h1 class="section-title">Браслети</h1>
       <div class="bracelet-grid">
         <article
-          v-for="(bracelet) in bracelets" 
+          v-for="(bracelet) in visibleBracelets" 
           :key="bracelet.id" 
           :class="['bracelet-card', { 'special-background': bracelet.id === 3 || bracelet.id === 5 }]"
         >
           <div class="image-container">
-            <img :src="bracelet.image_url || require('@/assets/default-image.png')" :alt="bracelet.name" class="bracelet-image" /> <!-- Додано запасне зображення -->
+            <img :src="bracelet.image_url || require('@/assets/default-image.png')" :alt="bracelet.name" class="bracelet-image" />
           </div>
           <div class="bracelet-info">
             <h2 class="bracelet-name">{{ bracelet.name }}</h2>
@@ -51,8 +51,19 @@
           </div>
         </article>
       </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          v-for="page in totalPages" 
+          :key="page" 
+          :class="['page-button', { active: currentPage === page - 1 }]" 
+          @click="changePage(page - 1)"
+        >
+          {{ page }}
+        </button>
+      </div>
     </main>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   </section>
 
   <section class="category-product-section">
@@ -62,7 +73,7 @@
 
 <script>
 import { defineAsyncComponent } from 'vue';
-import axios from 'axios'; // Додано імпорт axios
+import axios from 'axios';
 
 export default {
   name: 'BraceletSection',
@@ -76,12 +87,37 @@ export default {
   },
   data() {
     return {
-      bracelets: [],
+      bracelets: [], // Массив браслетів
       wishlist: [],
-      categories: [], // Додано categories
+      categories: [],
+      currentPage: 0,
+      itemsPerPage: 15, // Кількість елементів на сторінці
     };
   },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.bracelets.length / this.itemsPerPage); // Загальна кількість сторінок
+    },
+    visibleBracelets() {
+      const start = this.currentPage * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.bracelets.slice(start, end); // Видимі браслети на поточній сторінці
+    }
+  },
   methods: {
+    async fetchBracelets() {
+      try {
+        const response = await axios.get('http://192.168.1.44:8080/api/categories/3/products');
+        this.bracelets = response.data; // Завантажити браслети з API
+      } catch (error) {
+        console.error('Помилка при отриманні браслетів:', error);
+      }
+    },
+    changePage(page) {
+      if (page >= 0 && page < this.totalPages) {
+        this.currentPage = page; // Зміна поточної сторінки
+      }
+    },
     isInWishlist(productName) {
       return this.wishlist.includes(productName);
     },
@@ -94,36 +130,13 @@ export default {
         alert(`${bracelet.name} додано до списку бажаного!`);
       }
     },
-    async fetchBracelets() {  // Додайте цей метод
-      try {
-        const response = await axios.get('http://192.168.1.44:8080/api/categories/3/products'); // Вставте правильний endpoint
-        this.bracelets = response.data; // Заповніть масив bracelets отриманими даними
-      } catch (error) {
-        console.error('Помилка при отриманні браслетів:', error);
-      }
-    },
-    async fetchCategories() {
-      try {
-        const response = await fetch('http://192.168.1.44:8080/api/categories');
-        const data = await response.json();
-
-        // Перевірка, чи дані - це масив
-        if (Array.isArray(data)) {
-          this.categories = data; // зберігаємо категорії
-        } else {
-          console.error('Отримані дані не є масивом:', data);
-        }
-      } catch (error) {
-        console.error('Помилка при отриманні категорій:', error);
-      }
-    },
   },
   mounted() {
-    this.fetchBracelets(); // Виклик методу для отримання браслетів
-    this.fetchCategories(); // Додайте виклик для отримання категорій
+    this.fetchBracelets();
   },
 };
 </script>
+
 
   
   <style scoped>

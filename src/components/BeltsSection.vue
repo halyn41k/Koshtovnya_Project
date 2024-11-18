@@ -1,184 +1,138 @@
 <template>
-    <section class="belts-section">
-      <aside class="sidebar">
-        <FilterComponent />
-      </aside>
-      <main class="main-content">
-        <h1 class="section-title">Пояси</h1>
-        <div class="belts-grid">
-          <article
-            v-for="(belt, index) in belts"
-            :key="index"
-            :class="['belts-card', { 'special-background': belt.id === 3 || belt.id === 5 }]"
-          >
-            <div class="image-container">
-              <img :src="belt.image" :alt="belt.name" class="belts-image" />
-            </div>
-            <div class="belts-info">
-              <h2 class="belts-name">{{ belt.name }}</h2>
-              <p class="belts-price">{{ belt.price }}₴</p>
-              <div class="material-wishlist">
-                <p class="belts-material">{{ belt.material }}</p>
-                <div class="wishlist-icon" @click="toggleWishlist(belt)">
-                  <svg
-                    v-if="isInWishlist(belt.name)"
-                    class="filled-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <svg
-                    v-else
-                    class="empty-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                  </svg>
-                </div>
+  <section class="belts-section">
+    <aside class="sidebar">
+      <FilterComponent />
+    </aside>
+    <main class="main-content">
+      <h1 class="section-title">Пояси</h1>
+      <div class="belts-grid">
+        <article
+          v-for="(belt, index) in visibleBelts"
+          :key="index"
+          :class="['belts-card', { 'special-background': belt.id === 3 || belt.id === 5 }]"
+        >
+          <div class="image-container">
+            <img :src="belt.image" :alt="belt.name" class="belts-image" />
+          </div>
+          <div class="belts-info">
+            <h2 class="belts-name">{{ belt.name }}</h2>
+            <p class="belts-price">{{ belt.price }}₴</p>
+            <div class="material-wishlist">
+              <p class="belts-material">{{ belt.material }}</p>
+              <div class="wishlist-icon" @click="toggleWishlist(belt)">
+                <svg
+                  v-if="isInWishlist(belt.name)"
+                  class="filled-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <svg
+                  v-else
+                  class="empty-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                </svg>
               </div>
-              <button class="buy-button">
-                <span>Купити</span>
-                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-              </button>
             </div>
-          </article>
-        </div>
-      </main>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    </section>
-    <section class="category-product-section">
+            <button class="buy-button">
+              <span>Купити</span>
+              <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          v-for="page in totalPages" 
+          :key="page" 
+          :class="['page-button', { active: currentPage === page - 1 }]" 
+          @click="changePage(page - 1)"
+        >
+          {{ page }}
+        </button>
+      </div>
+    </main>
+  </section>
+
+  <section class="category-product-section">
     <CategoryProduct />
   </section>
 </template>
-  
-  <script>
-  import { defineAsyncComponent } from 'vue';
-  
-  export default {
-    name: 'BeltsSection',
-    components: {
-      FilterComponent: defineAsyncComponent(() =>
-        import('./FilterComponent.vue')
-      ),
-      CategoryProduct: defineAsyncComponent(() =>
-        import('./CategoryProduct.vue')
-      ),
+
+<script>
+import { defineAsyncComponent } from 'vue';
+
+export default {
+  name: 'BeltsSection',
+  components: {
+    FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')),
+    CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')),
+  },
+  data() {
+    return {
+      belts: [
+        { id: 1, name: 'Пояс "Маковий сплеск"', price: 1500, material: 'Чеський бісер', image: require('@/assets/Маковий сплеск.png') },
+        { id: 2, name: 'Пояс "Сині мрії"', price: 750, material: 'Китайський бісер', image: require('@/assets/Сині мрії.png') },
+        { id: 3, name: 'Пояс "Золота симфонія маків"', price: 760, material: 'Китайський бісер', image: require('@/assets/Золота симфонія маків.png') },
+        { id: 4, name: 'Пояс "Квітковий акорд"', price: 1490, material: 'Японський бісер', image: require('@/assets/Квітковий акорд.png') },
+        { id: 5, name: 'Пояс "Ромбове мереживо"', price: 1120, material: 'Чеський бісер', image: require('@/assets/Ромбове мереживо.png') },
+        { id: 6, name: 'Пояс "Гуцульський"', price: 1580, material: 'Японський бісер', image: require('@/assets/Гуцульський2.png') },
+        { id: 7, name: 'Пояс "Різнобарвна симфонія"', price: 1160, material: 'Чеський бісер', image: require('@/assets/Різнобарвна симфонія.png') },
+        { id: 8, name: 'Пояс "Ромбові відблиски"', price: 700, material: 'Китайський бісер', image: require('@/assets/Ромбові відблиски.png') },
+        { id: 9, name: 'Пояс "Квітковий стиль"', price: 1680, material: 'Японський бісер', image: require('@/assets/Квітковий стиль.png') },
+        { id: 10, name: 'Пояс "Контрастні ромби"', price: 1400, material: 'Японський бісер', image: require('@/assets/Контрастні ромби.png') },
+        { id: 11, name: 'Пояс "Сині зорі"', price: 790, material: 'Китайський бісер', image: require('@/assets/Сині зорі.png') },
+        { id: 12, name: 'Пояс "Сніжні ромби"', price: 1080, material: 'Чеський бісер', image: require('@/assets/Сніжні ромби.png') },
+      ],
+      currentPage: 0,
+      itemsPerPage: 15, // кількість елементів на сторінці
+      wishlist: [],
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.belts.length / this.itemsPerPage);
     },
-    data() {
-      return {
-        belts: [
-          {
-            id: 1,
-            name: 'Пояс "Маковий сплеск"',
-            price: 1500,
-            material: 'Чеський бісер',
-            image: require('@/assets/Маковий сплеск.png'),
-          },
-          {
-            id: 2,
-            name: 'Пояс "Сині мрії"',
-            price: 750,
-            material: 'Китайський бісер',
-            image: require('@/assets/Сині мрії.png'),
-          },
-          {
-            id: 3,
-            name: 'Пояс "Золота симфонія маків"',
-            price: 760,
-            material: 'Китайський бісер',
-            image: require('@/assets/Золота симфонія маків.png'),
-          },
-          {
-            id: 4,
-            name: 'Пояс "Квітковий акорд"',
-            price: 1490,
-            material: 'Японський бісер',
-            image: require('@/assets/Квітковий акорд.png'),
-          },
-          {
-            id: 5,
-            name: 'Пояс "Ромбове мереживо"',
-            price: 1120,
-            material: 'Чеський бісер',
-            image: require('@/assets/Ромбове мереживо.png'),
-          },
-          {
-            id: 6,
-            name: 'Пояс "Гуцульський"',
-            price: 1580,
-            material: 'Японський бісер',
-            image: require('@/assets/Гуцульський2.png'),
-          },
-          {
-            id: 7,
-            name: 'Пояс "Різнобарвна симфонія"',
-            price: 1160,
-            material: 'Чеський бісер',
-            image: require('@/assets/Різнобарвна симфонія.png'),
-          },
-          {
-            id: 8,
-            name: 'Пояс "Ромбові відблиски"',
-            price: 700,
-            material: 'Китайський бісер',
-            image: require('@/assets/Ромбові відблиски.png'),
-          },
-          {
-            id: 9,
-            name: 'Пояс "Квітковий стиль"',
-            price: 1680,
-            material: 'Японський бісер',
-            image: require('@/assets/Квітковий стиль.png'),
-          },
-          {
-            id: 10,
-            name: 'Пояс "Контрастні ромби"',
-            price: 1400,
-            material: 'Японський бісер',
-            image: require('@/assets/Контрастні ромби.png'),
-          },
-          {
-            id: 11,
-            name: 'Пояс "Сині зорі"',
-            price: 790,
-            material: 'Китайський бісер',
-            image: require('@/assets/Сині зорі.png'),
-          },
-          {
-            id: 12,
-            name: 'Пояс "Сніжні ромби"',
-            price: 1080,
-            material: 'Чеський бісер',
-            image: require('@/assets/Сніжні ромби.png'),
-          },
-        ],
-        wishlist: [],
-      };
+    visibleBelts() {
+      const start = this.currentPage * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.belts.slice(start, end);
+    }
+  },
+  methods: {
+    changePage(page) {
+      if (page >= 0 && page < this.totalPages) {
+        this.currentPage = page;
+      }
     },
-    methods: {
-      isInWishlist(productName) {
-        return this.wishlist.includes(productName);
-      },
-      toggleWishlist(belt) {
-        if (this.isInWishlist(belt.name)) {
-          this.wishlist = this.wishlist.filter(item => item !== belt.name);
-          alert(`${belt.name} видалено зі списку бажаного!`);
-        } else {
-          this.wishlist.push(belt.name);
-          alert(`${belt.name} додано до списку бажаного!`);
-        }
-      },
+    isInWishlist(productName) {
+      return this.wishlist.includes(productName);
     },
-  };
-  </script>
+    toggleWishlist(belt) {
+      if (this.isInWishlist(belt.name)) {
+        this.wishlist = this.wishlist.filter(item => item !== belt.name);
+        alert(`${belt.name} видалено зі списку бажаного!`);
+      } else {
+        this.wishlist.push(belt.name);
+        alert(`${belt.name} додано до списку бажаного!`);
+      }
+    },
+  },
+};
+</script>
+
   
   
   <style scoped>
@@ -537,6 +491,37 @@
   width: 10px;
   height: 10px;
   margin-right: 5px;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  transition: all 0.3s ease; /* Додаємо плавний перехід */
+}
+
+.pagination button:hover {
+  background-color: #6b1f1f; /* Колір фону при ховері */
+  color: white; /* Колір тексту при ховері */
+  transform: scale(1.1); /* Збільшення кнопки */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+}
+
+.pagination button.active {
+  background-color: #6b1f1f;
+  color: white;
 }
 </style>
   

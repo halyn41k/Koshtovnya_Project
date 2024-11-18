@@ -1,184 +1,214 @@
 <template>
-    <section class="earings-section">
-      <aside class="sidebar">
-        <FilterComponent />
-      </aside>
-      <main class="main-content">
-        <h1 class="section-title">Сережки</h1>
-        <div class="earings-grid">
-          <article
-            v-for="(earing, index) in earings"
-            :key="index"
-            :class="['earings-card', { 'special-background': earing.id === 3 || earing.id === 5 }]"
-          >
-            <div class="image-container">
-              <img :src="earing.image" :alt="earing.name" class="earings-image" />
-            </div>
-            <div class="earings-info">
-              <h2 class="earings-name">{{ earing.name }}</h2>
-              <p class="earings-price">{{ earing.price }}₴</p>
-              <div class="material-wishlist">
-                <p class="earings-material">{{ earing.material }}</p>
-                <div class="wishlist-icon" @click="toggleWishlist(earing)">
-                  <svg
-                    v-if="isInWishlist(earing.name)"
-                    class="filled-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <svg
-                    v-else
-                    class="empty-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                  </svg>
-                </div>
+  <section class="earings-section">
+    <aside class="sidebar">
+      <FilterComponent />
+    </aside>
+    <main class="main-content">
+      <h1 class="section-title">Сережки</h1>
+      <div class="earings-grid">
+        <article
+          v-for="(earing, index) in visibleEarings"
+          :key="index"
+          :class="['earings-card', { 'special-background': earing.id === 3 || earing.id === 5 }]"
+        >
+          <div class="image-container">
+            <img :src="earing.image" :alt="earing.name" class="earings-image" />
+          </div>
+          <div class="earings-info">
+            <h2 class="earings-name">{{ earing.name }}</h2>
+            <p class="earings-price">{{ earing.price }}₴</p>
+            <div class="material-wishlist">
+              <p class="earings-material">{{ earing.material }}</p>
+              <div class="wishlist-icon" @click="toggleWishlist(earing)">
+                <svg
+                  v-if="isInWishlist(earing.name)"
+                  class="filled-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <svg
+                  v-else
+                  class="empty-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                </svg>
               </div>
-              <button class="buy-button">
-                <span>Купити</span>
-                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-              </button>
             </div>
-          </article>
-        </div>
-      </main>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    </section>
-    <section class="category-product-section">
-  <CategoryProduct />
-</section>
+            <button class="buy-button">
+              <span>Купити</span>
+              <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          v-for="page in totalPages" 
+          :key="page" 
+          :class="['page-button', { active: currentPage === page - 1 }]" 
+          @click="changePage(page - 1)"
+        >
+          {{ page }}
+        </button>
+      </div>
+    </main>
+  </section>
+
+  <section class="category-product-section">
+    <CategoryProduct />
+  </section>
 </template>
-  
-  <script>
-  import { defineAsyncComponent } from 'vue';
-  
-  export default {
-    name: 'EaringsSection',
-    components: {
-      FilterComponent: defineAsyncComponent(() =>
-        import('./FilterComponent.vue')
-      ),
-      CategoryProduct: defineAsyncComponent(() =>
-        import('./CategoryProduct.vue')
-      ),
+
+<script>
+import { defineAsyncComponent } from 'vue'; 
+
+export default {
+  name: 'EaringsSection',
+  components: {
+    FilterComponent: defineAsyncComponent(() =>
+      import('./FilterComponent.vue')
+    ),
+    CategoryProduct: defineAsyncComponent(() =>
+      import('./CategoryProduct.vue')
+    ),
+  },
+  data() {
+    return {
+      earings: [
+        {
+          id: 1,
+          name: 'Сережки "Орнамент"',
+          price: 120,
+          material: 'Чеський бісер',
+          image: require('@/assets/Орнамент.png'),
+        },
+        {
+          id: 2,
+          name: 'Сережки "Танок вогню і світла"',
+          price: 75,
+          material: 'Китайський бісер',
+          image: require('@/assets/Танок вогню і світла.png'),
+        },
+        {
+          id: 3,
+          name: 'Сережки "Маки"',
+          price: 310,
+          material: 'Японський бісер',
+          image: require('@/assets/Маки.png'),
+        },
+        {
+          id: 4,
+          name: 'Сережки "Вишиванка"',
+          price: 290,
+          material: 'Японський бісер',
+          image: require('@/assets/Вишиванка.png'),
+        },
+        {
+          id: 5,
+          name: 'Сережки "Сонячний спалах"',
+          price: 185,
+          material: 'Чеський бісер',
+          image: require('@/assets/Сонячний спалах.png'),
+        },
+        {
+          id: 6,
+          name: 'Сережки "Рубінові квіти"',
+          price: 150,
+          material: 'Чеський бісер',
+          image: require('@/assets/Рубінові квіти.png'),
+        },
+        {
+          id: 7,
+          name: 'Сережки "Небесне натхнення"',
+          price: 80,
+          material: 'Китайський бісер',
+          image: require('@/assets/Небесне натхнення.png'),
+        },
+        {
+          id: 8,
+          name: 'Сережки "Сонячна хвиля"',
+          price: 240,
+          material: 'Японський бісер',
+          image: require('@/assets/Сонячна хвиля.png'),
+        },
+        {
+          id: 9,
+          name: 'Сережки "Смарагдова тінь"',
+          price: 90,
+          material: 'Китайський бісер',
+          image: require('@/assets/Смарагдова тінь.png'),
+        },
+        {
+          id: 10,
+          name: 'Сережки "Поле трояндів"',
+          price: 90,
+          material: 'Китайський бісер',
+          image: require('@/assets/Поле трояндів.png'),
+        },
+        {
+          id: 11,
+          name: 'Сережки "Сонячний обрі́й"',
+          price: 145,
+          material: 'Чеський бісер',
+          image: require('@/assets/Сонячний обрі́й.png'),
+        },
+        {
+          id: 12,
+          name: 'Сережки "Сніжний мак"',
+          price: 240,
+          material: 'Японський бісер',
+          image: require('@/assets/Сніжний мак.png'),
+        },
+      ],
+      currentPage: 0,
+      itemsPerPage: 9, // Кількість елементів на сторінці
+      wishlist: [],
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.earings.length / this.itemsPerPage);
     },
-    data() {
-      return {
-        earings: [
-          {
-            id: 1,
-            name: 'Сережки "Орнамент"',
-            price: 120,
-            material: 'Чеський бісер',
-            image: require('@/assets/Орнамент.png'),
-          },
-          {
-            id: 2,
-            name: 'Сережки "Танок вогню і світла"',
-            price: 75,
-            material: 'Китайський бісер',
-            image: require('@/assets/Танок вогню і світла.png'),
-          },
-          {
-            id: 3,
-            name: 'Сережки "Маки"',
-            price: 310,
-            material: 'Японський бісер',
-            image: require('@/assets/Маки.png'),
-          },
-          {
-            id: 4,
-            name: 'Сережки "Вишиванка"',
-            price: 290,
-            material: 'Японський бісер',
-            image: require('@/assets/Вишиванка.png'),
-          },
-          {
-            id: 5,
-            name: 'Сережки "Сонячний спалах"',
-            price: 185,
-            material: 'Чеський бісер',
-            image: require('@/assets/Сонячний спалах.png'),
-          },
-          {
-            id: 6,
-            name: 'Сережки "Рубінові квіти"',
-            price: 150,
-            material: 'Чеський бісер',
-            image: require('@/assets/Рубінові квіти.png'),
-          },
-          {
-            id: 7,
-            name: 'Сережки "Небесне натхнення"',
-            price: 80,
-            material: 'Китайський бісер',
-            image: require('@/assets/Небесне натхнення.png'),
-          },
-          {
-            id: 8,
-            name: 'Сережки "Сонячна хвиля"',
-            price: 240,
-            material: 'Японський бісер',
-            image: require('@/assets/Сонячна хвиля.png'),
-          },
-          {
-            id: 9,
-            name: 'Сережки "Смарагдова тінь"',
-            price: 90,
-            material: 'Китайський бісер',
-            image: require('@/assets/Смарагдова тінь.png'),
-          },
-          {
-            id: 10,
-            name: 'Сережки "Поле трояндів"',
-            price: 90,
-            material: 'Китайський бісер',
-            image: require('@/assets/Поле трояндів.png'),
-          },
-          {
-            id: 11,
-            name: 'Сережки "Сонячний обрі́й"',
-            price: 145,
-            material: 'Чеський бісер',
-            image: require('@/assets/Сонячний обрі́й.png'),
-          },
-          {
-            id: 12,
-            name: 'Сережки "Сніжний мак"',
-            price: 240,
-            material: 'Японський бісер',
-            image: require('@/assets/Сніжний мак.png'),
-          },
-        ],
-        wishlist: [],
-      };
+    visibleEarings() {
+      const start = this.currentPage * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.earings.slice(start, end);
+    }
+  },
+  methods: {
+    changePage(page) {
+      if (page >= 0 && page < this.totalPages) {
+        this.currentPage = page;
+      }
     },
-    methods: {
-      isInWishlist(productName) {
-        return this.wishlist.includes(productName);
-      },
-      toggleWishlist(earing) {
-        if (this.isInWishlist(earing.name)) {
-          this.wishlist = this.wishlist.filter(item => item !== earing.name);
-          alert(`${earing.name} видалено зі списку бажаного!`);
-        } else {
-          this.wishlist.push(earing.name);
-          alert(`${earing.name} додано до списку бажаного!`);
-        }
-      },
+    isInWishlist(productName) {
+      return this.wishlist.includes(productName);
     },
-  };
-  </script>
+    toggleWishlist(earing) {
+      if (this.isInWishlist(earing.name)) {
+        this.wishlist = this.wishlist.filter(item => item !== earing.name);
+        alert(`${earing.name} видалено зі списку бажаного!`);
+      } else {
+        this.wishlist.push(earing.name);
+        alert(`${earing.name} додано до списку бажаного!`);
+      }
+    },
+  },
+};
+</script>
+
   
   <style scoped>
   @font-face {
@@ -356,6 +386,37 @@
   width: 10px;
   height: 10px;
   margin-right: 5px;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  transition: all 0.3s ease; /* Додаємо плавний перехід */
+}
+
+.pagination button:hover {
+  background-color: #6b1f1f; /* Колір фону при ховері */
+  color: white; /* Колір тексту при ховері */
+  transform: scale(1.1); /* Збільшення кнопки */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+}
+
+.pagination button.active {
+  background-color: #6b1f1f;
+  color: white;
 }
   </style>
   

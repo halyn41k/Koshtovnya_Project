@@ -1,179 +1,141 @@
 <template>
-    <section class="gerdan-section">
-      <aside class="sidebar">
-        <FilterComponent />
-      </aside>
-      <main class="main-content">
-        <h1 class="section-title">Гердани</h1>
-        <div class="gerdan-grid">
-          <article
-            v-for="(gerdan, index) in gerdans"
-            :key="index"
-            :class="['gerdan-card', { 'special-background': gerdan.id === 3 || gerdan.id === 5 }]"
-          >
-            <div class="image-container">
-              <img :src="gerdan.image" :alt="gerdan.name" class="gerdan-image" />
-            </div>
-            <div class="gerdan-info">
-              <h2 class="gerdan-name">{{ gerdan.name }}</h2>
-              <p class="gerdan-price">{{ gerdan.price }}</p>
-              <div class="material-wishlist">
-                <p class="gerdan-material">{{ gerdan.material }}</p>
-                <div class="wishlist-icon" @click="toggleWishlist(gerdan)">
-                  <svg
-                    v-if="isInWishlist(gerdan.name)"
-                    class="filled-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <svg
-                    v-else
-                    class="empty-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                  </svg>
-                </div>
+  <section class="gerdan-section">
+    <aside class="sidebar">
+      <FilterComponent />
+    </aside>
+    <main class="main-content">
+      <h1 class="section-title">Гердани</h1>
+      <div class="gerdan-grid">
+        <article
+          v-for="(gerdan, index) in visibleGerdans"
+          :key="index"
+          :class="['gerdan-card', { 'special-background': gerdan.id === 3 || gerdan.id === 5 }]"
+        >
+          <div class="image-container">
+            <img :src="gerdan.image" :alt="gerdan.name" class="gerdan-image" />
+          </div>
+          <div class="gerdan-info">
+            <h2 class="gerdan-name">{{ gerdan.name }}</h2>
+            <p class="gerdan-price">{{ gerdan.price }}</p>
+            <div class="material-wishlist">
+              <p class="gerdan-material">{{ gerdan.material }}</p>
+              <div class="wishlist-icon" @click="toggleWishlist(gerdan)">
+                <svg
+                  v-if="isInWishlist(gerdan.name)"
+                  class="filled-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <svg
+                  v-else
+                  class="empty-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                </svg>
               </div>
-              <button class="buy-button">
-                <span>Купити</span>
-              <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-              </button>
             </div>
-          </article>
-        </div>
-      </main>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    </section>
+            <button class="buy-button">
+              <span>Купити</span>
+            <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+            </button>
+          </div>
+        </article>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination">
+        <button 
+          v-for="page in totalPages" 
+          :key="page" 
+          :class="['page-button', { active: currentPage === page - 1 }]" 
+          @click="changePage(page - 1)"
+        >
+          {{ page }}
+        </button>
+      </div>
+    </main>
+  </section>
 
 <section class="category-product-section">
   <CategoryProduct />
 </section>
 </template>
   
-  <script>
-  import { defineAsyncComponent } from 'vue'; 
-  
-  export default {
-    name: 'GerdanSection',
-    components: {
-      FilterComponent: defineAsyncComponent(() =>
-        import('./FilterComponent.vue')
-      ),
-      CategoryProduct: defineAsyncComponent(() =>
-        import('./CategoryProduct.vue')
-      ),
+<script>
+import { defineAsyncComponent } from 'vue'; 
+
+export default {
+  name: 'GerdanSection',
+  components: {
+    FilterComponent: defineAsyncComponent(() =>
+      import('./FilterComponent.vue')
+    ),
+    CategoryProduct: defineAsyncComponent(() =>
+      import('./CategoryProduct.vue')
+    ),
+  },
+  data() {
+    return {
+      gerdans: [
+        { id: 1, name: 'Гердан "Квітка папороті"', price: '1500₴', material: 'Чешський бісер', image: require('@/assets/Квітка папороті.png') },
+        { id: 2, name: 'Гердан "Гуцулка"', price: '1200₴', material: 'Чешський бісер', image: require('@/assets/Гуцулка.png') },
+        { id: 3, name: 'Гердан "Українська вишиванка"', price: '2100₴', material: 'Японський бісер', image: require('@/assets/Українська вишиванка.png') },
+        { id: 4, name: 'Гердан "Фіалковий"', price: '800₴', material: 'Китайський бісер', image: require('@/assets/Фіалковий.png') },
+        { id: 5, name: 'Гердан "Теплі спогади"', price: '1900₴', material: 'Японський бісер', image: require('@/assets/Теплі спогади.png') },
+        { id: 6, name: 'Гердан "Макове диво"', price: '850₴', material: 'Китайський бісер', image: require('@/assets/Макове диво.png') },
+        { id: 7, name: 'Гердан "Червоно-білий"', price: '750₴', material: 'Китайський бісер', image: require('@/assets/Червоно-Білий.png') },
+        { id: 8, name: 'Гердан "Калина"', price: '2320₴', material: 'Японський бісер', image: require('@/assets/Калина.png') },
+        { id: 9, name: 'Гердан "Прозорий"', price: '1650₴', material: 'Чешський бісер', image: require('@/assets/Прозорий.png') },
+        { id: 10, name: 'Гердан "Мереживо"', price: '1300₴', material: 'Чешський бісер', image: require('@/assets/Мереживо.png') },
+        { id: 11, name: 'Гердан "Петрівський розпис"', price: '1100₴', material: 'Китайський бісер', image: require('@/assets/Петрівський розпис.png') },
+      ],
+      currentPage: 0,
+      itemsPerPage: 15,
+      wishlist: [],
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.gerdans.length / this.itemsPerPage);
     },
-    data() {
-      return {
-        gerdans: [
-          {
-            id: 1,
-            name: 'Гердан "Квітка папороті"',
-            price: '1500₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Квітка папороті.png'),
-          },
-          {
-            id: 2,
-            name: 'Гердан "Гуцулка"',
-            price: '1200₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Гуцулка.png'),
-          },
-          {
-            id: 3,
-            name: 'Гердан "Українська вишиванка"',
-            price: '2100₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Українська вишиванка.png'),
-          },
-          {
-            id: 4,
-            name: 'Гердан "Фіалковий"',
-            price: '800₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Фіалковий.png'),
-          },
-          {
-            id: 5,
-            name: 'Гердан "Теплі спогади"',
-            price: '1900₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Теплі спогади.png'),
-          },
-          
-          {
-            id: 7,
-            name: 'Гердан "Макове диво"',
-            price: '850₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Макове диво.png'),
-          },
-          {
-            id: 8,
-            name: 'Гердан "Червоно-білий"',
-            price: '750₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Червоно-Білий.png'),
-          },
-          {
-            id: 9,
-            name: 'Гердан "Калина"',
-            price: '2320₴',
-            material: 'Японський бісер',
-            image: require('@/assets/Калина.png'),
-          },
-          {
-            id: 10,
-            name: 'Гердан "Прозорий"',
-            price: '1650₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Прозорий.png'),
-          },
-          {
-            id: 11,
-            name: 'Гердан "Мереживо"',
-            price: '1300₴',
-            material: 'Чешський бісер',
-            image: require('@/assets/Мереживо.png'),
-          },
-          {
-            id: 12,
-            name: 'Гердан "Петрівський розпис"',
-            price: '1100₴',
-            material: 'Китайський бісер',
-            image: require('@/assets/Петрівський розпис.png'),
-          },
-        ],
-        wishlist: [],
-      };
+    visibleGerdans() {
+      const start = this.currentPage * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.gerdans.slice(start, end);
+    }
+  },
+  methods: {
+    changePage(page) {
+      if (page >= 0 && page < this.totalPages) {
+        this.currentPage = page;
+      }
     },
-    methods: {
-      isInWishlist(productName) {
-        return this.wishlist.includes(productName);
-      },
-      toggleWishlist(gerdan) {
-        if (this.isInWishlist(gerdan.name)) {
-          this.wishlist = this.wishlist.filter(item => item !== gerdan.name);
-          alert(`${gerdan.name} видалено зі списку бажаного!`);
-        } else {
-          this.wishlist.push(gerdan.name);
-          alert(`${gerdan.name} додано до списку бажаного!`);
-        }
-      },
+    isInWishlist(productName) {
+      return this.wishlist.includes(productName);
     },
-  };
-  </script>
+    toggleWishlist(gerdan) {
+      if (this.isInWishlist(gerdan.name)) {
+        this.wishlist = this.wishlist.filter(item => item !== gerdan.name);
+        alert(`${gerdan.name} видалено зі списку бажаного!`);
+      } else {
+        this.wishlist.push(gerdan.name);
+        alert(`${gerdan.name} додано до списку бажаного!`);
+      }
+    },
+  },
+};
+</script>
+
   
   <style scoped>
   @font-face {
@@ -351,6 +313,37 @@
   width: 10px;
   height: 10px;
   margin-right: 5px;
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  transition: all 0.3s ease; /* Додаємо плавний перехід */
+}
+
+.pagination button:hover {
+  background-color: #6b1f1f; /* Колір фону при ховері */
+  color: white; /* Колір тексту при ховері */
+  transform: scale(1.1); /* Збільшення кнопки */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+}
+
+.pagination button.active {
+  background-color: #6b1f1f;
+  color: white;
 }
   </style>
   
