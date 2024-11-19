@@ -87,9 +87,8 @@ export default {
   },
   data() {
     return {
-      bracelets: [], // Массив браслетів
+      bracelets: [], // Масив браслетів
       wishlist: [],
-      categories: [],
       currentPage: 0,
       itemsPerPage: 15, // Кількість елементів на сторінці
     };
@@ -102,13 +101,14 @@ export default {
       const start = this.currentPage * this.itemsPerPage;
       const end = start + this.itemsPerPage;
       return this.bracelets.slice(start, end); // Видимі браслети на поточній сторінці
-    }
+    },
   },
   methods: {
     async fetchBracelets() {
       try {
-        const response = await axios.get('http://192.168.1.44:8080/api/categories/3/products');
-        this.bracelets = response.data; // Завантажити браслети з API
+        const response = await axios.get('http://26.235.139.202:8080/api/categories/3/products');
+        console.log(response.data); // Для перевірки
+        this.bracelets = response.data.data; // Витягуємо масив браслетів із поля data
       } catch (error) {
         console.error('Помилка при отриманні браслетів:', error);
       }
@@ -135,6 +135,7 @@ export default {
     this.fetchBracelets();
   },
 };
+
 </script>
 
 
@@ -311,5 +312,36 @@ export default {
     height: 10px;
     margin-right: 5px;
   }
+
+  
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  transition: all 0.3s ease; /* Додаємо плавний перехід */
+}
+
+.pagination button:hover {
+  background-color: #6b1f1f; /* Колір фону при ховері */
+  color: white; /* Колір тексту при ховері */
+  transform: scale(1.1); /* Збільшення кнопки */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+}
+
+.pagination button.active {
+  background-color: #6b1f1f;
+  color: white;
+}
   </style>
   

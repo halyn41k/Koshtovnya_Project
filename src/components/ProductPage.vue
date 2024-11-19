@@ -19,7 +19,10 @@
                 <h1 class="product-title">{{ product.name }}</h1>
                 <hr class="thin-divider" />
                 <p class="product-price">{{ product.price }}₴</p>
-                <div class="availability-badge" :class="{ 'available': product.is_available, 'unavailable': !product.is_available }">
+                <div
+                  class="availability-badge"
+                  :class="{ 'available': product.is_available, 'unavailable': !product.is_available }"
+                >
                   <span>{{ product.is_available ? 'В наявності' : 'Немає в наявності' }}</span>
                 </div>
                 <p class="delivery-time">Приблизний час доставки: 1-7 днів</p>
@@ -28,13 +31,25 @@
               <label for="size-select" class="size-label">Розмір</label>
               <div class="size-selector">
                 <select id="size-select" class="size-dropdown">
-                  <option v-for="size in product.sizes" :key="size" :value="size">{{ size }} см</option>
+                  <option
+                    v-for="size in product.sizes"
+                    :key="size"
+                    :value="size"
+                  >
+                    {{ size }} см
+                  </option>
                 </select>
               </div>
               <div class="purchase-controls">
                 <!-- Кількість товару -->
                 <div class="quantity-selector">
-                  <input type="number" v-model="quantity" :max="product.quantity" min="1" class="quantity-input" />
+                  <input
+                    type="number"
+                    v-model="quantity"
+                    :max="product.quantity"
+                    min="1"
+                    class="quantity-input"
+                  />
                 </div>
                 <button class="buy-button" :disabled="!product.is_available">
                   <span class="buy-text">Купити</span>
@@ -50,9 +65,13 @@
     <h2 class="specifications-title">Характеристики</h2>
     <section class="specifications-list">
       <dl class="spec-grid">
-        <div class="spec-item" v-for="(spec, index) in product.specifications" :key="index">
-          <dt class="spec-term">{{ spec.term }}</dt>
-          <dd class="spec-description">{{ spec.description }}</dd>
+        <div
+          class="spec-item"
+          v-for="(value, key) in productCharacteristics"
+          :key="key"
+        >
+          <dt class="spec-term">{{ key }}</dt>
+          <dd class="spec-description">{{ value }}</dd>
         </div>
       </dl>
     </section>
@@ -67,28 +86,35 @@ export default {
       quantity: 1,
     };
   },
+  computed: {
+    productCharacteristics() {
+      // Вибираємо всі характеристики, крім певних
+      const excludeKeys = ['id', 'name', 'price', 'image_url', 'sizes', 'is_available', 'quantity'];
+      return Object.keys(this.product)
+        .filter((key) => !excludeKeys.includes(key))
+        .reduce((obj, key) => {
+          obj[key] = this.product[key];
+          return obj;
+        }, {});
+    },
+  },
   created() {
-    // Отримуємо ID товару з URL
     const productId = this.$route.params.id;
-    
-    // Запит до API для отримання даних про товар
-    fetch(`http://192.168.1.44:8080/api/products/${productId}`)
-      .then(response => response.json())
-      .then(data => {
+    fetch(`http://26.235.139.202:8080/api/products/${productId}`)
+      .then((response) => response.json())
+      .then((data) => {
         this.product = data.data;
       })
-      .catch(error => {
-        console.error("Помилка при завантаженні даних про товар:", error);
+      .catch((error) => {
+        console.error('Помилка при завантаженні даних про товар:', error);
       });
   },
 };
 </script>
-  
-  <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Montserrat:wght@700&family=Inter:wght@600&display=swap');
-  
-  /* Layout */
-  .product-content {
+
+<style scoped>
+/* Layout */
+.product-content {
     display: flex;
     flex-direction: column;
     margin-top: 250px;
@@ -105,11 +131,10 @@ export default {
   }
   
   .product-image {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: contain;
-  }
-  
+  width: 90%;
+  height: 300px; /* Фіксована висота */
+  object-fit: cover; /* Забезпечує покриття без спотворень */
+}
   .size-icon {
     position: absolute;
     right: -20px;

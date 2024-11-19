@@ -211,21 +211,28 @@ export default {
 },
 methods: {
   async fetchPopularProducts() {
-    try {
-      const response = await fetch("http://192.168.1.44:8080/api/popular-products");
-      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-      const data = await response.json();
-      this.products = data.data;
-    } catch (error) {
-      console.error("Помилка при отриманні популярних товарів:", error.message);
-      this.products = this.testPopularProducts; // Використовуємо тестові дані
+  try {
+    const response = await fetch("http://26.235.139.202:8080/api/popular-products");
+    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    const data = await response.json();
 
-      this.updateVisibleProducts();
-    }
-  },
+    // Очищення даних
+    this.products = data.data.map(product => ({
+      ...product,
+      name: product.name.trim(), // Видаляємо зайві пробіли або символи
+      image_url: product.image_url.trim() // Видаляємо зайві пробіли або символи
+    }));
+
+    this.updateVisibleProducts(); // Оновлюємо видимі продукти
+  } catch (error) {
+    console.error("Помилка при отриманні популярних товарів:", error.message);
+    this.products = this.testPopularProducts; // Використовуємо тестові дані
+    this.updateVisibleProducts();
+  }
+},
   async fetchNewArrivals() {
     try {
-      const response = await fetch("http://192.168.1.44:8080/api/new-arrivals");
+      const response = await fetch("http://26.235.139.202:8080/api/new-arrivals");
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const data = await response.json();
       this.newArrivals = data.data;

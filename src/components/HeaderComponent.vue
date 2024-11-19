@@ -33,11 +33,13 @@
           type="text"
           v-model="searchQuery"
           placeholder="Пошук в нашому каталозі"
-          @keyup.enter="search"
+          @keyup.enter="startSearch"
         />
-        <div class="search-icon" @click="search">
+        <div class="search-icon" @click="startSearch">
           <img src="@/assets/magnifying-glass-svgrepo-com.svg" alt="Search Icon" />
         </div>
+        <!-- Компонент для результатів -->
+        <SearchResults :query="searchQuery" />
       </div>
 
       <router-link to="/" class="logo">
@@ -53,8 +55,6 @@
         <router-link to="/cart" class="cart-icon">
           <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon" />
         </router-link>
-
-        <MiniCart v-if="isMiniCartVisible" :items="cartItems" :total="total" />
       </div>
     </div>
 
@@ -68,39 +68,21 @@
         <li><router-link to="/belts">Пояси</router-link></li>
       </ul>
     </nav>
-
-    <!-- Розділ для відображення результатів пошуку -->
-    <div v-if="searchResults.length > 0" class="search-results">
-      <h2>Результати пошуку:</h2>
-      <ul>
-        <li v-for="product in searchResults" :key="product.id" class="search-result-item">
-          <img :src="product.image_url" alt="Product Image" />
-          <div class="product-details">
-            <h3>{{ product.name }}</h3>
-            <p>Ціна: {{ product.price }} ₴</p>
-          </div>
-        </li>
-      </ul>
-    </div>
   </header>
 </template>
 
 <script>
-import axios from 'axios'; // імпорт бібліотеки axios
+import SearchResults from './SearchResults.vue';
 
 export default {
+  components: {
+    SearchResults,
+  },
   data() {
     return {
       searchQuery: '',
       selectedLanguage: 'uk',
       selectedCurrency: 'UAH',
-      isMiniCartVisible: false,
-      cartItems: [
-        { id: 1, name: 'Браслет', price: 250, quantity: 1, imageSrc: '@/assets/bracelet.png' },
-        { id: 2, name: 'Сережки', price: 150, quantity: 2, imageSrc: '@/assets/earrings.png' },
-      ],
-      total: 400,
-      searchResults: [], // Додано для зберігання результатів пошуку
     };
   },
   computed: {
@@ -111,38 +93,14 @@ export default {
     },
   },
   methods: {
-    showMiniCart() {
-      this.isMiniCartVisible = true;
-    },
-    hideMiniCart() {
-      this.isMiniCartVisible = false;
-    },
-    search() {
-  if (this.searchQuery.trim() === '') {
-    return; // Не виконувати запит, якщо поле пошуку порожнє
-  }
-
-  const apiUrl = `http://192.168.1.44:8080/api/products/search/${this.searchQuery}`;
-
-  axios.get(apiUrl)
-    .then(response => {
-      this.searchResults = response.data.data; // Оновлення результатів пошуку
-    })
-    .catch(error => {
-      console.error('Error fetching search results:', error);
-      this.searchResults = []; // Очистка результатів у випадку помилки
-    });
-
-
+    startSearch() {
+      // Логіка пошуку, якщо потрібно
+      console.log('Searching:', this.searchQuery);
     },
   },
-  mounted() {
-    this.$router.afterEach((to) => {
-      console.log('Navigated to:', to.path);
-    });
-  }
 };
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Montserrat:wght@400&display=swap');

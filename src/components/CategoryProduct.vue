@@ -7,7 +7,7 @@
         <router-link
           v-for="(category, index) in categories"
           :key="category.id"
-          :to="`/category/${category.id}`"
+          :to="category.url"
           class="category-item with-squares"
         >
           <!-- Only display squares on 1st, 3rd, and 5th items -->
@@ -42,31 +42,37 @@ export default {
         {
           id: 1,
           name: 'Браслети',
+          url: '/bracelets', // Фіксована URL-адреса
           image_url: require('@/assets/testpicture.png'),
         },
         {
           id: 2,
           name: 'Гердани',
+          url: '/herdany', // Фіксована URL-адреса
           image_url: require('@/assets/testpicture.png'),
         },
         {
           id: 3,
           name: 'Силянки',
+          url: '/sylyanky', // Фіксована URL-адреса
           image_url: require('@/assets/testpicture.png'),
         },
         {
           id: 4,
           name: 'Дукати',
+          url: '/dukats', // Фіксована URL-адреса
           image_url: require('@/assets/testpicture.png'),
         },
         {
           id: 5,
           name: 'Сережки',
+          url: '/earrings', // Фіксована URL-адреса
           image_url: require('@/assets/testpicture.png'),
         },
         {
           id: 6,
           name: 'Пояси',
+          url: '/belts', // Фіксована URL-адреса
           image_url: require('@/assets/testpicture.png'),
         },
       ],
@@ -75,7 +81,7 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const response = await fetch("http://192.168.1.44:8080/api/categories");
+        const response = await fetch("http://26.235.139.202:8080/api/categories");
 
         if (!response.ok) {
           throw new Error(`HTTP помилка: ${response.status}`);
@@ -92,14 +98,24 @@ export default {
           throw new Error("Очікував масив категорій з API");
         }
 
-        this.categories = data.data.map((category) => ({
+        // Додаємо фіксовані URL до кожної категорії
+        const fixedUrls = [
+          '/bracelets',
+          '/herdany',
+          '/sylyanky',
+          '/dukats',
+          '/earrings',
+          '/belts',
+        ];
+
+        this.categories = data.data.map((category, index) => ({
           id: category.id,
           name: category.name,
           image_url: category.image_url,
+          url: fixedUrls[index] || '#', // Призначаємо фіксовані URL
         }));
       } catch (error) {
         console.error("Помилка при отриманні категорій:", error.message);
-        // Якщо API недоступне, використовуємо fallback-дані
         this.categories = this.fallbackCategories;
       }
     },
@@ -109,6 +125,7 @@ export default {
   },
 };
 </script>
+
   
   
   <style scoped>

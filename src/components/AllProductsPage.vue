@@ -93,7 +93,7 @@ export default {
   methods: {
     async fetchProducts(page = 1) {
       try {
-        const response = await axios.get(`http://192.168.1.44:8080/api/products?page=${page}`);
+        const response = await axios.get(`http://26.235.139.202:8080/api/products?page=${page}`);
         this.products = response.data.data; // Отримуємо масив продуктів
         this.totalPages = response.data.meta.last_page; // Визначаємо кількість сторінок
         this.currentPage = response.data.meta.current_page; // Оновлюємо поточну сторінку
@@ -233,7 +233,7 @@ export default {
   font-weight: 600;
   font-size: 20px;
   color: #a01212;
-  margin-top: -90px; /* Забираємо зайвий відступ */
+  margin-top: -230px; /* Забираємо зайвий відступ */
 }
 
 .product-material {
@@ -247,14 +247,15 @@ export default {
   justify-content: space-between;
   align-items: center;
   position: absolute; /* Позиціонуємо в середині card */
-  top: 15px; /* Відступ від верхньої частини */
   width: 100%;
+  margin-top: 220px;
 }
 .wishlist-icon {
   width: 30px;
   height: 30px;
   cursor: pointer;
   transition: transform 0.3s ease;
+  margin-left: -100px;
   
 }
 
