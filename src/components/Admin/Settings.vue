@@ -1,42 +1,92 @@
 <template>
-    <main class="settings-content">
-      <header class="settings-header">
-        <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/323c4a41975024a41335e068c0653ecd7e32a04e8e9a79655a5b6ee065ec92f4?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Settings logo" class="settings-logo" />
-        <h1 class="settings-title">Налаштування</h1>
-      </header>
-      <section class="logo-section">
-        <h2 class="section-title">Змінити логотип:</h2>
-        <button class="upload-button">Завантажити фото</button>
-      </section>
-      <section class="contact-info-section">
-        <h2 class="section-title">Змінити контактну інформацію:</h2>
-        <div class="contact-info-container">
-          <h3 class="contact-info-title">Контактна Інформація</h3>
-          <form class="contact-form">
-            <div class="form-group">
-              <label for="address" class="form-label">Адреса</label>
-              <input type="text" id="address" class="form-input" value="вул. Степана Бандери 22, Коломия" />
-            </div>
-            <div class="form-group">
-              <label for="phone" class="form-label">Телефон</label>
-              <input type="tel" id="phone" class="form-input" value="+380123456789" />
-            </div>
-            <div class="form-group">
-              <label for="email" class="form-label">Електронна пошта</label>
-              <input type="email" id="email" class="form-input" value="koshtovnya@mail.com" />
-            </div>
-            <button type="submit" class="submit-button">Зберегти зміни</button>
-          </form>
-        </div>
-      </section>
-    </main>
-  </template>
+  <main class="settings-content">
+    <header class="settings-header">
+      <img
+        loading="lazy"
+        src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/323c4a41975024a41335e068c0653ecd7e32a04e8e9a79655a5b6ee065ec92f4?apiKey=c3e46d0a629546c7a48302a5db3297d5"
+        alt="Settings logo"
+        class="settings-logo"
+      />
+      <h1 class="settings-title">Налаштування</h1>
+    </header>
+    <section class="logo-section">
+      <h2 class="section-title">Змінити логотип:</h2>
+      <button class="upload-button">Завантажити фото</button>
+    </section>
+    <section class="contact-info-section">
+      <h2 class="section-title">Змінити контактну інформацію:</h2>
+      <div class="contact-info-container">
+        <h3 class="contact-info-title">Контактна Інформація</h3>
+        <form class="contact-form" @submit.prevent="saveSettings">
+          <div class="form-group">
+            <label for="address" class="form-label">Адреса</label>
+            <input type="text" id="address" class="form-input" v-model="settings.address" />
+          </div>
+          <div class="form-group">
+            <label for="phone" class="form-label">Телефон</label>
+            <input type="tel" id="phone" class="form-input" v-model="settings.phone" />
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Електронна пошта</label>
+            <input type="email" id="email" class="form-input" v-model="settings.email" />
+          </div>
+          <button type="submit" class="submit-button">Зберегти зміни</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</template>
 
 <script>
 export default {
-  name: 'ProfitReportView',
+  name: "ProfitReportView",
+  data() {
+    return {
+      settings: {
+        address: "",
+        phone: "",
+        email: "",
+      },
+      apiUrl: "http://26.235.139.202:8080/api/site-settings",
+    };
+  },
+  methods: {
+    async fetchSettings() {
+      try {
+        const response = await fetch(this.apiUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        this.settings = data;
+      } catch (error) {
+        console.error("Помилка завантаження налаштувань:", error);
+      }
+    },
+    async saveSettings() {
+      try {
+        const response = await fetch(this.apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.settings),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        alert("Налаштування успішно збережені!");
+      } catch (error) {
+        console.error("Помилка збереження налаштувань:", error);
+      }
+    },
+  },
+  created() {
+    this.fetchSettings();
+  },
 };
 </script>
+
   
   <style scoped>
   .settings-content {

@@ -121,7 +121,7 @@
     text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-weight: bold;
-    font-size: 18px; /* Зменшено на 5 пікселів */
+    font-size: 18px; 
   }
   
   .search-results ul {
@@ -163,7 +163,7 @@
     font-family: 'Montserrat', sans-serif;
     font-weight: bold;
     margin: 0;
-    font-size: 15px; /* Зменшено на 3 пікселя */
+    font-size: 15px;
   }
   
   .product-details p {
@@ -175,11 +175,11 @@
   .highlight {
     color: gray;
     font-weight: bold;
-    font-size: 14px; /* Розмір також зменшено */
+    font-size: 14px; 
   }
   
   .search-results::-webkit-scrollbar {
-    width: 6px; /* Зроблено тоншим */
+    width: 6px; 
   }
   
   .search-results::-webkit-scrollbar-thumb {
