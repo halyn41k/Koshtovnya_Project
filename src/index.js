@@ -9,32 +9,32 @@ const routes = [
   {
     path: '/bracelets',
     name: 'BraceletSection',
-    component: () => import('@/components/BraceletSection.vue') 
+    component: () => import('@/components/Categories/BraceletSection.vue') 
   },
   {
     path: '/herdany',
     name: 'Gerdany',
-    component: () => import('@/components/GerdanSection.vue')
+    component: () => import('@/components/Categories/GerdanSection.vue')
   },
   {
     path: '/dukats',
     name: 'Dukats',
-    component: () => import('@/components/DucatsSection.vue')
+    component: () => import('@/components/Categories/DucatsSection.vue')
   },
   {
     path: '/sylyanky',
     name: 'Sylyanky',
-    component: () => import('@/components/SyluankaSection.vue')
+    component: () => import('@/components/Categories/SyluankaSection.vue')
   },
   {
     path: '/earrings',
     name: 'Earrings',
-    component: () => import('@/components/EaringsSection.vue')
+    component: () => import('@/components/Categories/EaringsSection.vue')
   },
   {
     path: '/belts',
     name: 'Belts',
-    component: () => import('@/components/BeltsSection.vue')
+    component: () => import('@/components/Categories/BeltsSection.vue')
   },
   {
     path: '/aboutus',
@@ -64,22 +64,22 @@ const routes = [
   {
     path: '/wishlist',
     name: 'UserWishlist',
-    component: () => import('@/components/UserWishlist.vue')
+    component: () => import('@/components/User/UserWishlist.vue')
   },
   {
     path: '/account',
     name: 'AccountInfo',
-    component: () => import('@/components/AccountInfo.vue')
+    component: () => import('@/components/User/AccountInfo.vue')
   },
   {
     path:'/cart',
     name: 'CartShop',
-    component: () => import('@/components/CartShopPage.vue')
+    component: () => import('@/components/Cart/CartShopPage.vue')
   },
   {
     path:'/allproduct',
     name: 'AllProductsPage',
-    component: () => import('@/components/AllProductsPage.vue')
+    component: () => import('@/components/Categories/AllProductsPage.vue')
   },
   {
     path:'/changepassword',
@@ -94,12 +94,12 @@ const routes = [
   {
     path:'/admin',
     name:'AdminPanel',
-    component: () => import('@/components/AdminPanel.vue')
+    component: () => import('@/components/Admin/AdminPanel.vue')
   },
   {
     path:'/updateproduct',
     name:'ProductUpdate',
-    component: () => import('@/components/ProductUpdate.vue')
+    component: () => import('@/components/Admin/ProductUpdate.vue')
   },
 ];
 

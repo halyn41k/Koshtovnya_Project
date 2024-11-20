@@ -1,27 +1,27 @@
 <template>
-  <section class="gerdan-section">
+  <section class="bracelet-section">
     <aside class="sidebar">
       <FilterComponent />
     </aside>
     <main class="main-content">
-      <h1 class="section-title">Гердани</h1>
-      <div class="gerdan-grid">
+      <h1 class="section-title">Браслети</h1>
+      <div class="bracelet-grid">
         <article
-          v-for="(gerdan, index) in visibleGerdans"
-          :key="index"
-          :class="['gerdan-card', { 'special-background': gerdan.id === 3 || gerdan.id === 5 }]"
+          v-for="(bracelet) in visibleBracelets" 
+          :key="bracelet.id" 
+          :class="['bracelet-card', { 'special-background': bracelet.id === 3 || bracelet.id === 5 }]"
         >
           <div class="image-container">
-            <img :src="gerdan.image" :alt="gerdan.name" class="gerdan-image" />
+            <img :src="bracelet.image_url || require('@/assets/default-image.png')" :alt="bracelet.name" class="bracelet-image" />
           </div>
-          <div class="gerdan-info">
-            <h2 class="gerdan-name">{{ gerdan.name }}</h2>
-            <p class="gerdan-price">{{ gerdan.price }}</p>
+          <div class="bracelet-info">
+            <h2 class="bracelet-name">{{ bracelet.name }}</h2>
+            <p class="bracelet-price">{{ bracelet.price }} ₴</p> 
             <div class="material-wishlist">
-              <p class="gerdan-material">{{ gerdan.material }}</p>
-              <div class="wishlist-icon" @click="toggleWishlist(gerdan)">
+              <p class="bracelet-material">{{ bracelet.material }}</p>
+              <div class="wishlist-icon" @click="toggleWishlist(bracelet)">
                 <svg
-                  v-if="isInWishlist(gerdan.name)"
+                  v-if="isInWishlist(bracelet.name)"
                   class="filled-heart"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -46,12 +46,12 @@
             </div>
             <button class="buy-button">
               <span>Купити</span>
-            <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+              <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
             </button>
           </div>
         </article>
       </div>
-      
+
       <div class="pagination">
         <button 
           v-for="page in totalPages" 
@@ -65,68 +65,83 @@
     </main>
   </section>
 
-<section class="category-product-section">
-  <CategoryProduct />
-</section>
+  <section class="category-product-section">
+    <CategoryProduct />
+  </section>
 </template>
-  
+
 <script>
-import { defineAsyncComponent } from 'vue'; // Імпорт функції для асинхронного завантаження компонентів
+import { defineAsyncComponent } from 'vue';
+import axios from 'axios';
 
 export default {
-  name: 'GerdanSection',
+  name: 'BraceletSection',
   components: {
-    FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')), // Компонент фільтра
-    CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')), // Компонент категорій
+    // Асинхронне завантаження компонентів для оптимізації
+    FilterComponent: defineAsyncComponent(() =>
+      import('../FilterComponent.vue') // Компонент для фільтрації
+    ),
+    CategoryProduct: defineAsyncComponent(() =>
+      import('../CategoryProduct.vue') // Компонент для відображення продуктів
+    ),
   },
   data() {
     return {
-      gerdans: [
-        { id: 1, name: 'Гердан "Квітка папороті"', price: '1500₴', material: 'Чешський бісер', image: require('@/assets/Квітка папороті.png') },
-        { id: 2, name: 'Гердан "Гуцулка"', price: '1200₴', material: 'Чешський бісер', image: require('@/assets/Гуцулка.png') },
-        { id: 3, name: 'Гердан "Українська вишиванка"', price: '2100₴', material: 'Японський бісер', image: require('@/assets/Українська вишиванка.png') },
-        { id: 4, name: 'Гердан "Фіалковий"', price: '800₴', material: 'Китайський бісер', image: require('@/assets/Фіалковий.png') },
-        { id: 5, name: 'Гердан "Теплі спогади"', price: '1900₴', material: 'Японський бісер', image: require('@/assets/Теплі спогади.png') },
-        { id: 6, name: 'Гердан "Макове диво"', price: '850₴', material: 'Китайський бісер', image: require('@/assets/Макове диво.png') },
-        { id: 7, name: 'Гердан "Червоно-білий"', price: '750₴', material: 'Китайський бісер', image: require('@/assets/Червоно-Білий.png') },
-        { id: 8, name: 'Гердан "Калина"', price: '2320₴', material: 'Японський бісер', image: require('@/assets/Калина.png') },
-        { id: 9, name: 'Гердан "Прозорий"', price: '1650₴', material: 'Чешський бісер', image: require('@/assets/Прозорий.png') },
-        { id: 10, name: 'Гердан "Мереживо"', price: '1300₴', material: 'Чешський бісер', image: require('@/assets/Мереживо.png') },
-        { id: 11, name: 'Гердан "Петрівський розпис"', price: '1100₴', material: 'Китайський бісер', image: require('@/assets/Петрівський розпис.png') },
-      ],
-      currentPage: 0, // Поточна сторінка
-      itemsPerPage: 15, // Кількість герданів на сторінці
-      wishlist: [], // Список бажаних товарів
+      bracelets: [], // Масив браслетів, отриманих із сервера
+      wishlist: [], // Масив бажаних продуктів
+      currentPage: 0, // Поточна сторінка пагінації
+      itemsPerPage: 15, // Кількість елементів на одній сторінці
     };
   },
   computed: {
-    totalPages() { // Розрахунок кількості сторінок
-      return Math.ceil(this.gerdans.length / this.itemsPerPage);
+    // Підрахунок загальної кількості сторінок для пагінації
+    totalPages() {
+      return Math.ceil(this.bracelets.length / this.itemsPerPage); 
     },
-    visibleGerdans() { // Гердани для поточної сторінки
-      const start = this.currentPage * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.gerdans.slice(start, end);
+    // Отримання браслетів, які будуть відображені на поточній сторінці
+    visibleBracelets() {
+      const start = this.currentPage * this.itemsPerPage; // Початковий індекс
+      const end = start + this.itemsPerPage; // Кінцевий індекс
+      return this.bracelets.slice(start, end); // Масив видимих браслетів
     },
   },
   methods: {
-    changePage(page) { // Перемикання сторінки
+    // Метод для отримання браслетів із сервера
+    async fetchBracelets() {
+      try {
+        const response = await axios.get('http://26.235.139.202:8080/api/categories/3/products');
+        console.log(response.data); // Лог для перевірки отриманих даних
+        this.bracelets = response.data.data; // Збереження браслетів у масив
+      } catch (error) {
+        console.error('Помилка при отриманні браслетів:', error); // Виведення помилки
+      }
+    },
+    // Метод для зміни поточної сторінки
+    changePage(page) {
       if (page >= 0 && page < this.totalPages) {
-        this.currentPage = page;
+        this.currentPage = page; // Змінюємо поточну сторінку, якщо вона в межах
       }
     },
-    isInWishlist(productName) { // Перевірка, чи є товар у списку бажаного
-      return this.wishlist.includes(productName);
+    // Перевірка, чи є продукт у списку бажаного
+    isInWishlist(productName) {
+      return this.wishlist.includes(productName); // Повертає true, якщо продукт у списку
     },
-    toggleWishlist(gerdan) { // Додавання/видалення товару зі списку бажаного
-      if (this.isInWishlist(gerdan.name)) {
-        this.wishlist = this.wishlist.filter(item => item !== gerdan.name);
-        alert(`${gerdan.name} видалено зі списку бажаного!`);
+    // Додавання або видалення продукту зі списку бажаного
+    toggleWishlist(bracelet) {
+      if (this.isInWishlist(bracelet.name)) {
+        // Якщо продукт уже є у списку, видаляємо його
+        this.wishlist = this.wishlist.filter(item => item !== bracelet.name);
+        alert(`${bracelet.name} видалено зі списку бажаного!`);
       } else {
-        this.wishlist.push(gerdan.name);
-        alert(`${gerdan.name} додано до списку бажаного!`);
+        // Якщо продукту немає у списку, додаємо його
+        this.wishlist.push(bracelet.name);
+        alert(`${bracelet.name} додано до списку бажаного!`);
       }
     },
+  },
+  // Викликаємо метод отримання браслетів після завантаження компонента
+  mounted() {
+    this.fetchBracelets();
   },
 };
 </script>
@@ -139,7 +154,7 @@ export default {
     font-weight: 900;
     font-style: normal;
   }
-  .gerdan-section {
+  .bracelet-section {
     display: flex;
     padding: 20px;
     justify-content: center;
@@ -163,7 +178,7 @@ export default {
     margin-bottom: 40px;
   }
   
-  .gerdan-grid {
+  .bracelet-grid {
     display: flex;
     justify-content: center;
     gap: 40px;
@@ -171,7 +186,7 @@ export default {
     width: 100%;
   }
   
-  .gerdan-card {
+  .bracelet-card {
     border-radius: 12px;
     background-color: #fff7f6;
     padding-bottom: 15px;
@@ -186,7 +201,7 @@ export default {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
-  .gerdan-card:hover {
+  .bracelet-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
@@ -196,18 +211,18 @@ export default {
     height: 180px;
   }
   
-  .gerdan-image {
+  .bracelet-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
   }
   
-  .gerdan-card:hover .gerdan-image {
+  .bracelet-card:hover .bracelet-image {
     transform: scale(1.05);
   }
   
-  .gerdan-info {
+  .bracelet-info {
     color: #333;
     padding: 10px;
     font-family: 'Merriweather', sans-serif;
@@ -218,12 +233,12 @@ export default {
     text-align: left;
   }
   
-  .gerdan-name {
+  .bracelet-name {
     font-size: 18px;
     font-weight: bold;
   }
   
-  .gerdan-price {
+  .bracelet-price {
     align-items: baseline;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
@@ -232,7 +247,7 @@ export default {
     margin-top: -5px;
   }
   
-  .gerdan-material {
+  .bracelet-material {
     font-size: 16px;
     color: #808080;
     margin-top: -20px;
@@ -294,23 +309,18 @@ export default {
   }
   
   .buy-button img {
-    width: 40px;
-    height: 30px;
+    width: 20px;
+    height: 15px;
     margin-left: auto;
   }
-  .buy-button img {
-  width: 20px;
-  height: 15px;
-  margin-left: auto;
-}
+  
+  .button-icon{
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+  }
 
-.button-icon{
-  width: 10px;
-  height: 10px;
-  margin-right: 5px;
-}
-
-
+  
 .pagination {
   display: flex;
   justify-content: center;

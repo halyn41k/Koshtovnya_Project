@@ -77,10 +77,10 @@ export default {
   components: {
     // Асинхронно завантажуємо компоненти.
     FilterComponent: defineAsyncComponent(() =>
-      import('./FilterComponent.vue')
+      import('../FilterComponent.vue')
     ),
     CategoryProduct: defineAsyncComponent(() =>
-      import('./CategoryProduct.vue')
+      import('../CategoryProduct.vue')
     ),
   },
   data() {

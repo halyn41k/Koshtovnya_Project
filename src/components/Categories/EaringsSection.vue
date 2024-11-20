@@ -81,11 +81,11 @@ export default {
   components: {
     // Компонент для фільтрації товарів
     FilterComponent: defineAsyncComponent(() =>
-      import('./FilterComponent.vue')
+      import('../FilterComponent.vue')
     ),
     // Компонент для відображення товарів у категорії
     CategoryProduct: defineAsyncComponent(() =>
-      import('./CategoryProduct.vue')
+      import('../CategoryProduct.vue')
     ),
   },
 

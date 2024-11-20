@@ -32,7 +32,7 @@
                 />
               </div>
               <div v-if="index === currentStep && step.isExpanded" class="step-content">
-=                <template v-if="step.title === 'Особиста інформація'">
+                <template v-if="step.title === 'Особиста інформація'">
                   <div class="input-container">
                     <input class="input-field" v-model="formData.firstName" placeholder="Ім'я" />
                     <span v-if="errors.firstName" class="error">{{ errors.firstName }}</span>

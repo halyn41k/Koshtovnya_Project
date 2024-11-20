@@ -79,8 +79,8 @@ export default {
   name: 'AllProducts', // Ім'я компонента
   components: {
     // Динамічне підключення компонентів для фільтрації та відображення категорій
-    FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')),
-    CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')),
+    FilterComponent: defineAsyncComponent(() => import('../FilterComponent.vue')),
+    CategoryProduct: defineAsyncComponent(() => import('../CategoryProduct.vue')),
   },
   data() {
     return {

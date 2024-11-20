@@ -78,8 +78,8 @@ export default {
   name: 'BeltsSection', // Ім'я компонента
   components: {
     // Асинхронне завантаження компонентів для фільтрації та категорій
-    FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')),
-    CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')),
+    FilterComponent: defineAsyncComponent(() => import('../FilterComponent.vue')),
+    CategoryProduct: defineAsyncComponent(() => import('../CategoryProduct.vue')),
   },
   data() {
     return {
