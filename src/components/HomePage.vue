@@ -1,9 +1,7 @@
 <template>
   <div class="main-container">
-    <!-- Welcome Section -->
     <div class="welcome-image"></div>
 
-    <!-- Header Text and New Button -->
     <div class="text-container">
       <div class="handmade-beaded-products">
         Вироби ручної роботи<br>з бісеру
@@ -11,13 +9,11 @@
       <div class="exclusive-necklaces-bracelets-earrings">
         <br>Ексклюзивні гердани, браслети, <br> силянки та інше
       </div>
-      <!-- New Button to View Products -->
       <router-link to="/allproduct" class="view-products-button">
       <button class="view-products-button">Дивитися вироби</button>
       </router-link>
     </div>
 
-    <!-- Content Section -->
     <div class="content-container">
       <div class="left-image-container">
         <div class="girl-image"></div>
@@ -33,7 +29,6 @@
       </div>
     </div>
 
-    <!-- Popular Goods Section -->
     <section class="popular-goods">
   <h2 class="section-title">Популярні товари</h2>
   <div class="arrow-container">
@@ -64,9 +59,6 @@
     <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
   </div>
 </section>
-
-
-    <!-- New Arrivals Section -->
     <section class="new-arrivals">
   <h2 class="section-title">Новинки</h2>
   <div class="arrow-container">
@@ -106,7 +98,6 @@
     </p>
   </div>
 
-  <!-- Instagram images displayed individually below text -->
   <div class="instagram-grid">
     <div class="instagram-image">
       <img src="@/assets/pic1.png" alt="Instagram Image 1" />
@@ -135,23 +126,21 @@
   </div>
 </div>
 
-    <!-- Category Product Component -->
     <CategoryProduct />
   </div>
 </template>
 
 <script>
-import CategoryProduct from '@/components/CategoryProduct.vue';
+import CategoryProduct from '@/components/CategoryProduct.vue'; // Імпорт компонента для відображення товарів
 
 export default {
   components: {
-    CategoryProduct
+    CategoryProduct, // Реєструємо компонент
   },
   mounted() {
-  this.fetchPopularProducts();
-  this.fetchNewArrivals();
-},
-
+    this.fetchPopularProducts(); // Завантаження популярних продуктів при монтуванні компонента
+    this.fetchNewArrivals(); // Завантаження нових надходжень при монтуванні компонента
+  },
   data() {
   return {
     products: [], // Дані з API
@@ -209,52 +198,52 @@ export default {
     ],
   };
 },
-methods: {
-  async fetchPopularProducts() {
-  try {
-    const response = await fetch("http://26.235.139.202:8080/api/popular-products");
-    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    const data = await response.json();
+  methods: {
+    async fetchPopularProducts() { // Завантаження популярних товарів з API
+      try {
+        const response = await fetch("http://26.235.139.202:8080/api/popular-products"); // Запит до API
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`); // Обробка помилки відповіді
+        const data = await response.json();
+        
+        // Очищення та збереження отриманих даних
+        this.products = data.data.map(product => ({
+          ...product,
+          name: product.name.trim(), // Видалення зайвих пробілів у назві
+          image_url: product.image_url.trim(), // Видалення зайвих пробілів у URL зображення
+        }));
 
-    // Очищення даних
-    this.products = data.data.map(product => ({
-      ...product,
-      name: product.name.trim(), // Видаляємо зайві пробіли або символи
-      image_url: product.image_url.trim() // Видаляємо зайві пробіли або символи
-    }));
-
-    this.updateVisibleProducts(); // Оновлюємо видимі продукти
-  } catch (error) {
-    console.error("Помилка при отриманні популярних товарів:", error.message);
-    this.products = this.testPopularProducts; // Використовуємо тестові дані
-    this.updateVisibleProducts();
-  }
-},
-  async fetchNewArrivals() {
-    try {
-      const response = await fetch("http://26.235.139.202:8080/api/new-arrivals");
-      if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-      const data = await response.json();
-      this.newArrivals = data.data;
-    } catch (error) {
-      console.error("Помилка при отриманні новинок:", error.message);
-      this.newArrivals = this.testNewArrivals; // Використовуємо тестові дані
-    } finally {
-      this.updateVisibleNewArrivals();
-    }
+        this.updateVisibleProducts(); // Оновлення списку видимих товарів
+      } catch (error) {
+        console.error("Помилка при отриманні популярних товарів:", error.message); // Лог помилки
+        this.products = this.testPopularProducts; // Використовуємо тестові дані у разі помилки
+        this.updateVisibleProducts();
+      }
+    },
+    async fetchNewArrivals() { // Завантаження нових надходжень з API
+      try {
+        const response = await fetch("http://26.235.139.202:8080/api/new-arrivals");
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        const data = await response.json();
+        this.newArrivals = data.data; // Збереження отриманих даних
+      } catch (error) {
+        console.error("Помилка при отриманні новинок:", error.message);
+        this.newArrivals = this.testNewArrivals; // Використовуємо тестові дані у разі помилки
+      } finally {
+        this.updateVisibleNewArrivals(); // Оновлення списку видимих новинок
+      }
+    },
+    updateVisibleProducts() { // Оновлення видимих популярних товарів на основі поточної сторінки
+      const start = this.currentPage * this.productsPerPage;
+      const end = start + this.productsPerPage;
+      this.visibleProducts = this.products.slice(start, end);
+    },
+    updateVisibleNewArrivals() { // Оновлення видимих нових надходжень на основі поточної сторінки
+      const start = this.newArrivalsPage * this.productsPerPage;
+      const end = start + this.productsPerPage;
+      this.visibleNewArrivals = this.newArrivals.slice(start, end);
+    },
   },
-  updateVisibleProducts() {
-    const start = this.currentPage * this.productsPerPage;
-    const end = start + this.productsPerPage;
-    this.visibleProducts = this.products.slice(start, end);
-  },
-  updateVisibleNewArrivals() {
-    const start = this.newArrivalsPage * this.productsPerPage;
-    const end = start + this.productsPerPage;
-    this.visibleNewArrivals = this.newArrivals.slice(start, end);
-  },
-},
-}
+};
 </script>
 
   
@@ -268,7 +257,6 @@ methods: {
     font-style: normal;
   }
   
-  /* Загальний контейнер */
   .main-container {
   display: flex;
   flex-direction: column;
@@ -279,7 +267,6 @@ methods: {
   margin-top: 180px;
 }
   
-  /* Welcome зображення */
   .welcome-image {
   width: 100%;
   height: 510px;
@@ -287,7 +274,6 @@ methods: {
   background-size: cover;
 }
   
-  /* Заголовки */
   .text-container {
   position: relative;
   margin-top: -450px;
@@ -306,7 +292,7 @@ methods: {
 
 .handmade-beaded-products {
   font-size: 45px;
-  margin-top: -50px; /* Increased space between texts */
+  margin-top: -50px; 
 }
 
 .exclusive-necklaces-bracelets-earrings {
@@ -317,7 +303,6 @@ methods: {
   margin-top: 550px;
 }
   
-  /* Контент */
   .content-container {
     display: flex;
     justify-content: space-between;
@@ -379,30 +364,28 @@ methods: {
     margin-left: 350px;
   }
   
-  /* Секція популярних товарів */
   .popular-goods {
     display: flex;
     flex-direction: column;
-    border-bottom: -100px; /* Reduced margin */
+    border-bottom: -100px; 
   }
   
   .section-title {
     color: #222222;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900;
-    font-size: 32px; /* Increased font size by 5px */
+    font-size: 32px; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
     text-align: center;
     margin-top: 70px;
   }
   
-  /* Арров для переключення */
   .arrow-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 90%; /* Ближче до карток */
+    width: 90%; 
     margin: 0 auto;
     padding: 20px 0;
     position: relative;
@@ -419,11 +402,11 @@ methods: {
   }
   
   .left-arrow {
-    left: 150px; /* Стрілка тепер ближче до картки зліва */
+    left: 150px; 
   }
   
   .right-arrow {
-    right: 150px; /* Стрілка тепер ближче до картки справа */
+    right: 150px; 
   }
   
   .arrow:hover {
@@ -506,7 +489,7 @@ methods: {
   .product-info {
     margin-top: 0px;
     color:#000;
-    text-align: left; /* Вирівнювання з лівого боку */
+    text-align: left; 
   }
   
   .product-price {
@@ -555,8 +538,8 @@ methods: {
     width: 100%;
     font-family: 'Merriweather', sans-serif;
     font-size: 18px;
-    text-transform: none; /* Remove uppercase */
-    padding-left: 15px; /* Add left padding */
+    text-transform: none; 
+    padding-left: 15px; 
     transition: background-color 0.3s ease, transform 0.3s ease;
   }
   
@@ -597,7 +580,6 @@ methods: {
     opacity: 25%;
   }
   
-  /* Style for the heart icon, common properties */
   .wishlist-icon {
     width: 30px;
     height: 30px;
@@ -609,16 +591,14 @@ methods: {
     transform: scale(1.1);
   }
   
-  /* Filled heart icon (the heart is in the wishlist) */
   .filled-heart {
-    fill: #A01212; /* Filled heart color */
+    fill: #A01212; 
   }
   
-  /* Empty heart icon (the heart is not in the wishlist) */
   .empty-heart {
-    stroke: #B3B3B3; /* Empty heart border color */
-    stroke-width: 2; /* Ensure visible stroke */
-    fill: none; /* Keep the heart hollow */
+    stroke: #B3B3B3; 
+    stroke-width: 2; 
+    fill: none; 
   }
   
   .view-products-button {
@@ -630,7 +610,7 @@ methods: {
   border-radius: 8px;
   cursor: pointer;
   font-size: 18px;
-  margin-top: 50px; /* Ensures button is on a new line */
+  margin-top: 50px; 
   transition: background-color 0.3s ease, transform 0.3s ease;
 
 }
@@ -672,7 +652,7 @@ methods: {
 .insta-pattern-image {
   width: 680px;
   height: 90px;
-  margin-left: 560px; /* Positions pattern to the right of the text */
+  margin-left: 560px; 
   margin-bottom: -130px;
 }
 
@@ -683,7 +663,6 @@ methods: {
   justify-content: flex-start;
 }
 
-/* Instagram handle hover underline effect */
 .instagram-handle-link {
   font-size: 25px;
   font-family: 'Montserrat', sans-serif;
@@ -712,7 +691,6 @@ methods: {
   color: #333;
 }
 
-/* Instagram images hover zoom effect */
 .instagram-image {
   width: 300px;
   height: 300px;

@@ -72,61 +72,67 @@
 
 
 <script>
-import axios from 'axios';
-import { defineAsyncComponent } from 'vue';
+import axios from 'axios'; // Імпортуємо бібліотеку для HTTP-запитів
+import { defineAsyncComponent } from 'vue'; // Імпортуємо функцію для динамічного завантаження компонентів
 
 export default {
-  name: 'AllProducts',
+  name: 'AllProducts', // Ім'я компонента
   components: {
+    // Динамічне підключення компонентів для фільтрації та відображення категорій
     FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')),
     CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')),
   },
   data() {
     return {
-      products: [],
-      currentPage: 1,
-      totalPages: 1,
-      itemsPerPage: 15,
-      wishlist: [],
+      products: [], // Масив продуктів
+      currentPage: 1, // Поточна сторінка
+      totalPages: 1, // Загальна кількість сторінок
+      itemsPerPage: 15, // Кількість продуктів на сторінку
+      wishlist: [], // Список бажаних продуктів
     };
   },
   methods: {
     async fetchProducts(page = 1) {
+      // Завантаження продуктів із сервера
       try {
         const response = await axios.get(`http://26.235.139.202:8080/api/products?page=${page}`);
-        this.products = response.data.data; // Отримуємо масив продуктів
-        this.totalPages = response.data.meta.last_page; // Визначаємо кількість сторінок
-        this.currentPage = response.data.meta.current_page; // Оновлюємо поточну сторінку
+        this.products = response.data.data; // Збереження отриманого списку продуктів
+        this.totalPages = response.data.meta.last_page; // Збереження загальної кількості сторінок
+        this.currentPage = response.data.meta.current_page; // Оновлення поточної сторінки
       } catch (error) {
-        console.error('Помилка завантаження продуктів:', error);
+        console.error('Помилка завантаження продуктів:', error); // Логування помилки
       }
     },
     changePage(page) {
+      // Зміна сторінки (перевіряється діапазон)
       if (page > 0 && page <= this.totalPages) {
         this.fetchProducts(page);
       }
     },
     isInWishlist(productName) {
+      // Перевіряє, чи знаходиться продукт у списку бажаного
       return this.wishlist.includes(productName);
     },
     toggleWishlist(product) {
+      // Додає або видаляє продукт зі списку бажаного
       if (this.isInWishlist(product.name)) {
-        this.wishlist = this.wishlist.filter(item => item !== product.name);
+        this.wishlist = this.wishlist.filter(item => item !== product.name); // Видалення
         alert(`${product.name} видалено зі списку бажаного!`);
       } else {
-        this.wishlist.push(product.name);
+        this.wishlist.push(product.name); // Додавання
         alert(`${product.name} додано до списку бажаного!`);
       }
     },
   },
   mounted() {
+    // Завантажує продукти при монтуванні компонента
     this.fetchProducts();
   },
 };
 </script>
 
+
 <style scoped>
-/* Font import */
 @font-face {
   font-family: 'KyivType Titling';
   src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
@@ -134,7 +140,6 @@ export default {
   font-style: normal;
 }
 
-/* Layout for the main product section */
 .products-section {
   display: flex;
   padding: 20px;
@@ -147,7 +152,6 @@ export default {
   max-width: 1200px;
 }
 
-/* Title styling */
 .section-title {
   color: #333;
   font-family: 'KyivType Titling', sans-serif;
@@ -160,7 +164,6 @@ export default {
   margin-bottom: 40px;
 }
 
-/* Grid to display products */
 .products-grid {
   display: flex;
   justify-content: center;
@@ -169,7 +172,6 @@ export default {
   width: 100%;
 }
 
-/* Card container */
 .product-card {
   border-radius: 12px;
   background-color: #fff7f6;
@@ -190,7 +192,6 @@ export default {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Image container */
 .image-container {
   width: 100%;
   height: 180px;
@@ -218,14 +219,14 @@ export default {
   text-align: left;
   text-decoration: none;
   color: inherit;
-  gap: 10px; /* Збільшити відступи між елементами */
-  position: relative; /* Додаємо для позиціонування серця */
+  gap: 10px; 
+  position: relative; 
 }
 
 .product-name {
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 5px; /* Зменшуємо відступ між назвою і ціною */
+  margin-bottom: 5px; 
 }
 
 .product-price {
@@ -233,20 +234,20 @@ export default {
   font-weight: 600;
   font-size: 20px;
   color: #a01212;
-  margin-top: -230px; /* Забираємо зайвий відступ */
+  margin-top: -230px; 
 }
 
 .product-material {
   font-size: 16px;
   color: #808080;
-  margin-top: -210px; /* Забираємо зайвий відступ */
+  margin-top: -210px; 
 }
 
 .material-wishlist {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: absolute; /* Позиціонуємо в середині card */
+  position: absolute; 
   width: 100%;
   margin-top: 220px;
 }
@@ -273,8 +274,6 @@ export default {
   fill: none;
 }
 
-
-/* Buy button styling */
 .buy-button {
   border-radius: 10px;
   background-color: #6b1f1f;
@@ -330,14 +329,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease;
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white; 
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .pagination button.active {
@@ -345,10 +344,8 @@ export default {
   color: white;
 }
 .product-card-link {
-  text-decoration: none; /* Прибираємо підкреслення */
-  color: inherit; /* Забираємо зміни кольору тексту */
+  text-decoration: none; 
+  color: inherit; 
 }
-
-/* При фокусі або наведенні */
 
 </style>

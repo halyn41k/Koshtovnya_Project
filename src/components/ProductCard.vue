@@ -27,7 +27,6 @@ export default {
       type: Object,
       required: true,
     },
-    // Inside ProductUpdate.vue
 methods: {
   closeUpdate() {
     this.$emit('close');

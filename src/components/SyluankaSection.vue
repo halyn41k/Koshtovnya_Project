@@ -52,7 +52,6 @@
         </article>
       </div>
 
-      <!-- Pagination -->
       <div class="pagination">
         <button 
           v-for="page in totalPages" 
@@ -71,11 +70,12 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue'; // Імпортуємо функцію для асинхронного імпорту компонентів.
 
 export default {
-  name: 'SyluankaSection',
+  name: 'SyluankaSection', // Назва компонента.
   components: {
+    // Асинхронно завантажуємо компоненти.
     FilterComponent: defineAsyncComponent(() =>
       import('./FilterComponent.vue')
     ),
@@ -85,7 +85,7 @@ export default {
   },
   data() {
     return {
-      syluankas: [
+      syluankas: [ // Масив даних про силянки.
         { id: 1, name: 'Силянка "Гуцулка"', price: 1000, material: 'Чеський бісер', image: require('@/assets/Гуцулка2.png') },
         { id: 2, name: 'Силянка "Лемківська"', price: 1600, material: 'Японський бісер', image: require('@/assets/Лемківська.png') },
         { id: 3, name: 'Силянка "Темна ніч"', price: 800, material: 'Чеський бісер', image: require('@/assets/Темна ніч.png') },
@@ -99,37 +99,42 @@ export default {
         { id: 11, name: 'Силянка "Червоні квіти"', price: 1390, material: 'Японський бісер', image: require('@/assets/Червоні квіти.png') },
         { id: 12, name: 'Силянка "Білосніжна"', price: 550, material: 'Китайський бісер', image: require('@/assets/Білосніжна.png') },
       ],
-      currentPage: 0,
-      itemsPerPage: 15,
-      wishlist: [],
+      currentPage: 0, // Поточна сторінка.
+      itemsPerPage: 15, // Кількість елементів на сторінці.
+      wishlist: [], // Масив для списку бажаного.
     };
   },
   computed: {
+    // Обчислюємо кількість сторінок для пагінації.
     totalPages() {
       return Math.ceil(this.syluankas.length / this.itemsPerPage);
     },
+    // Отримуємо видимі елементи для поточної сторінки.
     visibleSyluankas() {
-      const start = this.currentPage * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.syluankas.slice(start, end);
+      const start = this.currentPage * this.itemsPerPage; // Початок списку для поточної сторінки.
+      const end = start + this.itemsPerPage; // Кінець списку.
+      return this.syluankas.slice(start, end); // Повертаємо частину масиву.
     }
   },
   methods: {
+    // Зміна сторінки.
     changePage(page) {
-      if (page >= 0 && page < this.totalPages) {
-        this.currentPage = page;
+      if (page >= 0 && page < this.totalPages) { // Перевірка на коректність сторінки.
+        this.currentPage = page; // Оновлюємо поточну сторінку.
       }
     },
+    // Перевіряємо, чи товар вже в списку бажаного.
     isInWishlist(productName) {
-      return this.wishlist.includes(productName);
+      return this.wishlist.includes(productName); // Повертаємо true, якщо товар є у списку.
     },
+    // Додавання/видалення товару зі списку бажаного.
     toggleWishlist(syluanka) {
-      if (this.isInWishlist(syluanka.name)) {
-        this.wishlist = this.wishlist.filter(item => item !== syluanka.name);
-        alert(`${syluanka.name} видалено зі списку бажаного!`);
+      if (this.isInWishlist(syluanka.name)) { 
+        this.wishlist = this.wishlist.filter(item => item !== syluanka.name); // Видаляємо з списку.
+        alert(`${syluanka.name} видалено зі списку бажаного!`); 
       } else {
-        this.wishlist.push(syluanka.name);
-        alert(`${syluanka.name} додано до списку бажаного!`);
+        this.wishlist.push(syluanka.name); // Додаємо в список бажаного.
+        alert(`${syluanka.name} додано до списку бажаного!`); 
       }
     },
   },
@@ -158,7 +163,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -314,16 +319,7 @@ export default {
   height: 10px;
   margin-right: 5px;
 }
-  </style>
   
-  
-  <style scoped>
-  @font-face {
-    font-family: 'KyivType Titling';
-    src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-  }
   .syluanka-section {
     display: flex;
     padding: 20px;
@@ -338,7 +334,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -511,14 +507,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease; 
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white; 
+  transform: scale(1.1); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .pagination button.active {

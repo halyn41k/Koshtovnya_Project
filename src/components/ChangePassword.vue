@@ -74,42 +74,49 @@
   
   <script>
   export default {
+    // Об'єкт data містить дані компонента
     data() {
       return {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-        showCurrentPassword: false,
-        showNewPassword: false,
-        showConfirmPassword: false,
-        // SVG icons as inline HTML for eye open and eye closed
+        currentPassword: '', // Поточний пароль
+        newPassword: '', // Новий пароль
+        confirmPassword: '', // Підтвердження нового пароля
+        showCurrentPassword: false, // Видимість поточного пароля
+        showNewPassword: false, // Видимість нового пароля
+        showConfirmPassword: false, // Видимість підтвердження пароля
+        // SVG-іконки для кнопок показу/приховування пароля
         eyeOpenIcon: `
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5z" stroke="#555" stroke-width="2"/>
             <circle cx="12" cy="12" r="3" fill="#555"/>
-          </svg>`,
+          </svg>`, // Іконка "око відкрите"
         eyeClosedIcon: `
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3m5.87-2.8c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5m0 0l6.57 6.57M16.87 16.87c1.9-1.02 3.37-2.77 4.13-4.87-1.73-4.39-6-7.5-11-7.5-1.08 0-2.13.14-3.13.4" stroke="#555" stroke-width="2"/>
-          </svg>`
+          </svg>` // Іконка "око закрите"
       };
     },
     methods: {
+      // Метод для обробки зміни пароля
       submitPasswordChange() {
         if (this.newPassword === this.confirmPassword) {
-          console.log('Поточний пароль:', this.currentPassword);
-          console.log('Новий пароль:', this.newPassword);
-          this.$router.push('/account'); // Redirect to account page
+          // Якщо новий пароль співпадає з підтвердженням
+          console.log('Поточний пароль:', this.currentPassword); // Лог поточного пароля
+          console.log('Новий пароль:', this.newPassword); // Лог нового пароля
+          this.$router.push('/account'); // Перенаправлення на сторінку акаунта
         } else {
+          // Якщо паролі не співпадають
           alert('Новий пароль і підтвердження пароля не збігаються.');
         }
       },
+      // Метод для переключення видимості поточного пароля
       toggleCurrentPasswordVisibility() {
         this.showCurrentPassword = !this.showCurrentPassword;
       },
+      // Метод для переключення видимості нового пароля
       toggleNewPasswordVisibility() {
         this.showNewPassword = !this.showNewPassword;
       },
+      // Метод для переключення видимості підтвердження пароля
       toggleConfirmPasswordVisibility() {
         this.showConfirmPassword = !this.showConfirmPassword;
       }
@@ -122,8 +129,8 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    max-width: 100vw; /* Limit width to the viewport */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    max-width: 100vw;
+    overflow-x: hidden;
   }
   
   .password-change-background-image {
@@ -181,7 +188,7 @@
   justify-content: center;
   padding: 96px 80px;
   width: 100%;
-  max-width: 1640px; /* Збільшено на 500px */
+  max-width: 1640px; 
   border: 1px solid rgba(0, 0, 0, 0.5);
   position: relative;
   z-index: 2;
@@ -190,7 +197,7 @@
 .password-change-form {
   display: flex;
   width: 100%;
-  max-width: 1200px; /* Збільшено на 500px */
+  max-width: 1200px; 
   flex-direction: column;
   align-items: center;
 }
@@ -207,7 +214,7 @@
     gap: 30px;
     color: var(--Grays-Black, #000);
     font: 400 18px/1.3 Merriweather, sans-serif;
-    flex: 1; /* Takes 1/3 of the width */
+    flex: 1; 
     align-items: flex-end;
     padding-right: 20px;
     text-align: left;
@@ -217,7 +224,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    flex: 2; /* Takes 2/3 of the width */
+    flex: 2; 
   }
   
   .form-input {

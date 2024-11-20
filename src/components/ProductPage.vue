@@ -3,7 +3,6 @@
     <section class="product-section">
       <div class="product-layout">
         <article class="product-image-container">
-          <!-- Зображення товару -->
           <img
             loading="lazy"
             :src="product.image_url"
@@ -41,7 +40,6 @@
                 </select>
               </div>
               <div class="purchase-controls">
-                <!-- Кількість товару -->
                 <div class="quantity-selector">
                   <input
                     type="number"
@@ -61,7 +59,6 @@
       </div>
     </section>
 
-    <!-- Характеристики товару -->
     <h2 class="specifications-title">Характеристики</h2>
     <section class="specifications-list">
       <dl class="spec-grid">

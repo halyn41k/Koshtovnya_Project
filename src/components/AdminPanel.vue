@@ -18,20 +18,19 @@
       </nav>
     </aside>
     <section class="content">
-      <!-- Dynamically load the active component or WelcomeAdmin by default -->
       <component :is="activeComponent" />
     </section>
   </main>
 </template>
 
 <script>
-import WelcomeAdmin from './WelcomeAdmin.vue';
-import ProductList from './ProductList.vue';
-import Employees from './Employees.vue';
-import Orders from './Orders.vue';
-import Reports from './Reports.vue';
-import Clients from './Clients.vue';
-import Settings from './Settings.vue';
+import WelcomeAdmin from './WelcomeAdmin.vue'; // Компонент вітального екрану
+import ProductList from './ProductList.vue'; // Компонент списку товарів
+import Employees from './Employees.vue'; // Компонент працівників
+import Orders from './Orders.vue'; // Компонент замовлень
+import Reports from './Reports.vue'; // Компонент звітів
+import Clients from './Clients.vue'; // Компонент клієнтів
+import Settings from './Settings.vue'; // Компонент налаштувань
 
 export default {
   name: 'AdminPanel',
@@ -46,7 +45,7 @@ export default {
   },
   data() {
     return {
-      activeTab: -1, // Set to -1 to show WelcomeAdmin by default
+      activeTab: -1, // Активна вкладка (-1 для вітального екрану)
       menuItems: [
         { title: 'Товари', icon: require('@/assets/arrowadmin.png') },
         { title: 'Працівники', icon: require('@/assets/arrowadmin.png') },
@@ -59,7 +58,8 @@ export default {
   },
   computed: {
     activeComponent() {
-      if (this.activeTab === -1) return 'WelcomeAdmin'; // Show WelcomeAdmin by default
+      // Визначає, який компонент відображати на основі активної вкладки
+      if (this.activeTab === -1) return 'WelcomeAdmin';
       switch (this.activeTab) {
         case 0: return 'ProductList';
         case 1: return 'Employees';
@@ -73,21 +73,19 @@ export default {
   },
   methods: {
     selectTab(index) {
-      this.activeTab = index;
+      this.activeTab = index; // Встановлює активну вкладку
     },
   },
 };
 </script>
 
 <style scoped>
-/* Main admin panel container */
 .admin-panel {
   font-family: 'Montserrat', sans-serif;
   display: flex;
   margin-top: 180px;
 }
 
-/* Sidebar styling */
 .sidebar {
   background-color: #fff7f6;
   display: flex;

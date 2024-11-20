@@ -94,7 +94,6 @@ export default {
   },
   methods: {
     startSearch() {
-      // Логіка пошуку, якщо потрібно
       console.log('Searching:', this.searchQuery);
     },
   },
@@ -124,14 +123,13 @@ body {
   font-family: 'Merriweather', serif;
 }
 
-/* Apply Montserrat Regular to specific texts */
 .nav-links a,
 .wishlist,
 .language-currency select,
 .search-bar input {
   font-family: 'Montserrat', serif;
-  font-weight: 400; /* Regular */
-  font-size: 14px; /* Slightly reduced font size */
+  font-weight: 400; 
+  font-size: 14px; 
 }
 
 .search-bar {
@@ -152,27 +150,27 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 15px; /* Reduced padding */
+  padding: 5px 15px; 
   background-color: white;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 10px; /* Reduced gap */
+  gap: 10px; 
 }
 
 .nav-links a {
   text-decoration: none;
   color: #333;
   font-weight: bold;
-  font-size: 14px; /* Reduced font size */
+  font-size: 14px; 
 }
 
 .language-currency {
   display: flex;
   align-items: center;
-  gap: 10px; /* Reduced gap */
+  gap: 10px; 
 }
 
 .language {
@@ -182,11 +180,10 @@ body {
 }
 
 .language .flag {
-  width: 15px; /* Reduced flag size */
+  width: 15px; 
   height: 10px;
 }
 
-/* No border for language and currency dropdowns */
 .no-border {
   border: none;
   outline: none;
@@ -197,10 +194,9 @@ body {
 .wishlist {
   text-decoration: none;
   color: #333;
-  font-size: 14px; /* Reduced font size */
+  font-size: 14px; 
 }
 
-/* Сіра розмита полоска */
 .separator {
   height: 1px;
   width: 100%;
@@ -213,25 +209,25 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px; /* Reduced padding */
-  margin-top: 5px; /* Reduced margin-top */
+  padding: 10px 15px; 
+  margin-top: 5px; 
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   position: relative;
-  width: 250px; /* Reduced width */
+  width: 250px; 
   background-color:white;
 }
 
 .search-bar input {
   width: 100%;
-  padding: 8px; /* Reduced padding */
+  padding: 8px;
   padding-right: 25px;
   border-radius: 5px;
   background-color: #F1E6E6;
-  border: none; /* No border */
+  border: none; 
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
 }
@@ -244,43 +240,42 @@ body {
 }
 
 .search-icon img {
-  width: 15px; /* Reduced icon size */
+  width: 15px; 
 }
 
-/* Move logo 50px left instead of 100px */
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: -230px; /* Reduced margin */
+  margin-left: -230px; 
   text-decoration: none;
 }
 
 .logo img {
-  width: 60px; /* Reduced logo size */
+  width: 60px; 
 }
 
 .logo h1 {
   color:#111111;
-  font-size: 20px; /* Reduced font size */
+  font-size: 20px;
   font-family: 'KyivType Titling', sans-serif;
   font-weight: 900;
 }
 
 .user-cart {
   display: flex;
-  gap: 10px; /* Reduced gap */
+  gap: 10px; 
   position: relative;
 }
 
 .user-cart .icon {
-  width: 30px; /* Reduced icon size */
+  width: 30px; 
 }
 
 .nav-menu {
   background-color: rgba(107, 31, 31, 0.09);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 10px 0; /* Reduced padding */
+  padding: 10px 0; 
 }
 
 .nav-menu ul {
@@ -300,10 +295,10 @@ body {
   color: #6B1F1F;
   font-family: 'KyivType Titling', sans-serif;
   font-weight: bold;
-  padding: 8px 10px; /* Reduced padding */
-  font-size: 14px; /* Reduced font size */
+  padding: 8px 10px; 
+  font-size: 14px; 
   border-bottom: 3px solid transparent;
-  transition: border-bottom 0.3s ease, background-color 0.3s ease; /* Add transition */
+  transition: border-bottom 0.3s ease, background-color 0.3s ease; 
 }
 
 .nav-menu a:hover {
@@ -317,20 +312,20 @@ body {
   top: 100%;
   left: 0;
   width: 250px;
-  background-color: #FFF7F6; /* Змінено на FFF7F6 */
+  background-color: #FFF7F6; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   z-index: 1000;
   max-height: 300px;
   overflow-y: auto;
-  padding: 10px; /* Додано для відступів */
+  padding: 10px; 
 }
 
 .search-results h2 {
-  margin: 0 0 10px; /* Відступи для заголовка */
-  text-align: center; /* Вирівняно по центру */
+  margin: 0 0 10px; 
+  text-align: center; 
   font-family: 'Montserrat', sans-serif;
-  font-weight: bold; /* Bold для заголовка */
+  font-weight: bold; 
 }
 
 .search-results ul {
@@ -357,32 +352,31 @@ body {
 }
 
 .product-details {
-  flex-grow: 1; /* Залишити простір для деталей продукту */
-  text-align: center; /* Центрування тексту */
+  flex-grow: 1; 
+  text-align: center; 
 }
 
 .product-name {
   font-family: 'Montserrat', sans-serif;
-  font-weight: bold; /* Bold для назви товару */
+  font-weight: bold;
 }
 
 .product-price {
   font-family: 'Montserrat', sans-serif;
-  font-weight: normal; /* Regular для ціни */
+  font-weight: normal; 
 }
 
-/* Тонший скролер */
 .search-results::-webkit-scrollbar {
-  width: 6px; /* Товщина скролера */
+  width: 6px; 
 }
 
 .search-results::-webkit-scrollbar-thumb {
-  background: #ccc; /* Колір скролера */
-  border-radius: 10px; /* Закруглення країв */
+  background: #ccc; 
+  border-radius: 10px; 
 }
 
 .search-results::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Колір фону скролера */
+  background: #f1f1f1;
 }
 
 </style>

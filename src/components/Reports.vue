@@ -1,12 +1,10 @@
 <template>
   <main class="profit-report">
-    <!-- Header Section -->
     <header class="report-header">
       <h1 class="report-title">Звіти</h1>
       <h2 class="report-subtitle">Звіт по прибутку</h2>
     </header>
 
-    <!-- Controls Section -->
     <section class="report-controls">
       <div class="date-range-picker">
         <label for="start-date" class="date-label">Період:</label>
@@ -24,7 +22,6 @@
       </div>
     </section>
 
-    <!-- Report Content Section -->
     <div class="report-table-container">
       <table class="profit-table">
         <thead>
@@ -62,7 +59,6 @@
       <button class="action-button" @click="exportToPDF">Експорт в PDF</button>
     </div>
 
-    <!-- Additional Reports Section -->
     <section class="materials-report">
       <h3 class="report-title">Матеріали</h3>
       <table class="materials-table">
@@ -172,7 +168,6 @@ export default {
     exportToPDF() {
       const doc = new jsPDF();
       doc.text('Звіт по прибутку', 20, 20);
-      // Додати таблиці та інші дані для PDF
       doc.save('profit_report.pdf');
     }
   }

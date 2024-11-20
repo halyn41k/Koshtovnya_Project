@@ -37,11 +37,10 @@
     margin-top: -40px;
   }
   
-  /* Adjust logo-wrapper for close alignment */
   .logo-wrapper {
     display: flex;
     align-items: center;
-    margin-left: 4px; /* Small space between text and logo */
+    margin-left: 4px; 
   }
   
   .logo-image {

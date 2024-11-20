@@ -1,9 +1,7 @@
 <template>
     <div class="filter-container"> 
       </div>
-      <!-- Фільтр -->
       <section class="filter">
-        <!-- Доступність Section -->
         <h2 class="section-title">Доступність</h2>
         <hr class="divider" />
         <div class="availability-options">
@@ -17,7 +15,6 @@
           </div>
         </div>
   
-        <!-- Розмір Section -->
         <h3 class="subsection-title">Розмір</h3>
         <hr class="divider" />
         <div class="dropdown-menu">
@@ -32,7 +29,6 @@
           </select>
         </div>
   
-        <!-- Колір Section -->
         <h3 class="subsection-title">Колір</h3>
         <hr class="divider" />
         <div class="dropdown-menu">
@@ -46,9 +42,8 @@
           </select>
         </div>
   
-      <!-- Тип бісеру Section -->
       <h3 class="subsection-title">Тип бісеру</h3>
-      <hr class="divider" /> <!-- Thin line below the title -->
+      <hr class="divider" />
       <div class="bead-type-options">
         <div class="option">
           <input type="checkbox" id="matte" @change="applyFilters" />
@@ -60,9 +55,8 @@
         </div>
       </div>
   
-      <!-- Виробник бісеру Section -->
       <h3 class="subsection-title">Виробник бісеру</h3>
-      <hr class="divider" /> <!-- Thin line below the title -->
+      <hr class="divider" /> 
       <div class="manufacturer-options">
         <div class="option">
           <input type="checkbox" id="china" @change="applyFilters" />
@@ -78,7 +72,6 @@
         </div>
       </div>
   
-  <!-- Слайдер Вага -->
   <h3 class="subsection-title">Вага</h3>
   <hr class="divider" />
   <div class="input-box">
@@ -96,7 +89,6 @@
     <div class="slider-track" :style="trackStyle(weightRange[0], weightRange[1], 3000)"></div>
   </div>
   
-  <!-- Слайдер Ціна -->
   <h3 class="range-title">Ціна</h3>
   <hr class="divider" />
   <div class="input-box">
@@ -123,17 +115,22 @@
     name: 'FilterComponent',
     data() {
       return {
+        // Фільтри для доступності товарів
         availabilityFilters: {
-          outOfStock: false,
-          inStock: false,
+          outOfStock: false, // Товари, яких немає в наявності
+          inStock: false, // Товари, які є в наявності
         },
-        selectedSize: '',
-        selectedColors: '',
-        weightRange: [0, 3000], // Діапазон ваги
-        priceRange: [0, 10000], // Діапазон ціни
+        selectedSize: '', // Обраний розмір
+        selectedColors: '', // Обрані кольори
+        weightRange: [0, 3000], // Діапазон ваги у грамах
+        priceRange: [0, 10000], // Діапазон ціни у гривнях
       };
     },
     methods: {
+      /**
+       * Застосовує фільтри до даних.
+       * Наразі лише виводить інформацію про вибрані фільтри у консоль.
+       */
       applyFilters() {
         console.log('Застосовані фільтри:', {
           availability: this.availabilityFilters,
@@ -143,52 +140,77 @@
           weightRange: this.weightRange,
         });
       },
+
+      /**
+       * Розраховує стиль для треку діапазону (смуга між двома ползунками).
+       * @param {number} min - Мінімальне значення
+       * @param {number} max - Максимальне значення
+       * @param {number} maxRange - Загальний діапазон
+       * @returns {Object} Об'єкт стилю CSS
+       */
       trackStyle(min, max, maxRange) {
-        const minPercent = (min / maxRange) * 100;
-        const maxPercent = (max / maxRange) * 100;
+        const minPercent = (min / maxRange) * 100; // Мінімальний відсоток
+        const maxPercent = (max / maxRange) * 100; // Максимальний відсоток
         return {
           left: `${minPercent}%`,
           right: `${100 - maxPercent}%`,
-          backgroundColor: '#6B1F1F',
+          backgroundColor: '#6B1F1F', // Колір заповненої частини
         };
       },
+
+      /**
+       * Визначає, який ползунок (лівий чи правий) слід перемістити залежно від кліку.
+       * @param {MouseEvent} event - Подія кліку
+       * @param {string} rangeName - Назва діапазону (наприклад, 'priceRange' або 'weightRange')
+       * @param {number} maxRange - Максимальне значення діапазону
+       */
       moveClosestThumb(event, rangeName, maxRange) {
-        const rect = event.target.getBoundingClientRect();
-        const clickPosition = ((event.clientX - rect.left) / rect.width) * maxRange;
-        const [minValue, maxValue] = this[rangeName];
-  
+        const rect = event.target.getBoundingClientRect(); // Розміри і позиція треку
+        const clickPosition = ((event.clientX - rect.left) / rect.width) * maxRange; // Позиція кліку у діапазоні
+        const [minValue, maxValue] = this[rangeName]; // Поточні значення діапазону
+
+        // Визначає, до якої точки ближче клік
         const distToMin = Math.abs(minValue - clickPosition);
         const distToMax = Math.abs(maxValue - clickPosition);
-  
+
         if (distToMin < distToMax) {
-          this[rangeName][0] = Math.max(0, Math.min(Math.round(clickPosition), this[rangeName][1] - 1)); // Ліва точка
+          // Переміщує ліву точку
+          this[rangeName][0] = Math.max(0, Math.min(Math.round(clickPosition), this[rangeName][1] - 1));
         } else {
-          this[rangeName][1] = Math.min(maxRange, Math.max(Math.round(clickPosition), this[rangeName][0] + 1)); // Права точка
+          // Переміщує праву точку
+          this[rangeName][1] = Math.min(maxRange, Math.max(Math.round(clickPosition), this[rangeName][0] + 1));
         }
       },
+
+      /**
+       * Обробляє зміну значення в полях введення діапазонів.
+       * @param {string} range - Назва діапазону (наприклад, 'priceRange' або 'weightRange')
+       * @param {number} index - Індекс змінюваної точки (0 - ліва, 1 - права)
+       * @param {Event} event - Подія вводу
+       */
       handleNumberInput(range, index, event) {
-        let value = Math.max(0, Math.floor(event.target.value)); // Обмежуємо введення тільки цілими числами
-  
+        let value = Math.max(0, Math.floor(event.target.value)); // Гарантує, що значення буде цілим числом >= 0
+
         if (index === 0) {
-          this[range][0] = Math.min(value, this[range][1] - 1); // Ліва точка не перетинає праву
+          // Змінює мінімальне значення, не дозволяючи йому перетнути максимальне
+          this[range][0] = Math.min(value, this[range][1] - 1);
         } else {
-          this[range][1] = Math.max(value, this[range][0] + 1); // Права точка не перетинає ліву
+          // Змінює максимальне значення, не дозволяючи йому перетнути мінімальне
+          this[range][1] = Math.max(value, this[range][0] + 1);
         }
-  
-        this.applyFilters();
+
+        this.applyFilters(); // Застосовує фільтри після зміни значень
       },
     },
   };
-  
-  
-  
-  </script>
+</script>
+
   
   <style scoped>
   .filter {
-    top: 150px; /* Початкова позиція фільтру */
-    margin-left: -40px; /* Зсув фільтру, щоб він не перекривав паттерн */
-    z-index: 2; /* Фільтр поверх паттерна */
+    top: 150px; 
+    margin-left: -40px; 
+    z-index: 2; 
     background-color: #fff7f6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -200,29 +222,27 @@
     position: absolute;
     top: -15px;
     left: 100px;
-    transform: translateX(-10%); /* Вирівнюємо по центру сторінки */
-    width: 300px; /* Зменшена ширина зображення */
-    height: 1000px; /* Зменшена висота зображення */
+    transform: translateX(-10%); 
+    width: 300px;
+    height: 1000px; 
     background-image: url('@/assets/patternik.png');
     background-size: cover;
     background-repeat: no-repeat;
-    z-index: -1; /* Зображення позаду фільтру */
+    z-index: -1; 
   
   }
   
-  /* Section Titles */
   .section-title,
-.subsection-title {
-  text-align: center; /* Центрує заголовки */
+  .subsection-title {
+  text-align: center; 
   font-size: 18px;
   font-weight: bold;
-  margin: 10px 0; /* Зменшує відстань зверху і знизу */
+  margin: 10px 0; 
   color: #333;
   align-items: center;
 }
 
-  
-  /* Divider: thin 10px wide line */
+
   .divider {
     width: 30px;
     height: 1px;
@@ -230,7 +250,6 @@
     margin-bottom: 15px;
   }
   
-  /* Dropdown Styling */
   .dropdown {
     width: 100%;
     height: 40px;
@@ -243,7 +262,6 @@
     background-repeat: no-repeat;
   }
   
-  /* Option Styling */
   .option {
     display: flex;
     align-items: center;
@@ -252,12 +270,10 @@
     color: #333;
   }
   
-  /* Checkbox Styling */
   input[type="checkbox"] {
     accent-color: #996666;
   }
   
-  /* Slider Styles */
   .range-form {
     display: flex;
     flex-direction: column;
@@ -288,7 +304,6 @@
     width: 20px;
   }
   
-  /* Новий Слайдер */
   .double-slider-box {
     padding: 20px 40px;
     border-radius: 10px;
@@ -318,13 +333,11 @@
     position: absolute;
     background-color: #6B1F1F;
   }
-  
-  /* Слайдери Ціна/Вага */
-  
+    
   .range-slider {
     position: relative;
-    width: calc(100% - 30px); /* Зменшено ширину на 40px (по 20px з кожної сторони) */
-    margin-left: 5px; /* Додано відступ зліва */
+    width: calc(100% - 30px); 
+    margin-left: 5px; 
     height: 5px;
     margin: 30px 0;
     background-color: #8a8a8a;
@@ -343,13 +356,13 @@
   input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
-    width: calc(90% + 30px); /* Ширина збільшена на 40px (по 20px з кожної сторони) */
+    width: calc(90% + 30px);
     background: none;
     pointer-events: none;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: -7px; /* Зміщено вліво на 20px */
+    left: -7px; 
   }
   
   input[type="range"]::-webkit-slider-thumb {
@@ -364,8 +377,8 @@
     cursor: pointer;
     box-shadow: 0 0.125rem 0.5625rem -0.125rem rgba(0, 0, 0, 0.25);
     position: relative;
-    top: -12px; /* Підняти на 10px вище */
-    left: 5px; /* Змістити правіше на 3px */
+    top: -12px; 
+    left: 5px; 
     z-index: 5;
   }
   
@@ -403,18 +416,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px; /* Менший відступ між колонками */
+    gap: 20px; 
   }
   
   .min-box,
   .max-box {
-    width: 45%; /* Встановити однакову ширину для введення ваги і ціни */
+    width: 45%; 
   }
   
   .input-divider {
     width: 10px;
     height: 1px;
-    background-color: #8a8a8a; /* Полоска між комірками */
+    background-color: #8a8a8a; 
   }
   
   .double-slider-box {
@@ -424,7 +437,7 @@
   }
   
   .range-title {
-    margin-bottom: 1rem; /* Зменшено відстань */
+    margin-bottom: 1rem; 
   }
   
   input[type="number"] {

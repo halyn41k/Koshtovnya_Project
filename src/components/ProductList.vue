@@ -98,7 +98,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 32px; /* Adjusted for better balance */
+  margin-bottom: 32px; 
 }
 
 .product-title-container {
@@ -110,7 +110,7 @@ export default {
   font-size: 40px;
   font-weight: 700;
   color: #000;
-  margin-bottom: 16px; /* Reduced for a cleaner look */
+  margin-bottom: 16px; 
 }
 
 .filter-container {
@@ -141,7 +141,7 @@ export default {
 }
 
 .search-icon {
-  width: 30px; /* Розмір іконки */
+  width: 30px; 
   height: 30px;
   margin-left: 8px;
 }
@@ -156,7 +156,7 @@ export default {
   padding: 12px 18px;
   cursor: pointer;
   font-family: Montserrat, sans-serif;
-  font-size: 15px; /* Adjusted to fit container */
+  font-size: 15px; 
   color: #000;
   width: 150px;
   height: 45px;
@@ -170,16 +170,15 @@ export default {
 
 .add-icon {
   width: 36px;
-  height: 36px; /* Adjusted for balance */
+  height: 36px; 
 }
 
 .product-grid {
   margin-top: -100px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Збільшено мінімальну ширину */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
   gap: 10px;
 }
-
 
 .visually-hidden {
   position: absolute;
@@ -204,7 +203,7 @@ export default {
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px; /* Adjusted for narrower screens */
+    gap: 16px; 
   }
 }
 

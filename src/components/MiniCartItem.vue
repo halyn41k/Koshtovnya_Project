@@ -65,7 +65,7 @@
     margin-top: 40px;
     width: 100%;
     max-width: 500px;
-    position: relative; /* Додаємо позиціонування для коректної роботи */
+    position: relative; 
   }
   
   .item-number {
@@ -88,13 +88,13 @@
     aspect-ratio: 1.23;
     object-fit: contain;
     width: 140px;
-    transition: transform 0.3s; /* Додаємо плавний перехід */
-    pointer-events: auto; /* Додаємо події миші на зображення */
+    transition: transform 0.3s; 
+    pointer-events: auto; 
   }
   
   .item-image:hover {
-    transform: scale(1.2); /* Збільшуємо зображення при наведенні */
-    z-index: 10; /* Піднімаємо зображення в верхній шар */
+    transform: scale(1.2);
+    z-index: 10;
   }
   
   .item-details {

@@ -1,13 +1,11 @@
 <template>
   <div class="address-container">
-    <!-- Display add button if no address available -->
     <div v-if="!addressAvailable" class="no-address">
       <button class="add-address-button" @click="showForm = true">
         <span class="plus-icon">+</span> Створити нову адресу
       </button>
     </div>
 
-    <!-- Address form for adding/updating -->
     <div v-if="showForm" class="address-form">
       <h2>{{ addressAvailable ? 'Оновити адресу' : 'Додати нову адресу' }}</h2>
       <form @submit.prevent="submitAddress">
@@ -41,7 +39,6 @@
       </form>
     </div>
 
-    <!-- Display address card if available -->
     <div v-else-if="addressAvailable" class="address-card">
       <h2 class="card-title">Ваша адреса доставки</h2>
       <p><strong>Ім’я:</strong> {{ firstName }}</p>
@@ -50,7 +47,6 @@
       <p><strong>Місто:</strong> {{ city }}</p>
       <p><strong>Відділення пошти:</strong> {{ postalOffice }}</p>
 
-      <!-- Buttons for editing or deleting address -->
       <div class="button-group">
         <button class="update-button" @click="editAddress">
           <img src="@/assets/edit.png" alt="Edit" class="icon" /> Оновити
@@ -65,61 +61,71 @@
 
 <script>
 export default {
-  name: 'UserAddresses',
+  name: 'UserAddresses', // Назва компонента
   data() {
     return {
-      addressAvailable: false,
-      showForm: false,
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      city: '',
-      postalOffice: '',
-      errors: {},
+      addressAvailable: false, // Статус наявності адреси
+      showForm: false, // Показати форму
+      firstName: '', // Ім’я
+      lastName: '', // Прізвище
+      phoneNumber: '', // Номер телефону
+      city: '', // Місто
+      postalOffice: '', // Поштове відділення
+      errors: {}, // Об’єкт для зберігання помилок валідації
     };
   },
   methods: {
+    // Валідація полів форми
     validateFields() {
-      this.errors = {};
+      this.errors = {}; // Очищаємо попередні помилки
       if (!this.firstName) this.errors.firstName = 'Введіть ім’я';
       if (!this.lastName) this.errors.lastName = 'Введіть прізвище';
       if (!this.phoneNumber) this.errors.phoneNumber = 'Введіть телефон';
       if (!this.city) this.errors.city = 'Введіть місто';
       if (!this.postalOffice) this.errors.postalOffice = 'Введіть відділення пошти';
-      return Object.keys(this.errors).length === 0;
+      return Object.keys(this.errors).length === 0; // Якщо помилок немає, повертаємо true
     },
+
+    // Підтвердження адреси
     submitAddress() {
       if (this.validateFields()) {
-        this.addressAvailable = true;
-        this.showForm = false;
+        this.addressAvailable = true; // Адресу можна використовувати
+        this.showForm = false; // Приховуємо форму
       }
     },
+
+    // Редагування адреси
     editAddress() {
-      this.showForm = true;
+      this.showForm = true; // Відкриваємо форму для редагування
     },
+
+    // Видалення адреси
     deleteAddress() {
-      this.addressAvailable = false;
-      this.showForm = false;
-      this.firstName = '';
+      this.addressAvailable = false; // Видаляємо адресу
+      this.showForm = false; // Приховуємо форму
+      this.firstName = ''; // Очищаємо форму
       this.lastName = '';
       this.phoneNumber = '';
       this.city = '';
       this.postalOffice = '';
-      this.errors = {};
+      this.errors = {}; // Очищаємо помилки
     },
+
+    // Скасування редагування
     cancelEdit() {
-      this.showForm = false;
+      this.showForm = false; // Закриваємо форму
     },
   },
 };
 </script>
+
 
 <style scoped>
 .address-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
-  margin-left: -10px; /* Shift content left by 50px */
+  margin-left: -10px; 
 }
 
 .no-address {

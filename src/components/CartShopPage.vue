@@ -1,12 +1,10 @@
 <template>
   <main class="cart">
-    <!-- Заголовок з боковими лініями -->
     <header class="cart-header">
       <div class="line"></div>
       <h1 class="main-title">Кошик</h1>
       <div class="line"></div>
     </header>
-    <!-- Весь вміст кошика -->
     <div class="cart-content">
       <section class="cart-items">
         <CartItem
@@ -28,43 +26,47 @@
 </template>
 
 <script>
-import CartItem from './CartItem.vue';
-import Summary from './Summary.vue';
+import CartItem from './CartItem.vue'; // Компонент для відображення товару в кошику
+import Summary from './Summary.vue'; // Компонент для підсумкової інформації
 
 export default {
-  name: 'CartShopPage',
+  name: 'CartShopPage', // Головний компонент сторінки кошика
   components: {
-    CartItem,
-    Summary,
+    CartItem, // Підключення компоненту товару
+    Summary,  // Підключення компоненту підсумків
   },
   data() {
     return {
+      // Масив товарів у кошику
       cartItems: [
         {
           imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5",
-          title: "Браслет 'Розмаїття кольорів'",
-          price: 750,
-          quantity: 2
+          title: "Браслет 'Розмаїття кольорів'", // Назва товару
+          price: 750, // Ціна товару
+          quantity: 2 // Кількість товару
         },
         {
           imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5",
-          title: "Гердан 'Гуцулка'",
-          price: 1200,
-          quantity: 1
+          title: "Гердан 'Гуцулка'", // Назва товару
+          price: 1200, // Ціна товару
+          quantity: 1 // Кількість товару
         }
       ]
     };
   },
   methods: {
+    // Оновлення кількості товару
     updateQuantity(index, newQuantity) {
       this.cartItems[index].quantity = newQuantity;
     },
+    // Видалення товару з кошика
     removeItem(index) {
       this.cartItems.splice(index, 1);
     }
   }
 };
 </script>
+
 
 <style scoped>
 @font-face {

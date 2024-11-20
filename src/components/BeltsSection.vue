@@ -52,7 +52,7 @@
         </article>
       </div>
 
-      <!-- Pagination -->
+      <!-- Пагінація -->
       <div class="pagination">
         <button 
           v-for="page in totalPages" 
@@ -72,11 +72,12 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue'; // Імпортуємо функцію для асинхронного підключення компонентів
 
 export default {
-  name: 'BeltsSection',
+  name: 'BeltsSection', // Ім'я компонента
   components: {
+    // Асинхронне завантаження компонентів для фільтрації та категорій
     FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')),
     CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')),
   },
@@ -96,36 +97,41 @@ export default {
         { id: 11, name: 'Пояс "Сині зорі"', price: 790, material: 'Китайський бісер', image: require('@/assets/Сині зорі.png') },
         { id: 12, name: 'Пояс "Сніжні ромби"', price: 1080, material: 'Чеський бісер', image: require('@/assets/Сніжні ромби.png') },
       ],
-      currentPage: 0,
-      itemsPerPage: 15, // кількість елементів на сторінці
-      wishlist: [],
+      currentPage: 0, // Поточна сторінка
+      itemsPerPage: 15, // Кількість елементів на сторінку
+      wishlist: [], // Список бажаних поясів
     };
   },
   computed: {
     totalPages() {
+      // Розраховує загальну кількість сторінок
       return Math.ceil(this.belts.length / this.itemsPerPage);
     },
     visibleBelts() {
+      // Визначає пояси, які потрібно показати на поточній сторінці
       const start = this.currentPage * this.itemsPerPage;
       const end = start + this.itemsPerPage;
       return this.belts.slice(start, end);
-    }
+    },
   },
   methods: {
     changePage(page) {
+      // Змінює поточну сторінку, якщо вона у допустимому діапазоні
       if (page >= 0 && page < this.totalPages) {
         this.currentPage = page;
       }
     },
     isInWishlist(productName) {
+      // Перевіряє, чи є пояс у списку бажаного
       return this.wishlist.includes(productName);
     },
     toggleWishlist(belt) {
+      // Додає/видаляє пояс зі списку бажаного
       if (this.isInWishlist(belt.name)) {
-        this.wishlist = this.wishlist.filter(item => item !== belt.name);
+        this.wishlist = this.wishlist.filter(item => item !== belt.name); // Видалення поясу зі списку
         alert(`${belt.name} видалено зі списку бажаного!`);
       } else {
-        this.wishlist.push(belt.name);
+        this.wishlist.push(belt.name); // Додавання поясу до списку
         alert(`${belt.name} додано до списку бажаного!`);
       }
     },
@@ -133,9 +139,8 @@ export default {
 };
 </script>
 
-  
-  
-  <style scoped>
+
+<style scoped>
   @font-face {
     font-family: 'KyivType Titling';
     src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
@@ -156,7 +161,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -312,16 +317,6 @@ export default {
   height: 10px;
   margin-right: 5px;
 }
-  </style>
-  
-  
-  <style scoped>
-  @font-face {
-    font-family: 'KyivType Titling';
-    src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-  }
   .belts-section {
     display: flex;
     padding: 20px;
@@ -336,7 +331,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -509,14 +504,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease; 
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .pagination button.active {

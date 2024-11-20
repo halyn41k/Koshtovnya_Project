@@ -23,52 +23,41 @@
     </div>
   </article>
 </template>
-
 <script>
 export default {
-  name: 'CartItem',
+  name: 'CartItem', // Компонент елемента кошика
   props: {
-    itemNumber: {
-      type: Number,
-      required: true
-    },
-    imageSrc: {
-      type: String,
-      required: true
-    },
-    title: {
-      type: String,
-      required: true
-    },
-    price: {
-      type: Number,
-      required: true
-    },
-    quantity: {
-      type: Number,
-      required: true
-    }
+    itemNumber: { type: Number, required: true }, // Номер товару
+    imageSrc: { type: String, required: true }, // Зображення товару
+    title: { type: String, required: true }, // Назва товару
+    price: { type: Number, required: true }, // Ціна товару
+    quantity: { type: Number, required: true } // Кількість товару
   },
   computed: {
     totalPrice() {
+      // Загальна вартість для даного товару
       return this.price * this.quantity;
     }
   },
   methods: {
     increaseQuantity() {
+      // Збільшує кількість товару
       this.$emit('change-quantity', this.quantity + 1);
     },
     decreaseQuantity() {
+      // Зменшує кількість товару, якщо більше 1
       if (this.quantity > 1) {
         this.$emit('change-quantity', this.quantity - 1);
       }
     },
     removeItem() {
+      // Видаляє товар з кошика
       this.$emit('remove-item');
     }
   }
 };
 </script>
+
 
 
 <style scoped>

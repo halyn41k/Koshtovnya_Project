@@ -2,7 +2,6 @@
   <footer class="footer">
     <div class="footer-content">
       <div class="logo-section">
-        <!-- Make the logo a clickable router link, remove underline from text -->
         <router-link to="/" class="logo-wrapper">
           <img src="@/assets/logo.svg" alt="Коштовня Лого" class="logo-image" />
           <h1 class="logo-title">Коштовня</h1>
@@ -108,25 +107,25 @@ export default {
   display: flex;
   align-items: center;
   gap: 20px;
-  text-decoration: none; /* Remove underline for the text */
+  text-decoration: none; 
 }
 
 .logo-image {
   margin-top: -40px;
   margin-left: -30px;
-  width: 140px;  /* Updated width */
-  height: 160px; /* Updated height */
+  width: 140px;  
+  height: 160px; 
 }
 
 .logo-title {
   margin-top: -20px;
   margin-left: -20px;
   font-family: 'KyivType Titling', sans-serif;
-  font-weight: 900; /* Black2 */
+  font-weight: 900; 
   font-size: 30px;
   color: black;
   transition: transform 0.3s ease;
-  text-decoration: none; /* Ensure text is not underlined */
+  text-decoration: none; 
 }
 
 .logo-wrapper:hover .logo-title {

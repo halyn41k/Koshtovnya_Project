@@ -52,7 +52,6 @@
         </article>
       </div>
 
-      <!-- Пагінація -->
       <div class="pagination">
         <button
           v-for="page in totalPages"
@@ -74,17 +73,25 @@
 import { defineAsyncComponent } from 'vue';
 
 export default {
+  // Ім'я компонента
   name: 'DukatiSection',
+
+  // Асинхронне завантаження компонентів для оптимізації
   components: {
+    // Компонент для фільтрації товарів
     FilterComponent: defineAsyncComponent(() =>
       import('./FilterComponent.vue')
     ),
+    // Компонент для відображення товарів у категорії
     CategoryProduct: defineAsyncComponent(() =>
       import('./CategoryProduct.vue')
     ),
   },
+
+  // Дані компонента
   data() {
     return {
+      // Масив з інформацією про дукати
       dukats: [
         {
           id: 1,
@@ -164,37 +171,48 @@ export default {
           image: require('@/assets/Багряний захід.png'),
         },
       ],
-      wishlist: [],
-      currentPage: 0,
-      itemsPerPage: 8,
+      wishlist: [], // Список бажаних товарів
+      currentPage: 0, // Поточна сторінка
+      itemsPerPage: 8, // Кількість товарів на сторінці
     };
   },
+
+  // Обчислювані властивості
   computed: {
+    // Загальна кількість сторінок
     totalPages() {
       return Math.ceil(this.dukats.length / this.itemsPerPage);
     },
+    // Видимі товари для поточної сторінки
     visibleDukats() {
       const start = this.currentPage * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.dukats.slice(start, end);
+      return this.dukats.slice(start, end); // Повертає товари для поточної сторінки
     },
   },
+
+  // Методи компонента
   methods: {
+    // Зміна поточної сторінки
     changePage(page) {
       if (page >= 0 && page < this.totalPages) {
-        this.currentPage = page;
+        this.currentPage = page; // Оновлює поточну сторінку
       }
     },
+    // Перевірка, чи є товар у списку бажаного
     isInWishlist(productName) {
       return this.wishlist.includes(productName);
     },
+    // Додавання або видалення товару зі списку бажаного
     toggleWishlist(dukat) {
       if (this.isInWishlist(dukat.name)) {
+        // Якщо товар уже в списку, видаляємо його
         this.wishlist = this.wishlist.filter(item => item !== dukat.name);
-        alert(`${dukat.name} видалено зі списку бажаного!`);
+        alert(`${dukat.name} видалено зі списку бажаного!`); // Сповіщення
       } else {
+        // Якщо товару немає в списку, додаємо його
         this.wishlist.push(dukat.name);
-        alert(`${dukat.name} додано до списку бажаного!`);
+        alert(`${dukat.name} додано до списку бажаного!`); // Сповіщення
       }
     },
   },
@@ -396,14 +414,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease;
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white; 
+  transform: scale(1.1); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .pagination button.active {

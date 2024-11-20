@@ -8,7 +8,6 @@
   </header>
   <main class="account-page">
     <section class="account-content">
-      <!-- Sidebar menu -->
       <div class="account-sidebar">
         <nav class="profile-menu">
           <ul class="menu-list">
@@ -24,12 +23,11 @@
                    alt="Icon" />
               <h2 class="section-title">{{ menuItem.title }}</h2>
             </li>
-            <li v-if="index < menuItems.length - 1" class="divider"></li> <!-- Рисочка між пунктами меню -->
+            <li v-if="index < menuItems.length - 1" class="divider"></li> 
           </ul>
         </nav>
       </div>
 
-      <!-- Account information content -->
       <div class="account-details">
         <component :is="activeTabContent" 
                    :firstName="firstName" 
@@ -58,9 +56,9 @@ export default {
   data() {
     return {
       activeTab: 0,
-      firstName: 'Ім’я', // Заповніть фактичними значеннями
-      lastName: 'Прізвище', // Заповніть фактичними значеннями
-      email: 'email@example.com', // Заповніть фактичними значеннями
+      firstName: 'Ім’я', 
+      lastName: 'Прізвище', 
+      email: 'email@example.com', 
       menuItems: [
         { title: 'Інформація', icon: require('@/assets/user.png') },
         { title: 'Адреси', icon: require('@/assets/location.png') },
@@ -220,7 +218,6 @@ export default {
     margin-left: 3px;
   }
   
-  /* Change heart icon to black */
   .heart-icon {
     filter: brightness(0);
   }
@@ -240,9 +237,9 @@ export default {
   }
 
   .divider {
-  height: 1px; /* Висота рисочки */
-  background-color: #ddd; /* Колір рисочки */
-  margin: 5px 0; /* Відступи зверху і знизу */
+  height: 1px;
+  background-color: #ddd; 
+  margin: 5px 0; 
 }
 
   
@@ -257,7 +254,6 @@ export default {
       padding: 0;
     }
   
-    /* Adjust background image for smaller screens */
     .account-page {
       background-size: cover;
       background-position: center;

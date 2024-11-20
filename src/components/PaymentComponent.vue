@@ -32,8 +32,7 @@
                 />
               </div>
               <div v-if="index === currentStep && step.isExpanded" class="step-content">
-                <!-- Особиста інформація -->
-                <template v-if="step.title === 'Особиста інформація'">
+=                <template v-if="step.title === 'Особиста інформація'">
                   <div class="input-container">
                     <input class="input-field" v-model="formData.firstName" placeholder="Ім'я" />
                     <span v-if="errors.firstName" class="error">{{ errors.firstName }}</span>
@@ -49,7 +48,6 @@
                   </div>
                 </template>
                 
-                <!-- Поштове відділення -->
                 <template v-else-if="step.title === 'Поштове відділення'">
                   <div class="input-container">
                     <input class="input-field" v-model="formData.city" placeholder="Місто" />
@@ -74,7 +72,6 @@
                   </div>
                 </template>
                 
-                <!-- Оплата -->
                 <template v-else-if="step.title === 'Оплата'">
                   <div class="payment-options">
                     <div class="payment-option" v-for="(option, idx) in paymentOptions" :key="idx">
@@ -97,7 +94,6 @@
           </div>
         </section>
         
-        <!-- Підсумок та оплата -->
         <section class="payment-summary">
           <div class="order-summary">
             <h2 class="summary-title">Сума до оплати</h2>
@@ -160,82 +156,96 @@
 </template>
 
 
-
 <script>
 export default {
-  name: 'PaymentComponent',
+  name: 'PaymentComponent', // Назва компонента
+
+  // Дані для компонента
   data() {
     return {
+      // Кроки процесу оформлення замовлення
       steps: [
-        { title: 'Особиста інформація', completed: false, isExpanded: true },
-        { title: 'Поштове відділення', completed: false, isExpanded: false },
-        { title: 'Оплата', completed: false, isExpanded: false },
+        { title: 'Особиста інформація', completed: false, isExpanded: true }, // Перший крок
+        { title: 'Поштове відділення', completed: false, isExpanded: false }, // Другий крок
+        { title: 'Оплата', completed: false, isExpanded: false }, // Третій крок
       ],
-      currentStep: 0,
+      currentStep: 0, // Поточний крок
       formData: {
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        city: '',
-        postalService: '',
-        postalOffice: '',
-        phoneDelivery: '', // щоб не заважало переходу, буде автоматично заповнене
+        // Данні форми
+        firstName: '', // Ім'я
+        lastName: '', // Прізвище
+        email: '', // Email
+        phone: '', // Номер телефону
+        city: '', // Місто
+        postalService: '', // Поштове відділення
+        postalOffice: '', // Поштове відділення
+        phoneDelivery: '', // Телефон для доставки (якщо не заповнене — буде заповнене основним телефоном)
       },
-      selectedPaymentOption: '',
+      selectedPaymentOption: '', // Вибір способу оплати
       paymentOptions: [
-        'Оплата дебютовою або кредитною карткою',
+        'Оплата дебютовою або кредитною карткою', // Способи оплати
         'Оплата за допомогою PayPal',
         'Банківський переказ',
       ],
-      errors: {},
+      errors: {}, // Об'єкт для зберігання помилок валідації
     };
   },
+
   computed: {
+    // Перевірка, чи можна перейти до наступного кроку (немає помилок)
     canProceedToNextStep() {
-      return !Object.keys(this.errors).length;
+      return !Object.keys(this.errors).length; // Якщо немає помилок
     },
   },
-  methods: {
-    validateAndProceed() {
-      this.errors = {};
 
-      if (this.currentStep === 0) {
+  methods: {
+    // Метод для валідації даних та переходу до наступного кроку
+    validateAndProceed() {
+      this.errors = {}; // Очищення попередніх помилок
+
+      // Валідація для кожного кроку
+      if (this.currentStep === 0) { // Крок 1 — Особиста інформація
         if (!this.formData.firstName) this.errors.firstName = 'Ім\'я обов\'язкове';
         if (!this.formData.lastName) this.errors.lastName = 'Прізвище обов\'язкове';
         if (!this.formData.email || !this.validateEmail(this.formData.email)) this.errors.email = 'Введіть коректний email';
         if (!this.formData.phone) this.errors.phone = 'Номер телефону обов\'язковий';
-      } else if (this.currentStep === 1) {
+      } else if (this.currentStep === 1) { // Крок 2 — Поштове відділення
         if (!this.formData.city) this.errors.city = 'Місто обов\'язкове';
         if (!this.formData.postalService) this.errors.postalService = 'Оберіть поштову службу';
         if (!this.formData.postalOffice) this.errors.postalOffice = 'Відділення обов\'язкове';
-        // Якщо phoneDelivery порожнє, використовуємо phone
+        // Якщо телефон для доставки порожній — використовуємо основний телефон
         if (!this.formData.phoneDelivery) this.formData.phoneDelivery = this.formData.phone;
         if (!this.formData.phoneDelivery) this.errors.phoneDelivery = 'Телефон обов\'язковий';
-      } else if (this.currentStep === 2) {
+      } else if (this.currentStep === 2) { // Крок 3 — Оплата
         if (!this.selectedPaymentOption) this.errors.paymentOption = 'Оберіть спосіб оплати';
       }
 
-      // Якщо немає помилок, завершити крок
+      // Якщо немає помилок, переходимо до завершення кроку
       if (!Object.keys(this.errors).length) {
         this.completeStep();
       }
     },
+
+    // Метод для перевірки коректності введеного email
     validateEmail(email) {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailPattern.test(email);
+      return emailPattern.test(email); // Перевірка за допомогою регулярного виразу
     },
+
+    // Метод для розгортання/згортання кроків
     toggleStep(index) {
-      if (index <= this.currentStep) {
+      if (index <= this.currentStep) { // Розгортати тільки попередні або поточний крок
         this.steps[index].isExpanded = !this.steps[index].isExpanded;
       }
     },
+
+    // Метод для завершення поточного кроку
     completeStep() {
-      this.steps[this.currentStep].completed = true;
-      this.steps[this.currentStep].isExpanded = false;
-      if (this.currentStep < this.steps.length - 1) {
-        this.currentStep++;
-        this.steps[this.currentStep].isExpanded = true;
+      this.steps[this.currentStep].completed = true; // Позначити крок як завершений
+      this.steps[this.currentStep].isExpanded = false; // Сховати крок
+      if (this.currentStep < this.steps.length - 1) { // Якщо є наступний крок
+        this.currentStep++; // Перехід до наступного кроку
+        this.steps[this.currentStep].isExpanded = true; // Розгорнути наступний крок
       }
     },
   },
@@ -243,7 +253,6 @@ export default {
 </script>
 
 
-  
   <style scoped>
   .payment-header {
     margin-top: 200px;
@@ -272,7 +281,7 @@ export default {
   }
   
   .payment-content {
-  background-image: url('@/assets/paymentpattern.png'); /* Додайте фіксований фон */
+  background-image: url('@/assets/paymentpattern.png'); 
   background-attachment: fixed;
   background-size: cover;
   padding: 0 46.67px;
@@ -353,7 +362,7 @@ export default {
     }
     
     .payment-content {
-    background-image: url('@/assets/paymentpattern.png'); /* Додайте фіксований фон */
+    background-image: url('@/assets/paymentpattern.png');
     background-attachment: fixed;
     background-size: cover;
     padding: 0 46.67px;
@@ -473,7 +482,6 @@ export default {
   }
   
   .radio-input {
-    /* Сховуємо стандартне радіо, щоб стилізувати псевдоелементом */
     display: none;
   }
   
@@ -516,14 +524,14 @@ export default {
   border: 1px solid rgba(230, 230, 230, 1);
   max-height: 400px;
   overflow-y: auto;
-  transition: position 0.3s ease; /* Додаємо плавний перехід */
+  transition: position 0.3s ease; 
   z-index: 10;
 }
 
 .order-summary.sticky {
   position: absolute;
   top: auto;
-  bottom: 00px; /* Межа, після якої зупиняється прокрутка */
+  bottom: 00px; 
 }
 
 .summary-title {
@@ -584,7 +592,7 @@ export default {
 
 .order-items {
   border: 1px solid rgba(0, 0, 0, 0.5);
-  padding: 21px 25px; /* 32px / 1.5, 37px / 1.5 */
+  padding: 21px 25px; 
   background-color: #fff;
   width: 750px;
   margin-left: 50px;
@@ -592,36 +600,36 @@ export default {
 
 .item {
   display: flex;
-  gap: 13px; /* 20px / 1.5 */
-  border-radius: 16px; /* 24px / 1.5 */
+  gap: 13px; 
+  border-radius: 16px;
   background-color: rgba(255, 247, 246, 1);
-  padding: 13px; /* 20px / 1.5 */
-  border: 1.33px solid rgba(230, 230, 230, 1); /* 2px / 1.5 */
-  margin-bottom: 25px; /* 38px / 1.5 */
+  padding: 13px; 
+  border: 1.33px solid rgba(230, 230, 230, 1);
+  margin-bottom: 25px;
   width: 700px;
   margin-top: 20px;
 }
 
 .item-image {
-  width: 115px; /* 173px / 1.5 */
-  height: 106px; /* 159px / 1.5 */
+  width: 115px; 
+  height: 106px; 
   object-fit: contain;
 }
 
 .item-details {
-  font: 700 13.33px/1.3 Merriweather, sans-serif; /* 20px / 1.5 */
+  font: 700 13.33px/1.3 Merriweather, sans-serif; 
 }
 
 .item-title {
   color: var(--Grays-Black, #000);
-  margin-bottom: 2.67px; /* 4px / 1.5 */
+  margin-bottom: 2.67px; 
 }
 
 .item-price {
   color: rgba(160, 18, 18, 1);
   font-family: Inter, sans-serif;
   font-weight: 600;
-  margin-bottom: 17.33px; /* 26px / 1.5 */
+  margin-bottom: 17.33px; 
 }
 
 .item-quantity {
@@ -645,20 +653,20 @@ export default {
     }
   }
   .delivery-address {
-  padding: 23.33px 0; /* 35px / 1.5 */
-  font: 16.67px/1.3 Merriweather, sans-serif; /* 25px / 1.5 */
+  padding: 23.33px 0; 
+  font: 16.67px/1.3 Merriweather, sans-serif; 
 }
 
 .address-title {
-  margin-left: 25.33px; /* 38px / 1.5 */
+  margin-left: 25.33px; 
 }
 
 .address-divider {
-  margin-top: 13.33px; /* 20px / 1.5 */
+  margin-top: 13.33px; 
 }
 
 .address-details {
-  margin: 10.67px 0 0 25.33px; /* 16px, 38px / 1.5 */
+  margin: 10.67px 0 0 25.33px; 
 }
 
   
@@ -689,12 +697,11 @@ export default {
 
 .address-box {
   background-color: #fff;
-  border: 1px solid #d3d3d3; /* Thin gray border */
-  border-radius: 8px; /* Rounded corners */
+  border: 1px solid #d3d3d3; 
+  border-radius: 8px; 
   padding: 20px;
   color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
-  width: 750px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
 .address-box p {
@@ -712,7 +719,5 @@ export default {
     margin-left: 10px;
   }
 }
-
-
 
 </style>

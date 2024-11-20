@@ -52,7 +52,6 @@
         </article>
       </div>
       
-      <!-- Pagination -->
       <div class="pagination">
         <button 
           v-for="page in totalPages" 
@@ -72,17 +71,13 @@
 </template>
   
 <script>
-import { defineAsyncComponent } from 'vue'; 
+import { defineAsyncComponent } from 'vue'; // Імпорт функції для асинхронного завантаження компонентів
 
 export default {
   name: 'GerdanSection',
   components: {
-    FilterComponent: defineAsyncComponent(() =>
-      import('./FilterComponent.vue')
-    ),
-    CategoryProduct: defineAsyncComponent(() =>
-      import('./CategoryProduct.vue')
-    ),
+    FilterComponent: defineAsyncComponent(() => import('./FilterComponent.vue')), // Компонент фільтра
+    CategoryProduct: defineAsyncComponent(() => import('./CategoryProduct.vue')), // Компонент категорій
   },
   data() {
     return {
@@ -99,31 +94,31 @@ export default {
         { id: 10, name: 'Гердан "Мереживо"', price: '1300₴', material: 'Чешський бісер', image: require('@/assets/Мереживо.png') },
         { id: 11, name: 'Гердан "Петрівський розпис"', price: '1100₴', material: 'Китайський бісер', image: require('@/assets/Петрівський розпис.png') },
       ],
-      currentPage: 0,
-      itemsPerPage: 15,
-      wishlist: [],
+      currentPage: 0, // Поточна сторінка
+      itemsPerPage: 15, // Кількість герданів на сторінці
+      wishlist: [], // Список бажаних товарів
     };
   },
   computed: {
-    totalPages() {
+    totalPages() { // Розрахунок кількості сторінок
       return Math.ceil(this.gerdans.length / this.itemsPerPage);
     },
-    visibleGerdans() {
+    visibleGerdans() { // Гердани для поточної сторінки
       const start = this.currentPage * this.itemsPerPage;
       const end = start + this.itemsPerPage;
       return this.gerdans.slice(start, end);
-    }
+    },
   },
   methods: {
-    changePage(page) {
+    changePage(page) { // Перемикання сторінки
       if (page >= 0 && page < this.totalPages) {
         this.currentPage = page;
       }
     },
-    isInWishlist(productName) {
+    isInWishlist(productName) { // Перевірка, чи є товар у списку бажаного
       return this.wishlist.includes(productName);
     },
-    toggleWishlist(gerdan) {
+    toggleWishlist(gerdan) { // Додавання/видалення товару зі списку бажаного
       if (this.isInWishlist(gerdan.name)) {
         this.wishlist = this.wishlist.filter(item => item !== gerdan.name);
         alert(`${gerdan.name} видалено зі списку бажаного!`);
@@ -136,7 +131,7 @@ export default {
 };
 </script>
 
-  
+
   <style scoped>
   @font-face {
     font-family: 'KyivType Titling';
@@ -158,7 +153,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -331,14 +326,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease; 
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white; 
+  transform: scale(1.1); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .pagination button.active {

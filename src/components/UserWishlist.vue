@@ -36,10 +36,10 @@ export default {
   },
   methods: {
     removeItem(index) {
-      this.items.splice(index, 1); // Remove item from wishlist
+      this.items.splice(index, 1);
     },
     buyItem() {
-      this.$router.push('/cart'); // Redirect to cart
+      this.$router.push('/cart');
     },
   },
 };

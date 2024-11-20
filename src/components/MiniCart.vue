@@ -53,14 +53,14 @@
   
   <style scoped>
   .mini-cart {
-    position: absolute; /* Дозволяє позиціонування міні-картки */
-    top: 60px; /* Відступ зверху на 60 пікселів */
-    right: 0; /* Вирівнювання по правому краю */
-    background-color: #fffcfc; /* Фон міні-картки */
-    max-width: 400px; /* Задайте ширину міні-картки */
-    border: 1px solid #ccc; /* Межа міні-картки */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тінь для кращого вигляду */
-    z-index: 1000; /* Переконайтеся, що міні-картка поверх інших елементів */
+    position: absolute; 
+    top: 60px;
+    right: 0; 
+    background-color: #fffcfc;
+    max-width: 400px; 
+    border: 1px solid #ccc; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    z-index: 1000;
   }
   
   .cart-header {

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <HeaderComponent /> 
-    <router-view /> <!-- Тут відображатиметься активний компонент -->
+    <router-view />
     <FooterComponent />
   </div>
 </template>

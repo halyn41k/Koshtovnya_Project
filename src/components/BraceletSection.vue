@@ -52,7 +52,6 @@
         </article>
       </div>
 
-      <!-- Pagination -->
       <div class="pagination">
         <button 
           v-for="page in totalPages" 
@@ -78,68 +77,76 @@ import axios from 'axios';
 export default {
   name: 'BraceletSection',
   components: {
+    // Асинхронне завантаження компонентів для оптимізації
     FilterComponent: defineAsyncComponent(() =>
-      import('./FilterComponent.vue')
+      import('./FilterComponent.vue') // Компонент для фільтрації
     ),
     CategoryProduct: defineAsyncComponent(() =>
-      import('./CategoryProduct.vue')
+      import('./CategoryProduct.vue') // Компонент для відображення продуктів
     ),
   },
   data() {
     return {
-      bracelets: [], // Масив браслетів
-      wishlist: [],
-      currentPage: 0,
-      itemsPerPage: 15, // Кількість елементів на сторінці
+      bracelets: [], // Масив браслетів, отриманих із сервера
+      wishlist: [], // Масив бажаних продуктів
+      currentPage: 0, // Поточна сторінка пагінації
+      itemsPerPage: 15, // Кількість елементів на одній сторінці
     };
   },
   computed: {
+    // Підрахунок загальної кількості сторінок для пагінації
     totalPages() {
-      return Math.ceil(this.bracelets.length / this.itemsPerPage); // Загальна кількість сторінок
+      return Math.ceil(this.bracelets.length / this.itemsPerPage); 
     },
+    // Отримання браслетів, які будуть відображені на поточній сторінці
     visibleBracelets() {
-      const start = this.currentPage * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.bracelets.slice(start, end); // Видимі браслети на поточній сторінці
+      const start = this.currentPage * this.itemsPerPage; // Початковий індекс
+      const end = start + this.itemsPerPage; // Кінцевий індекс
+      return this.bracelets.slice(start, end); // Масив видимих браслетів
     },
   },
   methods: {
+    // Метод для отримання браслетів із сервера
     async fetchBracelets() {
       try {
         const response = await axios.get('http://26.235.139.202:8080/api/categories/3/products');
-        console.log(response.data); // Для перевірки
-        this.bracelets = response.data.data; // Витягуємо масив браслетів із поля data
+        console.log(response.data); // Лог для перевірки отриманих даних
+        this.bracelets = response.data.data; // Збереження браслетів у масив
       } catch (error) {
-        console.error('Помилка при отриманні браслетів:', error);
+        console.error('Помилка при отриманні браслетів:', error); // Виведення помилки
       }
     },
+    // Метод для зміни поточної сторінки
     changePage(page) {
       if (page >= 0 && page < this.totalPages) {
-        this.currentPage = page; // Зміна поточної сторінки
+        this.currentPage = page; // Змінюємо поточну сторінку, якщо вона в межах
       }
     },
+    // Перевірка, чи є продукт у списку бажаного
     isInWishlist(productName) {
-      return this.wishlist.includes(productName);
+      return this.wishlist.includes(productName); // Повертає true, якщо продукт у списку
     },
+    // Додавання або видалення продукту зі списку бажаного
     toggleWishlist(bracelet) {
       if (this.isInWishlist(bracelet.name)) {
+        // Якщо продукт уже є у списку, видаляємо його
         this.wishlist = this.wishlist.filter(item => item !== bracelet.name);
         alert(`${bracelet.name} видалено зі списку бажаного!`);
       } else {
+        // Якщо продукту немає у списку, додаємо його
         this.wishlist.push(bracelet.name);
         alert(`${bracelet.name} додано до списку бажаного!`);
       }
     },
   },
+  // Викликаємо метод отримання браслетів після завантаження компонента
   mounted() {
     this.fetchBracelets();
   },
 };
-
 </script>
 
 
-  
   <style scoped>
   @font-face {
     font-family: 'KyivType Titling';
@@ -161,7 +168,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif; 
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -329,14 +336,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease; 
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white; 
+  transform: scale(1.1); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .pagination button.active {

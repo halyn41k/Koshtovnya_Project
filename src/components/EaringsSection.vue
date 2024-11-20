@@ -52,7 +52,6 @@
         </article>
       </div>
 
-      <!-- Pagination -->
       <div class="pagination">
         <button 
           v-for="page in totalPages" 
@@ -72,20 +71,28 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'; 
+import { defineAsyncComponent } from 'vue'; // Імпорт функції для асинхронного завантаження компонентів
 
 export default {
+  // Ім'я компонента
   name: 'EaringsSection',
+
+  // Асинхронне завантаження компонентів для оптимізації
   components: {
+    // Компонент для фільтрації товарів
     FilterComponent: defineAsyncComponent(() =>
       import('./FilterComponent.vue')
     ),
+    // Компонент для відображення товарів у категорії
     CategoryProduct: defineAsyncComponent(() =>
       import('./CategoryProduct.vue')
     ),
   },
+
+  // Дані компонента
   data() {
     return {
+      // Список сережок із характеристиками
       earings: [
         {
           id: 1,
@@ -172,42 +179,54 @@ export default {
           image: require('@/assets/Сніжний мак.png'),
         },
       ],
-      currentPage: 0,
+      currentPage: 0, // Поточна сторінка
       itemsPerPage: 9, // Кількість елементів на сторінці
-      wishlist: [],
+      wishlist: [], // Список бажаних товарів
     };
   },
+
+  // Обчислювані властивості
   computed: {
+    // Загальна кількість сторінок
     totalPages() {
       return Math.ceil(this.earings.length / this.itemsPerPage);
     },
+    // Видимі сережки для поточної сторінки
     visibleEarings() {
       const start = this.currentPage * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.earings.slice(start, end);
+      return this.earings.slice(start, end); // Повертає сережки для поточної сторінки
     }
   },
+
+  // Методи компонента
   methods: {
+    // Зміна сторінки
     changePage(page) {
       if (page >= 0 && page < this.totalPages) {
-        this.currentPage = page;
+        this.currentPage = page; // Оновлення поточної сторінки
       }
     },
+    // Перевірка, чи товар є у списку бажаного
     isInWishlist(productName) {
       return this.wishlist.includes(productName);
     },
+    // Додавання або видалення товару зі списку бажаного
     toggleWishlist(earing) {
       if (this.isInWishlist(earing.name)) {
+        // Видаляємо товар зі списку, якщо він уже є
         this.wishlist = this.wishlist.filter(item => item !== earing.name);
-        alert(`${earing.name} видалено зі списку бажаного!`);
+        alert(`${earing.name} видалено зі списку бажаного!`); // Виводимо сповіщення
       } else {
+        // Додаємо товар у список, якщо його ще немає
         this.wishlist.push(earing.name);
-        alert(`${earing.name} додано до списку бажаного!`);
+        alert(`${earing.name} додано до списку бажаного!`); // Виводимо сповіщення
       }
     },
   },
 };
 </script>
+
 
   
   <style scoped>
@@ -231,7 +250,7 @@ export default {
   
   .section-title {
     color: #333;
-    font-family: 'KyivType Titling', sans-serif; /* Changed to Heavy2 font */
+    font-family: 'KyivType Titling', sans-serif;
     font-weight: 900; 
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
@@ -404,14 +423,14 @@ export default {
   margin-top: 20px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  transition: all 0.3s ease; /* Додаємо плавний перехід */
+  transition: all 0.3s ease; 
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; /* Колір фону при ховері */
-  color: white; /* Колір тексту при ховері */
-  transform: scale(1.1); /* Збільшення кнопки */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тінь навколо кнопки */
+  background-color: #6b1f1f; 
+  color: white; 
+  transform: scale(1.1); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .pagination button.active {

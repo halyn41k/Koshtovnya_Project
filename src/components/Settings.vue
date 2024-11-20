@@ -45,9 +45,9 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     font-family: Montserrat, sans-serif;
-  transform: scale(0.7); /* Зменшує контент вдвічі */
-  transform-origin: top left; /* Задає точку масштабування з лівого верхнього кута */
-  width: 1200px; /* Компенсує зменшення, щоб зберегти початковий розмір контейнера */
+  transform: scale(0.7); 
+  transform-origin: top left; 
+  width: 1200px;
   margin-left: 20px;
   }
   

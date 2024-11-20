@@ -1,7 +1,6 @@
 <template>
   <article class="about-us">
     <header class="about-us__header">
-      <!-- Title with side lines -->
       <h1 class="section-title-container">
         <div class="line"></div>
         <span class="main-title">Про нас</span>
@@ -131,7 +130,6 @@ export default {
     },
     handleSubmit() {
       console.log('Form submitted:', this.form);
-      // Add form handling logic here
       this.form.email = '';
       this.form.message = '';
       alert('Дякуємо за ваше повідомлення! Ми зв’яжемося з вами найближчим часом.');
@@ -143,7 +141,6 @@ export default {
 
 
 <style scoped>
-/* Font definitions */
 @font-face {
   font-family: 'KyivType Titling';
   src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeSans-Heavy2.ttf') format('truetype');
@@ -176,7 +173,6 @@ export default {
   margin-bottom: 50px;
 }
 
-/* Container for title with side lines */
 .section-title-container {
   display: flex;
   align-items: center;

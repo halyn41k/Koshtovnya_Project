@@ -1,7 +1,6 @@
 <template>
     <article class="payment-delivery-info">
       <header class="info-header">
-        <!-- Main title with side lines -->
         <h1 class="section-title-container">
           <div class="line"></div>
           <span class="main-title">Умови оплати та доставки</span>
@@ -19,7 +18,7 @@
               <p><b>- Нова Пошта</b></p>
               <p><b>- Укрпошта</b></p>
               <section class="delivery-conditions">
-                <h3 class="subsection-title">1. Умови доставки:</h3>
+                <h2 class="section-title">1. Умови доставки:</h2>
                 <ul class="delivery-list">
                   <li class="delivery-item">
                     <h4 class="delivery-company">

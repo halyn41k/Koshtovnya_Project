@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     changePassword() {
-      this.$router.push('/changepassword'); // Navigate to change password page
+      this.$router.push('/changepassword'); 
     },
   },
 };
@@ -42,7 +42,7 @@ export default {
 .personal-info-card p {
   font-size: 16px;
   color: #555;
-  margin: 16px 0; /* Increased vertical spacing */
+  margin: 16px 0; 
 }
 
 .change-password-button {

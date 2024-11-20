@@ -10,7 +10,7 @@
           :to="category.url"
           class="category-item with-squares"
         >
-          <!-- Only display squares on 1st, 3rd, and 5th items -->
+          <!-- Відображаються квадрати тільки на 1st, 3rd, і 5th елементах -->
           <template v-if="index === 0 || index === 2 || index === 4">
             <div class="square light-square"></div>
             <div class="square dark-square"></div>
@@ -37,7 +37,10 @@
 export default {
   data() {
     return {
-      categories: [], // Масив для зберігання категорій
+      // Масив для зберігання категорій, отриманих із API
+      categories: [], 
+
+      // Запасний масив категорій, якщо API недоступне
       fallbackCategories: [
         {
           id: 1,
@@ -79,26 +82,31 @@ export default {
     };
   },
   methods: {
+    // Метод для отримання категорій із API
     async fetchCategories() {
       try {
         const response = await fetch("http://26.235.139.202:8080/api/categories");
 
+        // Перевірка, чи успішна відповідь
         if (!response.ok) {
           throw new Error(`HTTP помилка: ${response.status}`);
         }
 
+        // Перевірка типу контенту, щоб переконатися, що сервер повернув JSON
         const contentType = response.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           throw new Error("Сервер не повернув JSON");
         }
 
+        // Парсинг JSON-відповіді
         const data = await response.json();
 
+        // Перевірка структури даних API (очікується масив категорій)
         if (!Array.isArray(data.data)) {
           throw new Error("Очікував масив категорій з API");
         }
 
-        // Додаємо фіксовані URL до кожної категорії
+        // Призначаємо фіксовані URL до кожної категорії
         const fixedUrls = [
           '/bracelets',
           '/herdany',
@@ -108,27 +116,29 @@ export default {
           '/belts',
         ];
 
+        // Форматуємо дані, додаючи фіксовані URL
         this.categories = data.data.map((category, index) => ({
           id: category.id,
           name: category.name,
           image_url: category.image_url,
-          url: fixedUrls[index] || '#', // Призначаємо фіксовані URL
+          url: fixedUrls[index] || '#', // Призначаємо URL або залишаємо '#'
         }));
       } catch (error) {
+        // У разі помилки використовуємо запасний масив
         console.error("Помилка при отриманні категорій:", error.message);
         this.categories = this.fallbackCategories;
       }
     },
   },
+  // Викликаємо fetchCategories одразу після монтуння компонента
   mounted() {
     this.fetchCategories();
   },
 };
 </script>
 
-  
-  
-  <style scoped>
+
+<style scoped>
     @font-face {
       font-family: 'KyivType Titling';
       src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Bold3.ttf') format('truetype');
@@ -188,9 +198,9 @@ export default {
     .image-wrapper {
       position: relative;
       width: 300px;
-      height: 300px; /* Збільшено висоту зображень */
+      height: 300px; 
       overflow: hidden;
-      margin-top: 20px; /* Додає відступ зверху для опускання елементів */
+      margin-top: 20px; 
     }
   
     .category-title-wrapper {
@@ -209,7 +219,7 @@ export default {
       font-weight: 900;
       margin-right: 10px;
     }
-    /* Стилі для квадратів */
+    
     .square {
   position: absolute;
   width: 300px;
@@ -231,7 +241,6 @@ export default {
   right: -50px;
 }
 
-/* Hover animations for squares */
 .category-item:hover .light-square {
   transform: translate(-10px, -10px);
 }
@@ -240,7 +249,6 @@ export default {
   transform: translate(10px, 10px);
 }
 
-/* Ensure only the first, third, and fifth items have squares */
 .category-grid .category-item:nth-child(1) .light-square,
 .category-grid .category-item:nth-child(1) .dark-square,
 .category-grid .category-item:nth-child(3) .light-square,
@@ -250,13 +258,11 @@ export default {
   display: block;
 }
 
-/* Hide squares for other items */
 .category-item .light-square,
 .category-item .dark-square {
   display: none;
 }
 
-/* Existing responsive styles */
 @media (max-width: 768px) {
   .category-grid {
     grid-template-columns: repeat(2, 1fr);

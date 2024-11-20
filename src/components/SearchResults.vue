@@ -22,76 +22,84 @@
   </template>
   
   <script>
-  import axios from "axios";
+  import axios from "axios"; // Імпортуємо бібліотеку axios для запитів до API.
   
   export default {
     props: {
-      query: {
+      query: { // Властивість для запиту пошуку.
         type: String,
         required: false,
-        default: "",
+        default: "", // За замовчуванням порожній рядок.
       },
     },
     data() {
       return {
-        results: [],
-        isVisible: false,
+        results: [], // Масив для збереження результатів пошуку.
+        isVisible: false, // Прапорець для відображення результатів.
       };
     },
     computed: {
+      // Виділяємо збіги в результатах пошуку.
       highlightedResults() {
-        const query = this.query.trim();
-        if (!query) return this.results;
-  
+        const query = this.query.trim(); // Очищаємо запит від пробілів.
+        if (!query) return this.results; // Якщо запит порожній — повертаємо всі результати.
+        
+        // Створюємо регулярний вираз для виділення частин тексту.
         const regex = new RegExp(`(${query})`, "gi");
         return this.results.map((product) => ({
           ...product,
           highlightedName: product.name.replace(
             regex,
-            '<span class="highlight">$1</span>'
+            '<span class="highlight">$1</span>' // Виділяємо знайдені частини.
           ),
         }));
       },
     },
     watch: {
+      // Стежимо за змінами в query і виконуємо пошук.
       query(newQuery) {
         if (newQuery.trim()) {
-          this.search(newQuery);
+          this.search(newQuery); // Якщо запит не порожній, виконуємо пошук.
         } else {
-          this.results = [];
-          this.isVisible = false;
+          this.results = []; // Якщо запит порожній, очищуємо результати.
+          this.isVisible = false; // Сховуємо блок з результатами.
         }
       },
     },
     methods: {
+      // Пошук товарів через API.
       search(query) {
-        const apiUrl = `http://26.235.139.202:8080/api/products/search/${query}`;
+        const apiUrl = `http://26.235.139.202:8080/api/products/search/${query}`; // Формуємо URL.
         axios
-          .get(apiUrl)
+          .get(apiUrl) // Запит до API.
           .then((response) => {
-            this.results = response.data.data;
-            this.isVisible = true;
+            this.results = response.data.data; // Оновлюємо результати.
+            this.isVisible = true; // Показуємо блок з результатами.
           })
           .catch((error) => {
-            console.error("Error fetching search results:", error);
-            this.results = [];
-            this.isVisible = false;
+            console.error("Error fetching search results:", error); // Логуємо помилки.
+            this.results = []; // Очищаємо результати у разі помилки.
+            this.isVisible = false; // Сховуємо блок з результатами.
           });
       },
+      // Обробка кліків за межами компонента.
       handleOutsideClick(event) {
         if (!this.$el.contains(event.target)) {
-          this.isVisible = false;
+          this.isVisible = false; // Сховуємо результати, якщо клікнули поза.
         }
       },
     },
     mounted() {
+      // Додаємо слухача на клік миші по всьому документу.
       document.addEventListener("mousedown", this.handleOutsideClick);
     },
     beforeUnmount() {
+      // Видаляємо слухача перед знищенням компонента.
       document.removeEventListener("mousedown", this.handleOutsideClick);
     },
   };
   </script>
+  
   
   <style scoped>
   .search-results {

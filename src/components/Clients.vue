@@ -82,10 +82,10 @@
   
   <style scoped>
   .client-list {
-  transform: scale(0.9); /* Зменшує контент вдвічі */
-  transform-origin: top left; /* Задає точку масштабування з лівого верхнього кута */
+  transform: scale(0.9); 
+  transform-origin: top left; 
   font-family: Montserrat, sans-serif;
-  width: 1200px; /* Компенсує зменшення, щоб зберегти початковий розмір контейнера */
+  width: 1200px; 
   margin-left: 20px;
 }
 
@@ -139,7 +139,7 @@
 }
 
 .search-icon {
-  width: 30px; /* Розмір іконки */
+  width: 30px; 
   height: 30px;
   margin-left: 8px;
 }

@@ -32,28 +32,31 @@
   
   <script>
   export default {
-    name: "ProductUpdate",
+    name: "ProductUpdate", // Назва компонента
+  
+    // Дані компонента, які містять інформацію про товар та поля форми
     data() {
       return {
         product: {
-          photo: null,
-          name: "",
-          price: null,
-          beadType: "",
-          countryOfOrigin: "",
-          material: "",
-          fittings: "",
-          weight: null,
-          size: "",
-          color: "",
-          beadManufacturer: ""
+          photo: null, // Фото товару
+          name: "", // Назва товару
+          price: null, // Ціна товару
+          beadType: "", // Вид бісеру
+          countryOfOrigin: "", // Країна виробник
+          material: "", // Матеріал
+          fittings: "", // Фурнітура
+          weight: null, // Вага товару
+          size: "", // Розмір товару
+          color: "", // Колір товару
+          beadManufacturer: "" // Виробник бісеру
         },
         productFields: {
+          // Опис полів форми для редагування товару
           name: { label: "Назва Товару", type: "text", placeholder: "Введіть назву товару", required: true },
           price: { label: "Ціна (грн)", type: "number", placeholder: "Введіть ціну товару", required: true },
           beadType: {
-            label: "Вид Бісеру",
-            type: "select",
+            label: "Вид Бісеру", 
+            type: "select", // Поле вибору для виду бісеру
             options: [
               { value: "japanese", label: "Японський" },
               { value: "czech", label: "Чеський" },
@@ -71,17 +74,22 @@
         }
       };
     },
+  
     methods: {
+      // Метод для обробки завантаження файлу фото товару
       handleFileUpload(event) {
-        this.product.photo = event.target.files[0];
+        this.product.photo = event.target.files[0]; // Присвоєння вибраного файлу до властивості photo
       },
+  
+      // Метод для оновлення товару (потрібно додати логіку оновлення)
       updateProduct() {
-        console.log("Product updated with data:", this.product);
-        // Додайте логіку для оновлення товару
+        console.log("Product updated with data:", this.product); // Логування даних товару для тестування
+        // Додайте логіку для оновлення товару через API або іншу бізнес-логіку
       }
     }
   };
   </script>
+  
   
   <style scoped>
   .page-title {

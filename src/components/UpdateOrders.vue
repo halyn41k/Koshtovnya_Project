@@ -48,7 +48,6 @@
     name: 'OrderUpdateForm',
     methods: {
       updateOrder() {
-        // Handle order update logic here
         console.log('Order updated');
       }
     }

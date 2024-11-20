@@ -125,8 +125,8 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  max-width: 100vw; /* Limit width to the viewport */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  max-width: 100vw; 
+  overflow-x: hidden; 
 }
   
   .registration-background-image {
@@ -153,14 +153,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 20px 0; /* Adjust spacing as needed */
+    margin: 20px 0;
   }
   
   .line {
-    flex: 1; /* Take available space */
-    height: 2px; /* Thickness of the line */
-    background-color: grey; /* Color of the line */
-    margin: 0 10px; /* Space between the line and the title */
+    flex: 1; 
+    height: 2px; 
+    background-color: grey; 
+    margin: 0 10px; 
     margin-top:120px;
   }
   
@@ -183,7 +183,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 96px 80px; /* Зменшено на 50 пікселів */
+    padding: 96px 80px; 
     border: 1px solid rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 2;
@@ -247,15 +247,15 @@
   
   .toggle-password-button {
   position: absolute;
-  right: 110px; /* Зміщення на 300 пікселів ліворуч від початкової позиції */
+  right: 110px; 
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
-  width: 24px; /* Розмір кнопки */
-  height: 24px; /* Розмір кнопки */
+  width: 24px; 
+  height: 24px; 
 }
   
   .login-prompt {
@@ -275,24 +275,24 @@
     border: none;
     color: white;
     display: flex;
-    justify-content: space-between; /* Change to space-between */
+    justify-content: space-between; 
     align-items: center;
     margin: 20px 0;
     min-height: 50px;
     width: 290px;
     max-width: 100%;
-    padding: 0 20px; /* Add padding for spacing */
+    padding: 0 20px; 
     font: 400 18px/1.3 Merriweather, sans-serif;
     transition: background-color 0.3s ease;
   }
   
   .registration-text {
-    flex: 1; /* Allow text to take available space */
-    text-align: left; /* Align text to the left */
+    flex: 1; 
+    text-align: left;
   }
   
   .registration-icon {
-    margin-left: 10px; /* Add margin for spacing */
+    margin-left: 10px; 
   }
   
   

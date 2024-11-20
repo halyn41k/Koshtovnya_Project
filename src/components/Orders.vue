@@ -51,7 +51,6 @@
         </li>
       </ul>
   
-      <!-- Update Order Modal -->
       <div v-if="isUpdateModalVisible" class="modal">
         <div class="modal-content">
           <h3>Оновити замовлення</h3>
@@ -96,7 +95,6 @@
     },
     methods: {
       handleSearch() {
-        // Implement search functionality
       },
       deleteOrder(index) {
         this.orders.splice(index, 1);
@@ -122,10 +120,10 @@
   <style scoped>
   .order-management {
     font-family: Montserrat, sans-serif;
-  transform: scale(0.9); /* Зменшує контент вдвічі */
-  transform-origin: top left; /* Задає точку масштабування з лівого верхнього кута */
+  transform: scale(0.9); 
+  transform-origin: top left; 
   font-family: Montserrat, sans-serif;
-  width: 1200px; /* Компенсує зменшення, щоб зберегти початковий розмір контейнера */
+  width: 1200px; 
   margin-left: 20px;
   }
   
@@ -176,7 +174,7 @@
 }
 
 .search-icon {
-  width: 30px; /* Розмір іконки */
+  width: 30px; 
   height: 30px;
   margin-left: 8px;
 }

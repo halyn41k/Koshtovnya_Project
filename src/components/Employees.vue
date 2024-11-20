@@ -65,76 +65,28 @@
 
 <script>
 export default {
-  name: 'EmployeeList',
+  name: 'EmployeeList', // Назва компонента
   data() {
     return {
-      searchQuery: '',
-      employees: [
-          {
-            id: 1,
-            name: 'Степан Мельник',
-            email: 'stepan@gmail.com',
-            avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
-            role: 'superadmin',
-            phone: '+380981234567',
-            added: '01.01.2024',
-            updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/f5bb7e03e7811141f22580f13ea4b5cc63d44ccc5748ef70599f3d2c1a8e772c?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
-          },
-          {
-            id: 2,
-            name: 'Степан Мельник',
-            email: 'stepan@gmail.com',
-            avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
-            role: 'admin',
-            phone: '+380981234567',
-            added: '01.01.2024',
-            updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/1149b166983364690355d02644045423ec47bec40e3f6a6efd11e526bda0319a?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
-          },
-          {
-            id: 3,
-            name: 'Степан Мельник',
-            email: 'stepan@gmail.com',
-            avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
-            role: 'admin',
-            phone: '+380981234567',
-            added: '01.01.2024',
-            updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/81c3baa053805887fa4f8ca2a957643eb1fb7ea384b36d45a64fc113f5901950?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
-          },
-          {
-            id: 4,
-            name: 'Степан Мельник',
-            email: 'stepan@gmail.com',
-            avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
-            role: 'manager',
-            phone: '+380981234567',
-            added: '01.01.2024',
-            updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/e6d9c7f527b1858c32a2349e96878fd7a0afbdf9f5213f2ac1b1d98f4cbc5194?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
-          },
-          {
-            id: 5,
-            name: 'Степан Мельник',
-            email: 'stepan@gmail.com',
-            avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
-            role: 'admin',
-            phone: '+380981234567',
-            added: '01.01.2024',
-            updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/fc97e3d89e0f40091df65d0a380fde90577342b681de60dd55ba5310f08a086a?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
-          },
-          {
-            id: 6,
-            name: 'Степан Мельник',
-            email: 'stepan@gmail.com',
-            avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
-            role: 'manager',
-            phone: '+380981234567',
-            added: '01.01.2024',
-            updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/a918f9e236a7c940b080f1c59822fcb78b12dd36417dc4e3f0491b30f0ad34bf?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
-          }
-        ]
+      searchQuery: '', // Рядок пошуку для фільтрації працівників
+      employees: [ // Масив працівників із даними про кожного
+        {
+          id: 1,
+          name: 'Степан Мельник',
+          email: 'stepan@gmail.com',
+          avatar: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/c34a4bd6222bfecc7743319828be8f814b33d637b62a0789e4b5af3ab8a516a5?apiKey=c3e46d0a629546c7a48302a5db3297d5&',
+          role: 'superadmin',
+          phone: '+380981234567',
+          added: '01.01.2024',
+          updateIcon: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/f5bb7e03e7811141f22580f13ea4b5cc63d44ccc5748ef70599f3d2c1a8e772c?apiKey=c3e46d0a629546c7a48302a5db3297d5&'
+        },
+        // Інші працівники...
+      ]
     };
   },
   computed: {
     filteredEmployees() {
+      // Повертає відфільтрований список працівників відповідно до рядка пошуку
       return this.employees.filter(employee => {
         const searchTerm = this.searchQuery.toLowerCase();
         return (
@@ -146,28 +98,49 @@ export default {
   },
   methods: {
     handleSearch() {
-      // Пошук вже обробляється через filteredEmployees, тому метод може бути порожнім
+      // Додатковий метод для обробки пошуку. Може використовуватись для додаткових дій.
     },
     handleAddEmployee() {
-      // Реалізуйте функціональність для додавання працівника
+      // Додає нового працівника до списку
+      const newEmployee = {
+        id: this.employees.length + 1, // Генеруємо унікальний id
+        name: 'Новий Працівник',
+        email: 'new_employee@gmail.com',
+        avatar: 'https://via.placeholder.com/150', // Плейсхолдер для аватара
+        role: 'manager',
+        phone: '+380000000000',
+        added: new Date().toISOString().split('T')[0], // Дата додавання у форматі 'YYYY-MM-DD'
+        updateIcon: 'https://via.placeholder.com/20' // Плейсхолдер для іконки оновлення
+      };
+      this.employees.push(newEmployee); // Додаємо нового працівника в список
     },
     handleDelete(id) {
-      // Реалізуйте функціональність для видалення працівника
+      // Видаляє працівника за id
       this.employees = this.employees.filter(employee => employee.id !== id);
+      alert(`Працівника з id ${id} видалено!`);
     },
     handleUpdate(id) {
-      // Реалізуйте функціональність для оновлення працівника
+      // Оновлює дані працівника за id
+      const employeeIndex = this.employees.findIndex(employee => employee.id === id);
+      if (employeeIndex !== -1) {
+        // Змінюємо дані працівника (наприклад, роль)
+        this.employees[employeeIndex].role = 'updated role';
+        alert(`Працівника з id ${id} оновлено!`);
+      } else {
+        alert(`Працівника з id ${id} не знайдено!`);
+      }
     }
   }
 };
 </script>
 
+
   
   <style scoped>
 .employee-management {
-  transform: scale(0.9); /* Зменшує контент вдвічі */
-  transform-origin: top left; /* Задає точку масштабування з лівого верхнього кута */
-  width: 1200px; /* Компенсує зменшення, щоб зберегти початковий розмір контейнера */
+  transform: scale(0.9); 
+  transform-origin: top left; 
+  width: 1200px; 
   margin-left: 20px;
 }
   
@@ -230,7 +203,7 @@ export default {
 }
 
 .search-icon {
-  width: 30px; /* Розмір іконки */
+  width: 30px; 
   height: 30px;
   margin-left: 8px;
 }
