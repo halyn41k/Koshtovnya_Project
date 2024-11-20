@@ -4,13 +4,13 @@
 
     <div class="text-container">
       <div class="handmade-beaded-products">
-        Вироби ручної роботи<br>з бісеру
+        {{ $t('handmadeProducts') }}
       </div>
       <div class="exclusive-necklaces-bracelets-earrings">
-        <br>Ексклюзивні гердани, браслети, <br> силянки та інше
+        {{ $t('exclusiveJewelry') }}
       </div>
       <router-link to="/allproduct" class="view-products-button">
-      <button class="view-products-button">Дивитися вироби</button>
+        <button class="view-products-button">{{ $t('viewProducts') }}</button>
       </router-link>
     </div>
 
@@ -22,77 +22,81 @@
       <div class="right-text-container">
         <div class="quote-text">
           <span class="ukrainian-heritage">
-            Українське етно – це голос предків, вишитий на полотні душі, вплетений у музику вітрів і відлуння карпатських вершин. Це нескінченне джерело сили та краси, яке живить наше сьогодення...
+            {{ $t('quoteText') }}
           </span>
         </div>
-        <span class="gnat-khotkevich">Гнат Хоткевич</span>
+        <span class="gnat-khotkevich">{{ $t('gnatKhotkevich') }}</span>
       </div>
     </div>
 
     <section class="popular-goods">
-  <h2 class="section-title">Популярні товари</h2>
-  <div class="arrow-container">
-    <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
-    <div class="product-grid">
-      <div class="product-row">
-        <div v-for="product in visibleProducts" :key="product.id" class="product-column">
-          <article class="product-card">
-            <img :src="product.image_url" :alt="product.name" class="product-main-image" />
-            <div class="product-details">
-              <h3 class="product-title">{{ product.name }}</h3>
-              <p class="product-price">{{ product.price }}₴</p>
-              <p class="product-bead-producer">{{ product.bead_producer_name || "Чешський бісер" }}</p> <!-- Added line -->
-              <p class="product-info">{{ product.country_of_manufacture }}</p>
-              <button class="buy-button">
-                <span>Купити</span>
-                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-              </button>
+      <h2 class="section-title">{{ $t('popularGoods') }}</h2>
+      <div class="arrow-container">
+        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
+        <div class="product-grid">
+          <div class="product-row">
+            <div v-for="product in visibleProducts" :key="product.id" class="product-column">
+              <article class="product-card">
+                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
+                <div class="product-details">
+                  <h3 class="product-title">{{ product.name }}</h3>
+                  <p class="product-price">{{ product.price }}₴</p>
+                  <p class="product-bead-producer">{{ product.bead_producer_name || $t('defaultBeadProducer') }}</p>
+                  <p class="product-info">{{ product.country_of_manufacture }}</p>
+                  <button class="buy-button">
+                    <span>{{ $t('buyButton') }}</span>
+                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+                  </button>
+                </div>
+              </article>
             </div>
-          </article>
+          </div>
         </div>
+        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
       </div>
-    </div>
-    <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
-  </div>
 
-  <div class="dots-container">
-    <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
-  </div>
-</section>
-    <section class="new-arrivals">
-  <h2 class="section-title">Новинки</h2>
-  <div class="arrow-container">
-    <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousNewArrivals" />
-    <div class="product-grid">
-      <div class="product-row">
-        <div v-for="product in visibleNewArrivals" :key="product.id" class="product-column">
-          <article class="product-card">
-            <img :src="product.image_url" :alt="product.name" class="product-main-image" />
-            <div class="product-details">
-              <h3 class="product-title">{{ product.name }}</h3>
-              <p class="product-price">{{ product.price }}₴</p>
-              <p class="product-bead-producer">{{ product.bead_producer_name || "Чешський бісер" }}</p> <!-- Added line -->
-              <p class="product-info">{{ product.country_of_manufacture }}</p>
-              <button class="buy-button">
-                <span>Купити</span>
-                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-              </button>
-            </div>
-          </article>
-        </div>
+      <div class="dots-container">
+        <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
       </div>
-    </div>
-    <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextNewArrivals" />
-  </div>
-  <div class="dots-container">
-    <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
-  </div>
-</section>
+    </section>
+
+    <section class="new-arrivals">
+      <h2 class="section-title">{{ $t('newArrivals') }}</h2>
+      <div class="arrow-container">
+        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousNewArrivals" />
+        <div class="product-grid">
+          <div class="product-row">
+            <div v-for="product in visibleNewArrivals" :key="product.id" class="product-column">
+              <article class="product-card">
+                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
+                <div class="product-details">
+                  <h3 class="product-title">{{ product.name }}</h3>
+                  <p class="product-price">{{ product.price }}₴</p>
+                  <p class="product-bead-producer">{{ product.bead_producer_name || $t('defaultBeadProducer') }}</p>
+                  <p class="product-info">{{ product.country_of_manufacture }}</p>
+                  <button class="buy-button">
+                    <span>{{ $t('buyButton') }}</span>
+                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+                  </button>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextNewArrivals" />
+      </div>
+      <div class="dots-container">
+        <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
+      </div>
+    </section>
 
     <div class="instagram-section">
   <div class="instagram-text-container">
     <img src="@/assets/instapattern.png" alt="Instagram pattern" class="insta-pattern-image" />
-    <p class="follow-text">Слідкуй за нами в Instagram, щоб <br>не пропустити найцікавіше!</p>
+    <p class="follow-text">
+      {{ $t('followInsta') }}<br /> <!-- Використовуємо <br /> для переходу на новий рядок -->
+      {{ $t('dontMissTheMost') }} <!-- Текст на другому рядку -->
+    </p>
     <p class="instagram-handle">
       <span class="instagram-handle-link">@koshtovnya_jewelry</span>
     </p>
@@ -125,7 +129,6 @@
     </div>
   </div>
 </div>
-
     <CategoryProduct />
   </div>
 </template>
@@ -297,6 +300,7 @@ export default {
 
 .exclusive-necklaces-bracelets-earrings {
   font-size: 30px;
+  margin-top: 30px;
 }
 
 .button-container {

@@ -1,16 +1,14 @@
 <template>
   <section class="buy-by-category">
-    <h2 class="section-title">Придбайте за категорією</h2>
+    <h2 class="section-title">{{ $t('shopByCategory') }}</h2>
     <div class="category-container">
       <div class="category-grid">
-        <!-- Динамічне завантаження категорій -->
         <router-link
           v-for="(category, index) in categories"
           :key="category.id"
           :to="category.url"
           class="category-item with-squares"
         >
-          <!-- Відображаються квадрати тільки на 1st, 3rd, і 5th елементах -->
           <template v-if="index === 0 || index === 2 || index === 4">
             <div class="square light-square"></div>
             <div class="square dark-square"></div>
@@ -24,7 +22,7 @@
             />
           </div>
           <div class="category-title-wrapper">
-            <h2 class="category-title">{{ category.name }}</h2>
+            <h2 class="category-title">{{ $t(category.name) }}</h2>
             <span class="arrow">→</span>
           </div>
         </router-link>
@@ -32,6 +30,7 @@
     </div>
   </section>
 </template>
+
 
 <script>
 export default {

@@ -2,14 +2,14 @@
   <header class="header">
     <div class="top-bar">
       <ul class="nav-links">
-        <li><router-link to="/aboutus">Про нас</router-link></li>
-        <li><router-link to="/aboutdelivery">Про оплату | Доставку</router-link></li>
+        <li><router-link to="/aboutus">{{ $t('aboutUs') }}</router-link></li>
+        <li><router-link to="/aboutdelivery">{{ $t('aboutDelivery') }}</router-link></li>
       </ul>
 
       <div class="language-currency">
         <div class="language">
           <img :src="currentFlag" :alt="selectedLanguage + ' Flag'" class="flag">
-          <select v-model="selectedLanguage" class="dropdown no-border">
+          <select v-model="selectedLanguage" @change="changeLanguage" class="dropdown no-border">
             <option value="uk">Українська</option>
             <option value="en">English</option>
           </select>
@@ -21,7 +21,7 @@
             <option value="USD">USD $</option>
           </select>
         </div>
-        <router-link :to="{ path: '/account', query: { tab: 'wishlist' } }" class="wishlist">Список бажаного</router-link>
+        <router-link :to="{ path: '/account', query: { tab: 'wishlist' } }" class="wishlist">{{ $t('wishlist') }}</router-link>
       </div>
     </div>
 
@@ -32,14 +32,13 @@
         <input
           type="text"
           v-model="searchQuery"
-          placeholder="Пошук в нашому каталозі"
+          :placeholder="$t('searchPlaceholder')" 
           @keyup.enter="startSearch"
         />
         <div class="search-icon" @click="startSearch">
           <img src="@/assets/magnifying-glass-svgrepo-com.svg" alt="Search Icon" />
         </div>
-        <!-- Компонент для результатів -->
-        <SearchResults :query="searchQuery" />
+        <SearchResults v-if="searchQuery" :query="searchQuery" />
       </div>
 
       <router-link to="/" class="logo">
@@ -60,12 +59,12 @@
 
     <nav class="nav-menu">
       <ul>
-        <li><router-link to="/bracelets">Браслети</router-link></li>
-        <li><router-link to="/herdany">Гердани</router-link></li>
-        <li><router-link to="/dukats">Дукати</router-link></li>
-        <li><router-link to="/sylyanky">Силянки</router-link></li>
-        <li><router-link to="/earrings">Сережки</router-link></li>
-        <li><router-link to="/belts">Пояси</router-link></li>
+        <li><router-link to="/bracelets">{{ $t('bracelets') }}</router-link></li>
+        <li><router-link to="/herdany">{{ $t('herdany') }}</router-link></li>
+        <li><router-link to="/dukats">{{ $t('dukats') }}</router-link></li>
+        <li><router-link to="/sylyanky">{{ $t('sylyanky') }}</router-link></li>
+        <li><router-link to="/earrings">{{ $t('earrings') }}</router-link></li>
+        <li><router-link to="/belts">{{ $t('belts') }}</router-link></li>
       </ul>
     </nav>
   </header>
@@ -78,13 +77,6 @@ export default {
   components: {
     SearchResults,
   },
-  data() {
-    return {
-      searchQuery: '',
-      selectedLanguage: 'uk',
-      selectedCurrency: 'UAH',
-    };
-  },
   computed: {
     currentFlag() {
       return this.selectedLanguage === 'uk'
@@ -96,6 +88,15 @@ export default {
     startSearch() {
       console.log('Searching:', this.searchQuery);
     },
+    changeLanguage() {
+      this.$i18n.locale = this.selectedLanguage; // Зміна мови
+    },
+  },
+  data() {
+    return {
+      selectedLanguage: 'uk', // Початково українська
+      selectedCurrency: 'UAH'
+    };
   },
 };
 </script>
