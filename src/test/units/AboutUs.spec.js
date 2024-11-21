@@ -9,10 +9,10 @@ describe('AboutUs.vue', () => {
   });
 
   afterEach(() => {
-    wrapper.unmount(); // Заміна destroy() на unmount()
+    wrapper.unmount(); // Очищення після кожного тесту
   });
 
-  // Мок для window.alert, оскільки JSDOM не підтримує цю функцію
+  // Мок
   beforeAll(() => {
     window.alert = jest.fn();
   });
