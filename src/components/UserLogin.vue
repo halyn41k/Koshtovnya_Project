@@ -47,10 +47,6 @@
           Немає облікового запису?
           <a href="/registration" class="signup-link">Створіть його тут</a>
         </p>
-        <button type="button" class="google-login-button">
-          <span>Увійти за допомогою</span>
-          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/08aa0f49547eb61ccbdd8f240faf33e528e6a75140fa2fd508211e78b31846db?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Google logo" class="google-icon" />
-        </button>
         <button type="submit" class="login-button">
           <span>Увійти</span>
           <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="login-icon" />
@@ -64,8 +60,8 @@
 export default {
   data() {
     return {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
       showPassword: false,
       eyeOpenIcon: `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,24 +71,59 @@ export default {
       eyeClosedIcon: `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3m5.87-2.8c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5m0 0l6.57 6.57M16.87 16.87c1.9-1.02 3.37-2.77 4.13-4.87-1.73-4.39-6-7.5-11-7.5-1.08 0-2.13.14-3.13.4" stroke="#555" stroke-width="2"/>
-        </svg>`
+        </svg>`,
     };
   },
   methods: {
-    submitLogin() {
-      if (this.email && this.password) {
-        console.log('Email:', this.email);
-        console.log('Password:', this.password);
-      } else {
-        alert('Будь ласка, введіть ваші дані.');
-      }
+    async submitLogin() {
+  try {
+    const response = await fetch("http://26.235.139.202:8080/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: this.email,
+        password: this.password,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Помилка входу. Перевірте дані.");
+    }
+
+    const data = await response.json();
+    console.log("Успішний вхід:", data);
+
+    // Збереження токена та даних користувача
+    localStorage.setItem("token", data.token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        firstName: data.user.first_name,
+        lastName: data.user.last_name,
+        email: data.user.email,
+      })
+    );
+
+    // Перенаправлення на сторінку особистої інформації
+    this.$router.push({ name: "AccountInfo" });
+  } catch (error) {
+    console.error("Помилка входу:", error.message);
+    alert("Не вдалося увійти. Перевірте ваші дані.");
+  }
+
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
-    }
-  }
+    },
+  },
 };
 </script>
+
+
+
+
 
   
   <style scoped>

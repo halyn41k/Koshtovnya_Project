@@ -1,28 +1,47 @@
 <template>
   <div class="personal-info-card">
-    <h2>Ваша особиста інформація</h2>
-    <p><strong>Ім’я:</strong> {{ firstName }}</p>
-    <p><strong>Прізвище:</strong> {{ lastName }}</p>
-    <p><strong>Email:</strong> {{ email }}</p>
+    <h2 class="info-title">Ваша особиста інформація</h2>
+    <div class="info-details">
+      <p><strong>Ім’я:</strong> {{ user.firstName }}</p>
+      <p><strong>Прізвище:</strong> {{ user.lastName }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
     <button class="change-password-button" @click="changePassword">Змінити пароль</button>
   </div>
 </template>
 
+
 <script>
 export default {
-  name: 'PersonalInfo',
-  props: {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true },
+  name: "PersonalInfo",
+  data() {
+    return {
+      user: {
+        firstName: "",
+        lastName: "",
+        email: "",
+      },
+    };
+  },
+  created() {
+    // Завантаження даних користувача з localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      this.user = JSON.parse(userData);
+    } else {
+      alert("Будь ласка, увійдіть у систему.");
+      this.$router.push("/login");
+    }
   },
   methods: {
     changePassword() {
-      this.$router.push('/changepassword'); 
+      this.$router.push("/changepassword");
     },
   },
 };
 </script>
+
+
 
 <style scoped>
 .personal-info-card {

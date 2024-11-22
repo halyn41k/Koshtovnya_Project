@@ -23,7 +23,7 @@
             <section class="product-card">
               <div class="product-header">
                 <h1 class="product-title">{{ product.name }}</h1>
-                <hr class="thin-divider" />
+                <hr class="divider" />
                 <p class="product-price">{{ product.price }}₴</p>
                 <div
                   class="availability-badge"
@@ -47,24 +47,55 @@
                 </select>
               </div>
               <div class="purchase-controls">
-                <div class="quantity-controls" v-if="product.is_available">
-                  <div class="quantity-selector">
-                    <button class="arrow-button arrow-up" @click="incrementQuantity"></button>
-                    <input
-                      type="number"
-                      v-model="quantity"
-                      :max="product.quantity"
-                      min="1"
-                      class="quantity-input"
-                    />
-                    <button class="arrow-button arrow-down" @click="decrementQuantity"></button>
+                <div class="quantity-wrapper">
+                      <div class="quantity-display">
+                        {{ quantity }}
+                      </div>
+                      <div class="quantity-buttons">
+                        <button class="quantity-arrow up-arrow" @click="increaseQuantity">
+                          ▲
+                        </button>
+                        <button class="quantity-arrow down-arrow" @click="decreaseQuantity">
+                          ▼
+                        </button>
+                      </div>
+                    </div>
+
+
+
+                <button class="buy-button">
+                  <span class="buy-text">Купити</span>
+                </button>
+
+                <!-- Сердечко (вибір у список бажаного) -->
+                <div class="wishlist-wrapper">
+                  <div class="wishlist-square" @click="toggleWishlist(product)">
+                    <svg
+                      v-if="isInWishlist(product.name)"
+                      class="filled-heart heart-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                    <svg
+                      v-else
+                      class="empty-heart heart-icon"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                    </svg>
                   </div>
-                  <button class="buy-button">
-                    <span class="buy-text">Купити</span>
-                  </button>
                 </div>
-                <p v-else class="out-of-stock-message">Товар тимчасово відсутній. Повідомте, коли буде в наявності.</p>
-              </div>
+              </div>⠀
+              <hr class="thin-divider" />
             </section>
           </div>
         </article>
@@ -86,33 +117,24 @@
       </dl>
     </section>
 
-    <h2 class="reviews-title">Відгуки</h2>
-    <section class="reviews-section">
-  <div class="reviews-container">
-    <p v-if="!product.reviews || product.reviews.length === 0" class="no-reviews">
-      Немає відгуків.
-    </p>
-    <div v-else>
-      <ul class="reviews-list">
-        <li v-for="review in product.reviews" :key="review.id" class="review-item">
-          <p class="review-author">{{ review.author }}</p>
-          <p class="review-text">{{ review.text }}</p>
-          <span class="review-rating">Оцінка: {{ review.rating }}/5</span>
-        </li>
-      </ul>
-      <button class="review-button">Написати відгук</button>
-    </div>
-  </div>
-</section>
+    <!-- Pass productId only if it's defined -->
+    <ProductReviews v-if="productId" :productId="productId" />
   </main>
 </template>
 
 <script>
+import ProductReviews from "./ProductReviews.vue";
+
 export default {
+  components: {
+    ProductReviews,
+  },
   data() {
     return {
       product: {},
       quantity: 1,
+      isImageEnlarged: false,
+      wishlist: [],
       translations: {
         country_of_manufacture: "Країна виробник товару",
         material: "Матеріал",
@@ -122,11 +144,20 @@ export default {
         colors: "Кольори",
         bead_producer_name: "Виробник бісеру",
       },
+      productId: null, // Initialize productId to null
     };
   },
   computed: {
     productCharacteristics() {
-      const excludeKeys = ['id', 'name', 'price', 'image_url', 'sizes', 'is_available', 'quantity'];
+      const excludeKeys = [
+        "id",
+        "name",
+        "price",
+        "image_url",
+        "sizes",
+        "is_available",
+        "quantity",
+      ];
       return Object.keys(this.product)
         .filter((key) => !excludeKeys.includes(key))
         .reduce((obj, key) => {
@@ -134,65 +165,105 @@ export default {
           return obj;
         }, {});
     },
-  localizedCharacteristics() {
-    return Object.entries(this.productCharacteristics).reduce((acc, [key, value]) => {
-      const translatedKey = this.translations[key] || key;
-      acc[translatedKey] = value === null ? "Немає" : value; // Якщо значення null, замінюємо на "Немає"
-      return acc;
-    }, {});
-  },
+    localizedCharacteristics() {
+      return Object.entries(this.productCharacteristics).reduce((acc, [key, value]) => {
+        const translatedKey = this.translations[key] || key;
+        acc[translatedKey] = value === null ? "Немає" : value; // Якщо значення null, замінюємо на "Немає"
+        return acc;
+      }, {});
+    },
   },
   methods: {
-    resizeImage() {
-      alert("Змінено розмір зображення!");
-    },
-    incrementQuantity() {
-      if (this.quantity < this.product.quantity) {
-        this.quantity++;
-      }
-    },
-    decrementQuantity() {
-      if (this.quantity > 1) {
-        this.quantity--;
-      }
-    },
+  increaseQuantity() {
+    if (this.quantity < this.product.quantity) {
+      this.quantity++;
+    }
   },
-  created() {
-  const productId = this.$route.params.id;
-  
-  // Завантажуємо дані про продукт
-  fetch(`http://26.235.139.202:8080/api/products/${productId}`)
-    .then((response) => response.json())
-    .then((data) => {
-      this.product = data.data;
-      
-      // Після успішного завантаження продукту завантажуємо відгуки
-      return fetch(`http://26.235.139.202:8080/api/products/${productId}/reviews`);
-    })
-    .then((response) => response.json())
-    .then((reviewsData) => {
-      // Додаємо відгуки до об'єкта продукту
-      this.product.reviews = reviewsData.data;
-    })
-    .catch((error) => {
-      console.error("Помилка при завантаженні даних:", error);
-    });
-}
+  decreaseQuantity() {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
+  },
+  toggleWishlist(product) {
+    if (this.isInWishlist(product.name)) {
+      this.wishlist = this.wishlist.filter((item) => item !== product.name);
+      alert(`${product.name} видалено зі списку бажаного!`);
+    } else {
+      this.wishlist.push(product.name);
+      alert(`${product.name} додано до списку бажаного!`);
+    }
+  },
+  isInWishlist(productName) {
+    return this.wishlist.includes(productName);
+  },
+  resizeImage() {
+    alert("Змінено розмір зображення!");
+  },
+  useTestData() {
+    this.product = {
+      id: 1,
+      name: "Керамічна ваза",
+      price: 450,
+      image_url: "https://via.placeholder.com/300",
+      sizes: [20, 25, 30],
+      is_available: true,
+      quantity: 10,
+      material: "Кераміка",
+      country_of_manufacture: "Україна",
+      type_of_fitting: "Латунь",
+      type_of_bead: "Скляний",
+      weight: "1 кг",
+      colors: "Білий, Золотий",
+      bead_producer_name: "GlassCo",
+    };
+  },
+},
 
+  created() {
+    const productIdFromRoute = this.$route.params.id;
+    if (productIdFromRoute) {
+      this.productId = productIdFromRoute;
+      
+      // Завантаження даних про продукт
+      fetch(`http://26.235.139.202:8080/api/products/${this.productId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Помилка завантаження продукту");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          this.product = data.data || {}; // Переконуємося, що `data` існує
+        })
+        .catch((error) => {
+          console.error("Помилка при завантаженні даних:", error);
+
+          // Використовуємо тестові дані
+          this.useTestData();
+        });
+    }
+    
+  },
 };
 </script>
 
+
 <style scoped>
+.title-divider {
+  margin: 8px 0; /* Відступ зверху та знизу */
+  width: 50%; /* Ширина лінії (коротша, ніж інші) */
+  border: 1px solid #ccc; /* Тонка сіра лінія */
+}
 
 .size-icon {
   position: absolute;
   right: 0;
-  top: -50px; /* Піднято на 300px */
-  right: -50px;
+  top: 300px; /* Піднято на 300px */
   transform: translateY(-50%);
   width: 35px;
   height: 40px;
   cursor: pointer;
+  right: -90px;
 }
 
 .specifications-list .spec-grid {
@@ -204,35 +275,7 @@ export default {
   margin: 8px 0;
 }
 
-.reviews-section {
-  margin-top: 30px;
-}
 
-.reviews-title {
-  font-size: 22px;
-  text-align: center;
-}
-
-.reviews-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.no-reviews {
-  font-size: 16px;
-  color: #666;
-  flex-grow: 1;
-}
-
-.review-button {
-  background-color: #6b1f1f;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
 
 .product-image {
   width: 90%;
@@ -240,22 +283,9 @@ export default {
   object-fit: cover;
   margin-left: 100px;
   margin-top: 15px;
-  box-shadow: 50px 10px 20px #4e2a2a; /* Збільшена інтенсивність тіні */
+  box-shadow: 10px 10px 50px #ddafaf; /* Збільшена інтенсивність тіні */
+
 }
-
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.quantity-selector {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
 .quantity-input {
   width: 50px;
   height: 40px;
@@ -276,32 +306,66 @@ export default {
   background-position: center;
 }
 
-.arrow-up {
-  background-image: url('@/assets/arrow-up.png'); /* Іконка вверх */
+.purchase-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Відстань між елементами */
+  margin-left: -30px;
+}
+.quantity-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 80px;
+  height: 40px;
+  background-color: #f9f9f9;
+  margin-left: -10px;
+
 }
 
-.arrow-down {
-  background-image: url('@/assets/arrow-down.png'); /* Іконка вниз */
-}
-
-.buy-button {
-  flex-grow: 1;
-}
-
-.product-image {
-  width: 90%;
-  height: 300px;
-  object-fit: cover;
-  margin-left: 100px;
-  margin-top: 15px;
-  box-shadow: 0px 4px 8px #744444; /* Тінь з кольором #744444 */
-}
-
-.purchase-controls .out-of-stock-message {
+.quantity-display {
+  flex: 1;
+  text-align: center;
   font-size: 16px;
-  color: #a01212;
-  font-family: 'Merriweather', serif;
+  font-weight: bold;
+  padding: 5px;
+  border-right: 1px solid #ccc;
 }
+
+.quantity-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.quantity-arrow {
+  width: 25px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  line-height: 20px;
+  color: #6b1f1f;
+}
+
+.quantity-arrow:hover {
+  background-color: #f0f0f0;
+}
+
+.up-arrow {
+  border-bottom: 1px solid #ccc;
+}
+
+.quantity-display {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 5px 0;
+  color: #171717;
+}
+
+
 .product-content {
     display: flex;
     flex-direction: column;
@@ -317,16 +381,19 @@ export default {
     width: 40%;
     position: relative;
   }
-  
 
-  .size-icon {
-    position: absolute;
-    right: -20px;
-    width: 35px;
-    height: 40px;
-    margin-top: 360px;
-    margin-left: 100px;
-  }
+
+.image-normal .product-image {
+  width: 300px;
+  height: auto;
+}
+
+.image-enlarged .product-image {
+  width: 500px; /* Новий розмір для збільшення */
+  height: auto;
+}
+
+
   
   /* Product Info */
   .product-info-container {
@@ -354,14 +421,15 @@ export default {
     color: #000;
     font-size: 30px;
     font-family: 'Merriweather', serif;
+    margin-bottom: 4px;
   }
   
   .product-price {
     color: #A01212;
     font-size: 25px;
-    margin-top: 10px;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
+    
   }
   
   .availability-badge {
@@ -370,7 +438,7 @@ export default {
     gap: 10px;
     background: #3C6B1F;
     color: #FFF;
-    font-size: 18px;
+    font-size: 15px;
     font-family: 'Merriweather', serif;
     border-radius: 8px;
     padding: 10px 15px;
@@ -413,30 +481,22 @@ export default {
     margin-top: 20px;
   }
   
-  
   .buy-button {
-    width: 100%;
     max-width: 200px;
     display: flex;
     justify-content: space-between; /* Align text and icon */
-    align-items: center;
-    padding: 5px;
+    
+    padding: 12px 17px; /* Збільшені падінги */
+    width: 180px; /* Більша ширина */
     color: #FFF;
+    align-items: center;
     background: #6B1F1F;
     border: none;
     border-radius: 8px;
     font-size: 18px;
     font-family: 'Merriweather', serif;
   }
-  
-  .buy-text {
-    margin-left: 10px; /* Align text to the left */
-  }
-  
-  .cart-icon {
-    margin-right: 10px; /* Align icon to the right */
-  }
-  
+
   /* Centered Sections */
   .centered-section {
     display: flex;
@@ -445,7 +505,7 @@ export default {
     text-align: center;
   }
   
-  /* Specifications */
+
   .specifications-title {
     font-size: 22px;
     font-family: 'Montserrat', sans-serif;
@@ -465,46 +525,6 @@ export default {
     width: 100%;
   }
   
-  .purchase-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    
-  }
-  
-  .quantity-selector {
-    display: flex;
-    align-items: center;
-    background-color: #F6E7E7;
-    border: 1px solid #ccc;
-  }
-  
-  .quantity-input {
-    width: 50px;
-    height: 40px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #F6E7E7;
-  }
-  
-  .quantity-arrows {
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-  }
-  
-  .arrow-up,
-  .arrow-down {
-    display: block;
-    width: 20px;
-    height: 20px;
-    background-color: #F6E7E7;
-    background-image: url('data:image/svg+xml;base64,...'); /* Replace with dropdown arrow icon */
-    background-repeat: no-repeat;
-    background-position: center;
-  }
   
   .wishlist-square {
     display: inline-flex;
@@ -550,7 +570,8 @@ export default {
   .spec-description {
     font-family: 'Montserrat', sans-serif;
     font-weight: normal;
-    text-align: right;
+    text-align: left;
+    margin-left: 800px;
   }
   
   .spec-divider {
@@ -559,13 +580,7 @@ export default {
   }
   
   /* Reviews */
-  .reviews-title {
-    font-size: 22px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
-    margin-top: 20px;
-    color: #171717;
-  }
+ 
   .specifications-list, .reviews-section {
     padding-top: 10px; /* Adjusted spacing */
   }
@@ -602,60 +617,16 @@ export default {
   .reviews-title::after {
     right: 0;
   }
+
+
+.heart-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.divider{
+  width: 100px;
+}
   
-  
-  .no-reviews {
-    font-family: 'Merriweather', serif;
-    font-size: 18px;
-    color: #333;
-    margin-left: 100px;
-  }
-  
-  .reviews-container {
-    display: flex;
-    justify-content: space-between; /* Align "Немає відгуків" left, button right */
-    align-items: center;
-    margin-top: 20px;
-  }
-  
-  .review-button {
-    display: flex;
-    gap: 10px;
-    background: #6B1F1F;
-    color: #FFF;
-    padding: 10px;
-    border-radius: 8px;
-    font-family: 'Merriweather', serif;
-    font-size: 18px;
-  }
-
-  .reviews-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.review-item {
-  margin-bottom: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-.review-author {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.review-text {
-  margin-bottom: 5px;
-}
-
-.review-rating {
-  font-size: 14px;
-  color: #888;
-}
-
   </style>
   
