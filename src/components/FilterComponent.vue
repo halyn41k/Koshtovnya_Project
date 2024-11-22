@@ -312,6 +312,7 @@
   
   .range-title {
     margin-bottom: 4rem;
+    text-align: center; 
   }
   
   .range-slider {
@@ -422,6 +423,7 @@
   .min-box,
   .max-box {
     width: 45%; 
+
   }
   
   .input-divider {

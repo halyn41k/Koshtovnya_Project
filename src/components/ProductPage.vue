@@ -119,15 +119,21 @@
 
     <!-- Pass productId only if it's defined -->
     <ProductReviews v-if="productId" :productId="productId" />
+
+    <section>
+      <ViewOtherProduct />
+    </section>
   </main>
 </template>
 
 <script>
+import ViewOtherProduct from "./ViewOtherProduct.vue";
 import ProductReviews from "./ProductReviews.vue";
 
 export default {
   components: {
     ProductReviews,
+    ViewOtherProduct,
   },
   data() {
     return {
@@ -463,16 +469,27 @@ export default {
   }
   
   .size-dropdown {
-    width: 170px;
-    height: 40px;
-    background-color: #F6E7E7;
-    border: none;
-    font-family: 'Montserrat', sans-serif;
-    padding-right: 20px;
-    background-image: url('data:image/svg+xml;base64,...');
-    background-position: calc(100% - 10px) center;
-    background-repeat: no-repeat;
-  }
+  width: 170px;
+  height: 40px;
+  background-color: #F6E7E7; /* основний колір фону */
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  padding-right: 20px;
+  background-image: url('data:image/svg+xml;base64,...');
+  background-position: calc(100% - 10px) center;
+  background-repeat: no-repeat;
+  
+}
+
+.size-dropdown option {
+  background-color: #F6E7E7; /* основний колір */
+  color: #171717; /* колір тексту */
+}
+
+.size-dropdown option:hover {
+  background-color: #D8B3B3; /* темніший колір, коли наведено */
+}
+
   
   .purchase-controls {
     display: flex;

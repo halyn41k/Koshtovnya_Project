@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     async submitLogin() {
-  try {
+    try {
     const response = await fetch("http://26.235.139.202:8080/api/login", {
       method: "POST",
       headers: {

@@ -29,65 +29,12 @@
       </div>
     </div>
 
-    <section class="popular-goods">
-      <h2 class="section-title">{{ $t('popularGoods') }}</h2>
-      <div class="arrow-container">
-        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousProducts" />
-        <div class="product-grid">
-          <div class="product-row">
-            <div v-for="product in visibleProducts" :key="product.id" class="product-column">
-              <article class="product-card">
-                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
-                <div class="product-details">
-                  <h3 class="product-title">{{ product.name }}</h3>
-                  <p class="product-price">{{ product.price }}₴</p>
-                  <p class="product-bead-producer">{{ product.bead_producer_name || $t('defaultBeadProducer') }}</p>
-                  <p class="product-info">{{ product.country_of_manufacture }}</p>
-                  <button class="buy-button">
-                    <span>{{ $t('buyButton') }}</span>
-                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-                  </button>
-                </div>
-              </article>
-            </div>
-          </div>
-        </div>
-        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextProducts" />
-      </div>
-
-      <div class="dots-container">
-        <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
-      </div>
+    <section>
+      <PopularProducts />
     </section>
 
-    <section class="new-arrivals">
-      <h2 class="section-title">{{ $t('newArrivals') }}</h2>
-      <div class="arrow-container">
-        <img src="@/assets/left_arrow.png" alt="left-arrow" class="arrow left-arrow" @click="showPreviousNewArrivals" />
-        <div class="product-grid">
-          <div class="product-row">
-            <div v-for="product in visibleNewArrivals" :key="product.id" class="product-column">
-              <article class="product-card">
-                <img :src="product.image_url" :alt="product.name" class="product-main-image" />
-                <div class="product-details">
-                  <h3 class="product-title">{{ product.name }}</h3>
-                  <p class="product-price">{{ product.price }}₴</p>
-                  <p class="product-bead-producer">{{ product.bead_producer_name || $t('defaultBeadProducer') }}</p>
-                  <p class="product-info">{{ product.country_of_manufacture }}</p>
-                  <button class="buy-button">
-                    <span>{{ $t('buyButton') }}</span>
-                    <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-                  </button>
-                </div>
-              </article>
-            </div>
-          </div>
-        </div>
-        <img src="@/assets/arrow_big.png" alt="right-arrow" class="arrow right-arrow" @click="showNextNewArrivals" />
-      </div>
-      <div class="dots-container">
-        <span v-for="(dot, index) in totalPages" :key="index" :class="['dot', index === currentPage ? 'dark' : 'light']"></span>
-      </div>
+    <section>
+      <NewArrivals />
     </section>
 
     <div class="instagram-section">
@@ -134,11 +81,15 @@
 </template>
 
 <script>
-import CategoryProduct from '@/components/CategoryProduct.vue'; // Імпорт компонента для відображення товарів
+import PopularProducts from "@/components/PopularProducts.vue"; 
+import NewArrivals from "@/components/NewArrivals.vue"; 
+import CategoryProduct from "@/components/CategoryProduct.vue"; 
 
 export default {
   components: {
-    CategoryProduct, // Реєструємо компонент
+    PopularProducts, 
+    NewArrivals, 
+    CategoryProduct, 
   },
   mounted() {
     this.fetchPopularProducts(); // Завантаження популярних продуктів при монтуванні компонента
@@ -367,244 +318,7 @@ export default {
     color: #000;
     margin-left: 350px;
   }
-  
-  .popular-goods {
-    display: flex;
-    flex-direction: column;
-    border-bottom: -100px; 
-  }
-  
-  .section-title {
-    color: #222222;
-    font-family: 'KyivType Titling', sans-serif; 
-    font-weight: 900;
-    font-size: 32px; 
-    text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
-    letter-spacing: -2px;
-    text-align: center;
-    margin-top: 70px;
-  }
-  
-  .arrow-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 90%; 
-    margin: 0 auto;
-    padding: 20px 0;
-    position: relative;
-  }
-  
-  .arrow {
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    transform: scale(1);
-    transition: transform 0.3s ease;
-    position: absolute;
-    top: 50%;
-  }
-  
-  .left-arrow {
-    left: 150px; 
-  }
-  
-  .right-arrow {
-    right: 150px; 
-  }
-  
-  .arrow:hover {
-    transform: scale(1.2);
-  }
-  
-  .product-grid {
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
-    padding: 0;
-  }
-  
-  .product-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-    margin: 0;
-  }
-  
-  .product-column {
-    flex-grow: 1;
-    flex-basis: 280px;
-    max-width: 280px;
-    margin: 0;
-  }
-  
-  .product-card {
-    border-radius: 12px;
-    background-color: #fff7f6;
-    padding-bottom: 15px;
-    border: 2px solid #e6e6e6;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-    width: 280px;
-    height: 390px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .product-main-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 12px 12px 0 0;
-    transition: transform 0.3s ease;
-  }
-  
-  .product-card:hover .product-main-image {
-    transform: scale(1.05);
-  }
-  
-  .product-details {
-    color: #333;
-    padding: 10px;
-    font-family: 'Merriweather', sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-  }
-  
-  .product-title {
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .product-title,
-  .product-price,
-  .product-info {
-    margin-top: 0px;
-    color:#000;
-    text-align: left; 
-  }
-  
-  .product-price {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    color: #a01212;
-    margin-top: -5px;
-  }
-  
-  .product-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: -10px;
-    color: #808080;
-  }
-  
-  .product-material-icon {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-  }
-  
-  .product-material-icon:hover {
-    transform: scale(1.1);
-  }
-  
-  .button-icon{
-    width: 10px;
-    height: 10px;
-    margin-right: 5px;
-  }
-  
-  .buy-button {
-    border-radius: 10px;
-    background-color: #6b1f1f;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 15px;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    width: 100%;
-    font-family: 'Merriweather', sans-serif;
-    font-size: 18px;
-    text-transform: none; 
-    padding-left: 15px; 
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  
-  .buy-button:hover {
-    background-color: #a01212;
-    transform: translateY(-2px);
-  }
-  
-  .buy-button span {
-    text-align: left;
-  }
-  
-  .buy-button img {
-    width: 20px;
-    height: 15px;
-    margin-left: auto;
-  }
-  
-  .dots-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 15px;
-  }
-  
-  .dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: #480B0B;
-    opacity: 75%;
-  }
-  
-  .dot.light {
-    background-color: #480B0B;
-    opacity: 25%;
-  }
-  
-  .wishlist-icon {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-  }
-  
-  .wishlist-icon:hover {
-    transform: scale(1.1);
-  }
-  
-  .filled-heart {
-    fill: #A01212; 
-  }
-  
-  .empty-heart {
-    stroke: #B3B3B3; 
-    stroke-width: 2; 
-    fill: none; 
-  }
-  
+
   .view-products-button {
   font-family: 'Merriweather', sans-serif;
   color: #fff;
