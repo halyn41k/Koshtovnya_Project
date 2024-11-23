@@ -15,9 +15,9 @@
         <div class="nav-section">
           <h2 class="nav-title">ПОСИЛАННЯ</h2>
           <ul class="footer-list">
-            <li><a href="/aboutus" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Про нас</a></li>
-            <li><a href="/aboutdelivery" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Про Оплату | Доставку</a></li>
-            <li><a href="/account" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Кабінет користувача</a></li>
+            <li><router-link to="/aboutus" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Про нас</router-link></li>
+            <li><router-link to="/aboutdelivery" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Про Оплату | Доставку</router-link></li>
+            <li><router-link to="/account" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Кабінет користувача</router-link></li>
           </ul>
         </div>
 

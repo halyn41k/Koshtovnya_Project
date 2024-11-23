@@ -45,19 +45,19 @@ describe('FooterComponent.vue', () => {
   });
 
   it('повинен переходити за посиланнями при кліку', async () => {
-    const links = wrapper.findAll('.footer-links .footer-link');
-    const expectedRoutes = ['/aboutus', '/aboutdelivery', '/account']; // Очікувані маршрути
+    const links = wrapper.findAll('.footer-links .router-link'); // Змінив клас для router-link
+    const expectedRoutes = ['/aboutus', '/aboutdelivery', '/account']; // Оновлений маршрут
 
     for (let i = 0; i < links.length; i++) {
       const link = links.at(i);
 
-      // Перевірка атрибуту 'href'
-      const href = link.attributes('href');
-      expect(href).toBe(expectedRoutes[i]); // Перевіряє, що шлях у href правильний
+      // Перевірка атрибуту `to`
+      const to = link.attributes('to');
+      expect(to).toBe(expectedRoutes[i]); // Перевіряє атрибут `to`
 
-      // Оновлення маршруту і перевірка
-      await router.push(href); // Переходимо на маршрут
-      expect(router.currentRoute.value.path).toBe(expectedRoutes[i]); // Перевіряє активний шлях
+      // Симуляція кліку та перевірка маршруту
+      await link.trigger('click');
+      expect(router.currentRoute.value.path).toBe(expectedRoutes[i]); // Перевіряє активний маршрут
     }
   });
 
