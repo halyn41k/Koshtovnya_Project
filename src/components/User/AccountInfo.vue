@@ -58,7 +58,7 @@ export default {
       activeTab: 0,
       firstName: 'Ім’я', 
       lastName: 'Прізвище', 
-      email: 'email@example.com', 
+      email: 'email@example.com',
       menuItems: [
         { title: 'Інформація', icon: require('@/assets/user.png') },
         { title: 'Адреси', icon: require('@/assets/location.png') },
@@ -66,83 +66,102 @@ export default {
         { title: 'Список бажаного', icon: require('@/assets/heart.png') },
         { title: 'Вийти', icon: require('@/assets/exit.png') },
       ],
+      message: '', // Для зберігання повідомлення
+      messageType: '', // Тип повідомлення (успіх / помилка)
     };
   },
   computed: {
-    activeTabContent() {
-      switch (this.activeTab) {
-        case 0: return 'PersonalInfo';
-        case 1: return 'Addresses';
-        case 2: return 'OrderHistory';
-        case 3: return 'Wishlist';
-        case 4: return 'Logout';
-        default: return 'PersonalInfo';
+  activeTabContent() {
+    switch (this.activeTab) {
+      case 0: return PersonalInfo;
+      case 1: return Addresses;
+      case 2: return OrderHistory;
+      case 3: return Wishlist;
+      case 4: return null; // Повертаємо null для вкладки "Вийти"
+      default: return PersonalInfo;
+    }
+  },
+},
+
+  methods: {
+    async fetchProfile() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          this.setMessage("Ви не авторизовані. Будь ласка, увійдіть.", "error"); 
+          this.$router.push({ name: "Login" });
+          return;
+        }
+
+        const response = await fetch("http://26.235.139.202:8080/api/profile", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            this.setMessage("Токен недійсний. Увійдіть знову.", "error");
+            localStorage.removeItem("token");
+            this.$router.push({ name: "Login" });
+          } else {
+            throw new Error(`Помилка: ${response.status}`);
+          }
+        }
+
+        const profile = await response.json();
+        console.log("Профіль отримано:", profile);
+
+        this.firstName = profile.first_name || "Ім’я";
+        this.lastName = profile.last_name || "Прізвище";
+        this.email = profile.email || "email@example.com";
+
+        // Показуємо успішне повідомлення
+        this.setMessage("Профіль успішно завантажено.", "success");
+      } catch (error) {
+        console.error("Помилка отримання профілю:", error.message);
+        this.setMessage("Сталася помилка. Спробуйте пізніше.", "error");
       }
     },
-  },
-  methods: {
-  async fetchProfile() {
-    try {
-      const response = await fetch('http://26.235.139.202:8080/api/profile', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Передаємо токен
-        },
-      });
 
-      if (response.ok) {
-        const profileData = await response.json();
-        console.log('Успішний запит профілю:', profileData); // Лог успіху
-        this.firstName = profileData.firstName || 'Ім’я';
-        this.lastName = profileData.lastName || 'Прізвище';
-        this.email = profileData.email || 'email@example.com';
-      } else if (response.status === 401) {
-        console.warn('Користувач не авторизований');
-        alert('Ви не авторизовані. Будь ласка, увійдіть у систему.');
-        this.$router.push('/login'); // Перенаправляємо на сторінку входу
-      } else {
-        console.error('Помилка запиту:', response.status);
-        alert('Сталася помилка при отриманні профілю.');
-      }
-    } catch (error) {
-      console.error('Помилка мережі:', error);
-      alert('Неможливо підключитися до сервера. Спробуйте пізніше.');
-    }
-  },
     async selectTab(index) {
-  if (index === 4) { // Якщо обрано "Вийти"
-    try {
-      const response = await fetch('http://26.235.139.202:8080/api/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`, // Передаємо токен
-        },
-      });
+      if (index === 4) { // Якщо обрано "Вийти"
+        try {
+          const response = await fetch("http://26.235.139.202:8080/api/logout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
 
-      // Перевірка статусу відповіді
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Server response:', data); // Виводимо всю відповідь від сервера
-        console.log(data.message || 'Вихід успішний'); // Виводимо повідомлення з відповіді
-      } else {
-        console.error('Помилка при виході, код статусу:', response.status);
+          if (response.ok) {
+            console.log("Вихід успішний");
+            localStorage.removeItem("token");
+            this.$router.push({ name: "Login" });
+
+            // Показуємо повідомлення про успішний вихід
+            this.setMessage("Вихід успішний.", "success");
+          } else {
+            console.error("Помилка при виході:", response.status);
+            this.setMessage("Не вдалося вийти. Спробуйте пізніше.", "error");
+          }
+        } catch (error) {
+          console.error("Помилка при виході:", error.message);
+          this.setMessage("Не вдалося вийти. Спробуйте пізніше.", "error");
+        }
       }
+    },
 
-      // Видаляємо токен із локального сховища
-      localStorage.removeItem('token');
-
-      // Перенаправляємо користувача на сторінку входу
-      this.$router.push('/login');
-    } catch (error) {
-      console.error('Помилка при виході:', error);
+    // Функція для встановлення повідомлення
+    setMessage(text, type) {
+      this.message = text;
+      this.messageType = type;
     }
-  } else {
-    this.activeTab = index;
-  }
-},
   },
+
   mounted() {
     // Перевіряє наявність параметра "tab" у запиті
     const tab = this.$route.query.tab;
@@ -151,6 +170,8 @@ export default {
     }
     this.fetchProfile();
   },
+  
+
   watch: {
     '$route.query.tab'(newTab) {
       if (newTab === 'wishlist') {

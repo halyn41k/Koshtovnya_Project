@@ -9,10 +9,12 @@
       />
       <h1 class="settings-title">Налаштування</h1>
     </header>
+
     <section class="logo-section">
       <h2 class="section-title">Змінити логотип:</h2>
-      <button class="upload-button">Завантажити фото</button>
+      <input type="url" id="logo" class="form-input" v-model="settings.logo" placeholder="Введіть URL логотипу" />
     </section>
+
     <section class="contact-info-section">
       <h2 class="section-title">Змінити контактну інформацію:</h2>
       <div class="contact-info-container">
@@ -30,6 +32,18 @@
             <label for="email" class="form-label">Електронна пошта</label>
             <input type="email" id="email" class="form-input" v-model="settings.email" />
           </div>
+          <div class="form-group">
+            <label for="instagram" class="form-label">Instagram</label>
+            <input type="url" id="instagram" class="form-input" v-model="settings.instagram" />
+          </div>
+          <div class="form-group">
+            <label for="facebook" class="form-label">Facebook</label>
+            <input type="url" id="facebook" class="form-input" v-model="settings.facebook" />
+          </div>
+          <div class="form-group">
+            <label for="tiktok" class="form-label">TikTok</label>
+            <input type="url" id="tiktok" class="form-input" v-model="settings.tiktok" />
+          </div>
           <button type="submit" class="submit-button">Зберегти зміни</button>
         </form>
       </div>
@@ -39,13 +53,17 @@
 
 <script>
 export default {
-  name: "ProfitReportView",
+  name: "SettingsView",
   data() {
     return {
       settings: {
         address: "",
         phone: "",
         email: "",
+        logo: "",
+        instagram: "",
+        facebook: "",
+        tiktok: "",
       },
       apiUrl: "http://26.235.139.202:8080/api/site-settings",
     };
@@ -57,24 +75,51 @@ export default {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        this.settings = data;
+        const { data } = await response.json();
+
+        // Маппінг налаштувань з API в модель
+        const mappedSettings = data.reduce((acc, setting) => {
+          acc[setting.setting_key] = setting.setting_value;
+          return acc;
+        }, {});
+
+        this.settings = {
+          address: mappedSettings.footer_address_info || "",
+          phone: mappedSettings.footer_phone_number || "",
+          email: mappedSettings.footer_email_info || "",
+          logo: mappedSettings.site_logo || "",
+          instagram: mappedSettings.footer_instagram || "",
+          facebook: mappedSettings.footer_facebook || "",
+          tiktok: mappedSettings.footer_tiktok || "",
+        };
       } catch (error) {
         console.error("Помилка завантаження налаштувань:", error);
       }
     },
     async saveSettings() {
       try {
+        const payload = [
+          { setting_key: "footer_address_info", setting_value: this.settings.address },
+          { setting_key: "footer_phone_number", setting_value: this.settings.phone },
+          { setting_key: "footer_email_info", setting_value: this.settings.email },
+          { setting_key: "site_logo", setting_value: this.settings.logo },
+          { setting_key: "footer_instagram", setting_value: this.settings.instagram },
+          { setting_key: "footer_facebook", setting_value: this.settings.facebook },
+          { setting_key: "footer_tiktok", setting_value: this.settings.tiktok },
+        ];
+
         const response = await fetch(this.apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.settings),
+          body: JSON.stringify({ data: payload }),
         });
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+
         alert("Налаштування успішно збережені!");
       } catch (error) {
         console.error("Помилка збереження налаштувань:", error);

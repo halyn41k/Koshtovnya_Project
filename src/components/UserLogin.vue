@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     async submitLogin() {
-    try {
+  try {
     const response = await fetch("http://26.235.139.202:8080/api/login", {
       method: "POST",
       headers: {
@@ -88,26 +88,20 @@ export default {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Помилка входу. Перевірте дані.");
-    }
+    if (!response.ok) throw new Error("Помилка входу. Перевірте дані.");
 
     const data = await response.json();
     console.log("Успішний вхід:", data);
 
-    // Збереження токена та даних користувача
+    // Збереження токена
     localStorage.setItem("token", data.token);
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        firstName: data.user.first_name,
-        lastName: data.user.last_name,
-        email: data.user.email,
-      })
-    );
 
-    // Перенаправлення на сторінку особистої інформації
-    this.$router.push({ name: "AccountInfo" });
+    // Перевірка чи токен збережений
+    if (localStorage.getItem("token")) {
+      this.$router.push({ name: "AccountInfo" });
+    } else {
+      alert("Не вдалося зберегти токен.");
+    }
   } catch (error) {
     console.error("Помилка входу:", error.message);
     alert("Не вдалося увійти. Перевірте ваші дані.");
