@@ -45,7 +45,7 @@
         </div>
         <p class="signup-prompt">
           Немає облікового запису?
-          <a href="/registration" class="signup-link">Створіть його тут</a>
+          <router-link to="/registration" class="signup-link">Створіть його тут</router-link>
         </p>
         <button type="submit" class="login-button">
           <span>Увійти</span>

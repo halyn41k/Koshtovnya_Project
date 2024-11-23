@@ -18,26 +18,34 @@
               @click="selectTab(index)"
               :class="{ active: activeTab === index }"
             >
-              <img :src="menuItem.icon" class="menu-icon" 
-                   :class="{ 'user-icon': menuItem.title === 'Інформація', 'heart-icon': menuItem.title === 'Список бажаного' }" 
-                   alt="Icon" />
+              <img
+                :src="menuItem.icon"
+                class="menu-icon"
+                :class="{ 'user-icon': menuItem.title === 'Інформація', 'heart-icon': menuItem.title === 'Список бажаного' }"
+                alt="Icon"
+              />
               <h2 class="section-title">{{ menuItem.title }}</h2>
             </li>
-            <li v-if="index < menuItems.length - 1" class="divider"></li> 
+            <li v-if="index < menuItems.length - 1" class="divider"></li>
           </ul>
         </nav>
       </div>
 
       <div class="account-details">
-        <component :is="activeTabContent" 
-                   :firstName="firstName" 
-                   :lastName="lastName" 
-                   :email="email" />
+        <component
+          :is="activeTabContent"
+          :first_name="first_name"
+          :last_name="last_name"
+          :email="email"
+        />
       </div>
     </section>
-  </main>⠀
-</template>
 
+    <div v-if="message" class="message-container" :class="messageType">
+      {{ message }}
+    </div>
+  </main>
+</template>
 
 <script>
 import PersonalInfo from './PersonalInfo.vue';
@@ -56,9 +64,9 @@ export default {
   data() {
     return {
       activeTab: 0,
-      firstName: 'Ім’я', 
-      lastName: 'Прізвище', 
-      email: 'email@example.com',
+      first_name: '', // Поля мають бути порожніми за замовчуванням
+      last_name: '',
+      email: '',
       menuItems: [
         { title: 'Інформація', icon: require('@/assets/user.png') },
         { title: 'Адреси', icon: require('@/assets/location.png') },
@@ -66,112 +74,104 @@ export default {
         { title: 'Список бажаного', icon: require('@/assets/heart.png') },
         { title: 'Вийти', icon: require('@/assets/exit.png') },
       ],
-      message: '', // Для зберігання повідомлення
-      messageType: '', // Тип повідомлення (успіх / помилка)
+      message: '',
+      messageType: '',
     };
   },
   computed: {
-  activeTabContent() {
-    switch (this.activeTab) {
-      case 0: return PersonalInfo;
-      case 1: return Addresses;
-      case 2: return OrderHistory;
-      case 3: return Wishlist;
-      case 4: return null; // Повертаємо null для вкладки "Вийти"
-      default: return PersonalInfo;
-    }
+    activeTabContent() {
+      switch (this.activeTab) {
+        case 0:
+          return PersonalInfo;
+        case 1:
+          return Addresses;
+        case 2:
+          return OrderHistory;
+        case 3:
+          return Wishlist;
+        case 4:
+          return null;
+        default:
+          return PersonalInfo;
+      }
+    },
   },
-},
-
   methods: {
     async fetchProfile() {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
         if (!token) {
-          this.setMessage("Ви не авторизовані. Будь ласка, увійдіть.", "error"); 
-          this.$router.push({ name: "Login" });
+          this.setMessage('Ви не авторизовані. Увійдіть у систему.', 'error');
           return;
         }
 
-        const response = await fetch("http://26.235.139.202:8080/api/profile", {
-          method: "GET",
+        const response = await fetch('http://26.235.139.202:8080/api/profile', {
+          method: 'GET',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
 
         if (!response.ok) {
           if (response.status === 401) {
-            this.setMessage("Токен недійсний. Увійдіть знову.", "error");
-            localStorage.removeItem("token");
-            this.$router.push({ name: "Login" });
+            this.setMessage('Токен недійсний. Увійдіть знову.', 'error');
+            localStorage.removeItem('token');
+            this.$router.push({ name: 'Login' });
           } else {
             throw new Error(`Помилка: ${response.status}`);
           }
         }
 
-        const profile = await response.json();
-        console.log("Профіль отримано:", profile);
-
-        this.firstName = profile.first_name || "Ім’я";
-        this.lastName = profile.last_name || "Прізвище";
-        this.email = profile.email || "email@example.com";
-
-        // Показуємо успішне повідомлення
-        this.setMessage("Профіль успішно завантажено.", "success");
+        const { user } = await response.json(); // Передбачено, що об'єкт користувача знаходиться всередині "user"
+        this.first_name = user.first_name || 'Невідоме ім’я';
+        this.last_name = user.last_name || 'Невідоме прізвище';
+        this.email = user.email || 'Невідомий email';
       } catch (error) {
-        console.error("Помилка отримання профілю:", error.message);
-        this.setMessage("Сталася помилка. Спробуйте пізніше.", "error");
+        this.setMessage('Сталася помилка. Спробуйте пізніше.', 'error');
       }
     },
-
     async selectTab(index) {
-      if (index === 4) { // Якщо обрано "Вийти"
+      if (index === 4) {
         try {
-          const response = await fetch("http://26.235.139.202:8080/api/logout", {
-            method: "POST",
+          const response = await fetch('http://26.235.139.202:8080/api/logout', {
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
           });
 
           if (response.ok) {
-            console.log("Вихід успішний");
-            localStorage.removeItem("token");
-            this.$router.push({ name: "Login" });
-
-            // Показуємо повідомлення про успішний вихід
-            this.setMessage("Вихід успішний.", "success");
+            localStorage.removeItem('token');
+            this.$router.push({ name: 'Login' });
+            this.setMessage('Вихід успішний.', 'success');
           } else {
-            console.error("Помилка при виході:", response.status);
-            this.setMessage("Не вдалося вийти. Спробуйте пізніше.", "error");
+            this.setMessage('Не вдалося вийти. Спробуйте пізніше.', 'error');
           }
         } catch (error) {
-          console.error("Помилка при виході:", error.message);
-          this.setMessage("Не вдалося вийти. Спробуйте пізніше.", "error");
+          this.setMessage('Не вдалося вийти. Спробуйте пізніше.', 'error');
         }
+      } else {
+        this.activeTab = index;
       }
     },
-
-    // Функція для встановлення повідомлення
     setMessage(text, type) {
       this.message = text;
       this.messageType = type;
-    }
+      setTimeout(() => {
+        this.message = '';
+        this.messageType = '';
+      }, 5000);
+    },
   },
-
   mounted() {
-    // Перевіряє наявність параметра "tab" у запиті
     const tab = this.$route.query.tab;
     if (tab === 'wishlist') {
-      this.activeTab = 3; // Індекс вкладки "Список бажаного"
+      this.activeTab = 3;
     }
     this.fetchProfile();
   },
-  
-
   watch: {
     '$route.query.tab'(newTab) {
       if (newTab === 'wishlist') {
@@ -181,6 +181,7 @@ export default {
   },
 };
 </script>
+
 
 
   

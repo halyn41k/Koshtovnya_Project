@@ -14,26 +14,26 @@
         <form class="registration-form" @submit.prevent="submitRegistration">
           <div class="form-group">
             <div class="form-labels">
-              <label for="firstName" class="form-label">Ім'я:</label>
-              <label for="lastName" class="form-label">Прізвище:</label>
+              <label for="first_name" class="form-label">Ім'я:</label>
+              <label for="last_name" class="form-label">Прізвище:</label>
               <label for="email" class="form-label">Email:</label>
               <label for="password" class="form-label">Пароль:</label>
             </div>
             <div class="form-inputs">
               <input 
                 type="text" 
-                id="firstName" 
+                id="first_name" 
                 class="form-input" 
-                v-model="firstName" 
+                v-model="first_name" 
                 aria-label="Ім'я" 
                 placeholder="Введіть ваше ім'я" 
                 required
               />
               <input 
                 type="text" 
-                id="lastName" 
+                id="last_name" 
                 class="form-input" 
-                v-model="lastName" 
+                v-model="last_name" 
                 aria-label="Прізвище" 
                 placeholder="Введіть ваше прізвище" 
                 required
@@ -69,7 +69,7 @@
           </div>
           <p class="login-prompt">
     Вже маєте обліковий запис?
-    <a href="/login" class="login-link">Увійти</a>
+    <router-link to="/login" class="login-link">Увійти</router-link>
   </p>
   
           <button type="submit" class="registration-button">
@@ -86,8 +86,8 @@
   export default {
     data() {
       return {
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
         showPassword: false,
@@ -103,22 +103,49 @@
       };
     },
     methods: {
-      submitRegistration() {
-        if (this.firstName && this.lastName && this.email && this.password) {
-          console.log('Ім\'я:', this.firstName);
-          console.log('Прізвище:', this.lastName);
-          console.log('Email:', this.email);
-          console.log('Пароль:', this.password);
-        } else {
-          alert('Будь ласка, введіть ваші дані.');
-        }
+      async submitRegistration() {
+  if (!this.first_name || !this.last_name || !this.email || !this.password) {
+    alert('Будь ласка, заповніть усі поля.');
+    return;
+  }
+  try {
+    const response = await fetch('http://26.235.139.202:8080/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',  // added Accept header
       },
-      togglePasswordVisibility() {
-        this.showPassword = !this.showPassword;
-      }
+      body: JSON.stringify({
+        first_name: this.first_name,
+        last_name: this.last_name,
+        email: this.email,
+        password: this.password,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Помилка з беку:', errorData);
+      throw new Error(errorData.message || 'Не вдалося зареєструватися.');
     }
-  };
-  </script>
+
+    const data = await response.json();
+    alert(`Реєстрація успішна! Ласкаво просимо, ${data.first_name}!`);
+    this.$router.push({ name: 'Login' });
+
+  } catch (error) {
+    console.error('Помилка реєстрації:', error.message);
+    alert(`Помилка реєстрації: ${error.message}`);
+  }
+
+
+    },
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
+  },
+};
+</script>
   
   <style scoped>
   .registration-container {
