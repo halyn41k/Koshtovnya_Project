@@ -23,10 +23,12 @@
     </div>
   </article>
 </template>
+
 <script>
 export default {
-  name: 'CartItem', // Компонент елемента кошика
+  name: 'CartItem',
   props: {
+    id: { type: String, required: true }, // ID товару
     itemNumber: { type: Number, required: true }, // Номер товару
     imageSrc: { type: String, required: true }, // Зображення товару
     title: { type: String, required: true }, // Назва товару
@@ -35,24 +37,20 @@ export default {
   },
   computed: {
     totalPrice() {
-      // Загальна вартість для даного товару
       return this.price * this.quantity;
     }
   },
   methods: {
     increaseQuantity() {
-      // Збільшує кількість товару
-      this.$emit('change-quantity', this.quantity + 1);
+      this.$emit('change-quantity', { id: this.id, quantity: this.quantity + 1 });
     },
     decreaseQuantity() {
-      // Зменшує кількість товару, якщо більше 1
       if (this.quantity > 1) {
-        this.$emit('change-quantity', this.quantity - 1);
+        this.$emit('change-quantity', { id: this.id, quantity: this.quantity - 1 });
       }
     },
     removeItem() {
-      // Видаляє товар з кошика
-      this.$emit('remove-item');
+      this.$emit('remove-item', this.id);
     }
   }
 };

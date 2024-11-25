@@ -1,9 +1,7 @@
 <template>
   <div class="wishlist">
     <h2 class="wishlist-title">Список бажань</h2>
-    <div v-if="loading" class="loading">
-      Завантаження...
-    </div>
+    <div v-if="loading" class="loading">Завантаження...</div>
     <div v-else-if="items.length === 0" class="no-items">
       Ваш список бажань порожній :(
     </div>
@@ -17,17 +15,28 @@
               <div class="item-details">
                 <h3 class="item-name">{{ item.title }}</h3>
                 <p class="item-price">{{ item.price }}₴</p>
-                <button class="buy-button" @click="buyItem">Купити</button>
+                <button
+                  class="buy-button"
+                  @click.prevent="() => addToCart(item.id)"
+                >
+                  Купити
+                </button>
+
               </div>
             </div>
           </router-link>
-          <button class="remove-button" @click.stop="removeItem(index)" aria-label="Remove item">X</button>
+          <button
+            class="remove-button"
+            @click.stop="removeItem(index)"
+            aria-label="Remove item"
+          >
+            X
+          </button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from "axios";
@@ -43,37 +52,25 @@ export default {
   methods: {
     async fetchWishlist() {
       this.loading = true;
-
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Будь ласка, увійдіть у свій обліковий запис.");
         this.$router.push("/login");
         return;
       }
-
       try {
-        const wishlistResponse = await axios.get("http://26.235.139.202:8080/api/wishlist", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.get("http://26.235.139.202:8080/api/wishlist", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("Дані, отримані з API:", wishlistResponse.data);
-
-        const wishlistItems = Array.isArray(wishlistResponse.data.products) ? wishlistResponse.data.products : [];
-
-        if (wishlistItems.length > 0) {
-          this.items = wishlistItems.map((item) => ({
-            id: item.id, // Додаємо ідентифікатор
-            title: item.name,
-            price: item.price,
-            imageSrc: item.image_url || "default_image_path",
-          }));
-
-        } else {
-          this.items = [];
-          alert("У вашому списку бажаного поки що немає товарів.");
-        }
+        const wishlistItems = Array.isArray(response.data.products)
+          ? response.data.products
+          : [];
+        this.items = wishlistItems.map((item) => ({
+          id: item.id,
+          title: item.name,
+          price: item.price,
+          imageSrc: item.image_url || "default_image_path",
+        }));
       } catch (error) {
         console.error("Помилка завантаження списку бажань:", error);
         alert("Не вдалося завантажити ваш список бажаного.");
@@ -81,39 +78,53 @@ export default {
         this.loading = false;
       }
     },
-    async removeItem(index) {
-  const itemToRemove = this.items[index];
-
+    async addToCart(itemId) {
+  console.log("Додається товар із ID:", itemId); // Для перевірки
   const token = localStorage.getItem("token");
   if (!token) {
     alert("Будь ласка, увійдіть у свій обліковий запис.");
     this.$router.push("/login");
     return;
   }
-
   try {
-    const response = await axios.delete(`http://26.235.139.202:8080/api/wishlist/${itemToRemove.id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.post(
+      "http://26.235.139.202:8080/api/cart",
+      { id: itemId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log("Товар додано до кошика:", response.data);
+    alert("Товар успішно додано до кошика!");
 
-    console.log("Відповідь API при видаленні:", response.data);
-
-    // Якщо видалення успішне, оновлюємо список локально
-    this.items.splice(index, 1);
-
-    // Виводимо алерт про успішне видалення
-    alert(`Елемент "${itemToRemove.title}" успішно видалено зі списку бажаного.`);
+    // Видаляємо товар зі списку бажань
+    const index = this.items.findIndex((item) => item.id === itemId);
+    if (index !== -1) {
+      this.removeItem(index);
+    }
   } catch (error) {
-    console.error("Помилка при видаленні елемента:", error);
-    alert("Не вдалося видалити елемент зі списку бажаного.");
+    console.error("Помилка додавання до кошика:", error);
+    alert("Не вдалося додати товар до кошика.");
   }
 },
 
 
-    buyItem() {
-      this.$router.push("/cart");
+    async removeItem(index) {
+      const itemToRemove = this.items[index];
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+      try {
+        await axios.delete(`http://26.235.139.202:8080/api/wishlist/${itemToRemove.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.items.splice(index, 1);
+        alert(`Елемент "${itemToRemove.title}" успішно видалено зі списку бажаного.`);
+      } catch (error) {
+        console.error("Помилка видалення:", error);
+        alert("Не вдалося видалити елемент.");
+      }
     },
   },
   mounted() {
@@ -121,6 +132,7 @@ export default {
   },
 };
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Merriweather:wght@400;700&family=Montserrat:wght@600&display=swap');

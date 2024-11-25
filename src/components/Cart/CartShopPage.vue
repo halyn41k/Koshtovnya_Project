@@ -7,9 +7,13 @@
     </header>
     <div class="cart-content">
       <section class="cart-items">
+        <div v-if="loading" class="loading">Завантаження...</div>
+        <div v-else-if="cartItems.length === 0" class="empty-cart">
+          Ваш кошик порожній.
+        </div>
         <CartItem
           v-for="(item, index) in cartItems"
-          :key="index"
+          :key="item.id"
           :item-number="index + 1"
           :image-src="item.imageSrc"
           :title="item.title"
@@ -19,8 +23,7 @@
           @remove-item="removeItem(index)"
         />
       </section>
-      <!-- Підключаємо компонент Summary -->
-      <Summary :cartItems="cartItems" />
+      <Summary v-if="cartItems.length > 0" :cartItems="cartItems" />
     </div>
   </main>
 </template>
@@ -28,45 +31,84 @@
 <script>
 import CartItem from './CartItem.vue'; // Компонент для відображення товару в кошику
 import Summary from './Summary.vue'; // Компонент для підсумкової інформації
+import axios from 'axios'; // Бібліотека для роботи з API
 
 export default {
-  name: 'CartShopPage', // Головний компонент сторінки кошика
+  name: 'CartShopPage',
   components: {
     CartItem, // Підключення компоненту товару
     Summary,  // Підключення компоненту підсумків
   },
   data() {
     return {
-      // Масив товарів у кошику
-      cartItems: [
-        {
-          imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/0bf96480ece714f079c9843f43c1f30f47a5cccc1c7e182979a1be8b68324be8?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5",
-          title: "Браслет 'Розмаїття кольорів'", // Назва товару
-          price: 750, // Ціна товару
-          quantity: 2 // Кількість товару
-        },
-        {
-          imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/d58f1b57332f78186f2422ff9cf0ab91eb0b5a533f0578d1ffbcb6ff8cacb928?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5",
-          title: "Гердан 'Гуцулка'", // Назва товару
-          price: 1200, // Ціна товару
-          quantity: 1 // Кількість товару
-        }
-      ]
+      cartItems: [], // Масив товарів у кошику
+      loading: false, // Стан завантаження
     };
   },
   methods: {
+    // Завантаження товарів у кошик
+    async fetchCartItems() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+      try {
+        const response = await axios.get("http://26.235.139.202:8080/api/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data && Array.isArray(response.data.products)) {
+          this.cartItems = response.data.products.map((product) => ({
+            id: product.id,
+            title: product.name || 'Без назви',
+            price: product.price || 0,
+            quantity: product.quantity || 0,
+            imageSrc: product.image_url || "default_image_path",
+          }));
+        } else {
+          console.error("Непередбачувана структура даних:", response.data);
+          alert("Отримано некоректні дані.");
+        }
+      } catch (error) {
+        console.error("Помилка завантаження кошика:", error);
+        alert("Не вдалося завантажити дані кошика.");
+      }
+    },
+
     // Оновлення кількості товару
     updateQuantity(index, newQuantity) {
       this.cartItems[index].quantity = newQuantity;
     },
+
     // Видалення товару з кошика
-    removeItem(index) {
-      this.cartItems.splice(index, 1);
-    }
-  }
+    async removeItem(index) {
+      const itemToRemove = this.cartItems[index];
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Будь ласка, увійдіть у свій обліковий запис.');
+        this.$router.push('/login');
+        return;
+      }
+
+      try {
+        await axios.delete(`http://26.235.139.202:8080/api/cart/${itemToRemove.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        this.cartItems.splice(index, 1);
+        alert(`Товар "${itemToRemove.title}" успішно видалено.`);
+      } catch (error) {
+        console.error('Помилка видалення товару:', error);
+        alert('Не вдалося видалити товар із кошика.');
+      }
+    },
+  },
+  mounted() {
+    this.fetchCartItems(); // Завантажити товари при завантаженні сторінки
+  },
 };
 </script>
-
 
 <style scoped>
 @font-face {
@@ -117,5 +159,32 @@ export default {
 .cart-items {
   width: 50%;
   height: 500px;
+  overflow-y: auto; /* Тонкий скрол */
+  scrollbar-width: thin; /* Для Firefox */
+}
+
+/* Стиль для скроллбару */
+.cart-items::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cart-items::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.cart-items::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.loading {
+  text-align: center;
+  color: grey;
+}
+
+.empty-cart {
+  text-align: center;
+  font-size: 18px;
+  color: grey;
 }
 </style>
