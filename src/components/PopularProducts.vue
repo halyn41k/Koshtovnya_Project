@@ -9,63 +9,51 @@
         @click="showPreviousProducts"
       />
       <div class="product-grid">
-        <div
+        <article
           v-for="product in visibleProducts"
           :key="product.id"
-          class="product-column"
+          class="product-card"
         >
-          <!-- Додаємо router-link для обгортки картки перед матеріалами -->
           <router-link :to="`/productpage/${product.id}`" class="product-card-link">
-            <div class="product-card">
-              <img
-                :src="product.image_url"
-                alt="product-image"
-                class="product-main-image"
-              />
-              <div class="product-details">
-                <h3 class="product-title">{{ product.name }}</h3>
-                <p class="product-price">{{ product.price }} грн</p>
-              </div>
-            </div> <!-- Закриття div.product-card перед кнопкою "Buy" -->
+            <div class="image-container">
+              <img :src="product.image_url" :alt="product.name" class="product-image" />
+            </div>
+            <div class="product-info">
+              <h2 class="product-name">{{ product.name }}</h2>
+              <p class="product-price">{{ product.price }} грн</p>
+            </div>
           </router-link>
-          
-          <!-- Інші елементи після закриття router-link -->
           <p class="material-wishlist">
             <span class="product-material">{{ product.bead_producer_name }}</span>
             <span class="wishlist-icon" @click.stop="toggleWishlist(product)">
               <svg
-                v-if="product.is_in_wishlist"
-                class="filled-heart"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-              <svg
-                v-else
-                class="empty-heart"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-              </svg>
+                  v-if="product.is_in_wishlist"
+                  class="filled-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <svg
+                  v-else
+                  class="empty-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                </svg>
+
             </span>
           </p>
           <button class="buy-button">
             <span>{{ $t('buyButton') }}</span>
-            <img
-              src="@/assets/miniarrow.png"
-              alt="Arrow icon"
-              class="button-icon"
-            />
+            <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
           </button>
-        </div> <!-- Закриття div.product-column -->
+        </article>
       </div>
       <img
         src="@/assets/arrow_big.png"
@@ -84,11 +72,6 @@
   </section>
 </template>
 
-
-
-
-  
-
 <script>
 import axios from 'axios';
 
@@ -98,75 +81,13 @@ export default {
       products: [],
       visibleProducts: [],
       currentPage: 0,
-      productsPerPage: 3, // Змінено на 3 для відображення трьох карточок
+      productsPerPage: 3,
       totalPages: 0,
-      wishlist: [],
+      wishlist: [], // Store IDs of products in the wishlist
     };
   },
   methods: {
-    async fetchWishlist() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    console.warn('Користувач не авторизований');
-    return;
-  }
-  try {
-    const response = await axios.get('http://26.235.139.202:8080/api/wishlist', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    // Перевіряємо, чи ключ `products` існує в відповіді
-    if (response.data && response.data.products) {
-      this.wishlist = response.data.products.map((item) => item.id);
-    } else {
-      console.warn('Некоректна структура відповіді API для списку бажаного:', response.data);
-      this.wishlist = [];
-    }
-
-    // Синхронізуємо стан продуктів
-    this.products.forEach((product) => {
-      product.is_in_wishlist = this.isInWishlist(product.id);
-    });
-  } catch (error) {
-    console.error('Помилка завантаження списку бажаного:', error);
-  }
-
-},
-
-    isInWishlist(productId) {
-      return this.wishlist.includes(productId);
-    },
-    async toggleWishlist(product) {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Будь ласка, увійдіть у свій обліковий запис.');
-    this.$router.push('/login');
-    return;
-  }
-  try {
-    if (this.isInWishlist(product.id)) {
-      // Видалення зі списку бажаного
-      await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      this.wishlist = this.wishlist.filter((id) => id !== product.id);
-    } else {
-      // Додавання до списку бажаного
-      await axios.post(
-        'http://26.235.139.202:8080/api/wishlist',
-        { product_id: product.id },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      this.wishlist.push(product.id);
-    }
-    // Оновлюємо стан продукту напряму
-    product.is_in_wishlist = this.isInWishlist(product.id);
-  } catch (error) {
-    console.error('Помилка при оновленні списку бажаного:', error);
-  }
-},
-
-    async fetchPopularProducts() {
+    async fetchProducts() {
       try {
         const response = await fetch("http://26.235.139.202:8080/api/popular-products");
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
@@ -174,21 +95,90 @@ export default {
         this.products = data.data;
         this.updateVisibleProducts();
         this.totalPages = Math.ceil(this.products.length / this.productsPerPage);
+
+        // Fetch the wishlist after products are fetched
+        await this.fetchWishlist();
       } catch (error) {
         console.error("Error fetching popular products:", error.message);
       }
     },
+    
+    async fetchWishlist() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('Користувач не авторизований');
+        return;
+      }
+      try {
+        const response = await axios.get('http://26.235.139.202:8080/api/wishlist', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Ensure the response contains products
+        if (response.data && response.data.products) {
+          this.wishlist = response.data.products.map((item) => item.id);
+        } else {
+          console.warn('Некоректна структура відповіді API для списку бажаного:', response.data);
+          this.wishlist = [];
+        }
+
+        // Sync product states with the wishlist
+        this.products.forEach((product) => {
+          product.is_in_wishlist = this.isInWishlist(product.id);
+        });
+      } catch (error) {
+        console.error('Помилка завантаження списку бажаного:', error);
+      }
+    },
+
+    isInWishlist(productId) {
+      return this.wishlist.includes(productId);
+    },
+
+    async toggleWishlist(product) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Будь ласка, увійдіть у свій обліковий запис.');
+        this.$router.push('/login');
+        return;
+      }
+      try {
+        if (this.isInWishlist(product.id)) {
+          // Remove from wishlist
+          await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          this.wishlist = this.wishlist.filter((id) => id !== product.id);
+        } else {
+          // Add to wishlist
+          await axios.post(
+            'http://26.235.139.202:8080/api/wishlist',
+            { product_id: product.id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          this.wishlist.push(product.id);
+        }
+        
+        // Immediately update product's wishlist state
+        product.is_in_wishlist = this.isInWishlist(product.id);
+      } catch (error) {
+        console.error('Помилка при оновленні списку бажаного:', error);
+      }
+    },
+
     updateVisibleProducts() {
       const start = this.currentPage * this.productsPerPage;
       const end = start + this.productsPerPage;
       this.visibleProducts = this.products.slice(start, end);
     },
+
     showPreviousProducts() {
       if (this.currentPage > 0) {
         this.currentPage--;
         this.updateVisibleProducts();
       }
     },
+
     showNextProducts() {
       if (this.currentPage < this.totalPages - 1) {
         this.currentPage++;
@@ -196,11 +186,13 @@ export default {
       }
     },
   },
+
   mounted() {
-    this.fetchPopularProducts();
+    this.fetchProducts();
   },
 };
 </script>
+
 
 
   <style scoped>
@@ -290,80 +282,56 @@ export default {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-  
-  .product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .product-main-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 12px 12px 0 0;
-    transition: transform 0.3s ease;
-  }
-  
-  .product-card:hover .product-main-image {
-    transform: scale(1.05);
-  }
-  
-  .product-details {
-    color: #333;
-    padding: 10px;
-    font-family: 'Merriweather', sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-  }
-  
-  .product-title {
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .product-title,
-  .product-price,
-  .product-info {
-    margin-top: 0px;
-    color:#000;
-    text-align: left; 
-  }
-  
-  .product-price {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 20px;
-    color: #a01212;
-    margin-top: -5px;
-  }
-  
-  .product-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: -10px;
-    color: #808080;
-  }
-  
-  .product-material-icon {
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-  }
-  
-  .product-material-icon:hover {
-    transform: scale(1.1);
-  }
-  
-  .button-icon{
-    width: 10px;
-    height: 10px;
-    margin-right: 5px;
-  }
-  
+.image-container {
+  width: 100%;
+  height: 210px;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-info {
+  color: #333;
+  padding: 15px;
+  font-family: 'Merriweather', sans-serif;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 5px;
+}
+
+.product-name, 
+.product-price, 
+.product-material {
+  margin: 0;
+  line-height: 1.8; /* Компактний текст */
+}
+
+.product-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.product-price {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #a01212;
+}
+
+.product-material {
+  font-size: 16px;
+  color: #808080;
+}
+
 .buy-button {
   border-radius: 7px;
   background-color: #6b1f1f;
@@ -396,7 +364,42 @@ export default {
   width: 20px;
   height: 15px;
 }
-  
+
+.material-wishlist {
+  display: flex;
+  justify-content: space-between; /* Розташування тексту і сердечка */
+  align-items: center;
+  margin-left: 14px;
+  margin-right: 14px;
+  transform: translateY(-20px);
+}
+
+.product-material {
+  font-size: 18px;
+  color: #808080;
+}
+
+.wishlist-icon {
+  width: 24px; /* Розмір іконки */
+  height: 24px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.wishlist-icon:hover {
+  transform: scale(1.1);
+}
+
+.filled-heart {
+  fill: #A01212;
+}
+
+.empty-heart {
+  stroke: #B3B3B3;
+  stroke-width: 2;
+  fill: none;
+}
+
   .dots-container {
     display: flex;
     justify-content: center;
