@@ -14,7 +14,7 @@
             src="@/assets/size_change.png"
             alt="Змінити розмір"
             class="size-icon"
-            @click="resizeImage"
+            @click="openModal"
           />
         </article>
 
@@ -48,20 +48,18 @@
               </div>
               <div class="purchase-controls">
                 <div class="quantity-wrapper">
-                      <div class="quantity-display">
-                        {{ quantity }}
-                      </div>
-                      <div class="quantity-buttons">
-                        <button class="quantity-arrow up-arrow" @click="increaseQuantity">
-                          ▲
-                        </button>
-                        <button class="quantity-arrow down-arrow" @click="decreaseQuantity">
-                          ▼
-                        </button>
-                      </div>
-                    </div>
-
-
+                  <div class="quantity-display">
+                    {{ quantity }}
+                  </div>
+                  <div class="quantity-buttons">
+                    <button class="quantity-arrow up-arrow" @click="increaseQuantity">
+                      ▲
+                    </button>
+                    <button class="quantity-arrow down-arrow" @click="decreaseQuantity">
+                      ▼
+                    </button>
+                  </div>
+                </div>
 
                 <button class="buy-button">
                   <span class="buy-text">Купити</span>
@@ -71,7 +69,7 @@
                 <div class="wishlist-wrapper">
                   <div class="wishlist-square" @click="toggleWishlist(product)">
                     <svg
-                      v-if="isInWishlist(product.name)"
+                      v-if="isInWishlist(product.id)"
                       class="filled-heart heart-icon"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -94,7 +92,9 @@
                     </svg>
                   </div>
                 </div>
-              </div>⠀
+
+            
+              </div>
               <hr class="thin-divider" />
             </section>
           </div>
@@ -104,31 +104,49 @@
 
     <h2 class="specifications-title">Характеристики</h2>
     <section class="specifications-list">
-      <dl class="spec-grid">
-        <div
-          class="spec-item"
-          v-for="(value, key) in localizedCharacteristics"
-          :key="key"
-        >
-          <dt class="spec-term">{{ key }}</dt>
-          <dd class="spec-description">{{ value }}</dd>
-          <hr class="spec-divider" />
-        </div>
-      </dl>
-    </section>
+  <dl class="spec-grid" v-if="localizedCharacteristics">
+    <div
+      class="spec-item"
+      v-for="(value, key) in localizedCharacteristics"
+      :key="key"
+    >
+      <dt class="spec-term">{{ key }}</dt>
+      <dd class="spec-description">
+        <!-- Додати перевірку на 'colors' -->
+        <template v-if="key === 'Кольори' && Array.isArray(value)">
+          {{ value.join(', ') }}
+        </template>
+        <template v-else>
+          {{ value }}
+        </template>
+      </dd>
+      <hr class="spec-divider" />
+    </div>
+  </dl>
+</section>
 
-    <!-- Pass productId only if it's defined -->
+
     <ProductReviews v-if="productId" :productId="productId" />
-
     <section>
       <ViewOtherProduct />
     </section>
+
+    <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <img
+          :src="product.image_url"
+          alt="Збільшене фото товару"
+          class="modal-image"
+        />
+      </div>
+    </div>
   </main>
 </template>
 
 <script>
 import ViewOtherProduct from "./ViewOtherProduct.vue";
 import ProductReviews from "./ProductReviews.vue";
+import axios from "axios";
 
 export default {
   components: {
@@ -137,10 +155,10 @@ export default {
   },
   data() {
     return {
-      product: {},
-      quantity: 1,
-      isImageEnlarged: false,
-      wishlist: [],
+      isModalOpen: false,
+      product: {}, // Інформація про товар
+      quantity: 1, // Кількість товару
+      wishlist: [], // Список бажаного
       translations: {
         country_of_manufacture: "Країна виробник товару",
         material: "Матеріал",
@@ -150,10 +168,11 @@ export default {
         colors: "Кольори",
         bead_producer_name: "Виробник бісеру",
       },
-      productId: null, // Initialize productId to null
+      productId: null, // Ідентифікатор продукту
     };
   },
   computed: {
+    // Фільтруємо характеристики продукту для виведення
     productCharacteristics() {
       const excludeKeys = [
         "id",
@@ -171,66 +190,135 @@ export default {
           return obj;
         }, {});
     },
+    // Локалізовані характеристики
     localizedCharacteristics() {
       return Object.entries(this.productCharacteristics).reduce((acc, [key, value]) => {
         const translatedKey = this.translations[key] || key;
-        acc[translatedKey] = value === null ? "Немає" : value; // Якщо значення null, замінюємо на "Немає"
+        acc[translatedKey] = value === null ? "Немає" : value;
         return acc;
       }, {});
     },
   },
   methods: {
-  increaseQuantity() {
-    if (this.quantity < this.product.quantity) {
-      this.quantity++;
-    }
+    async fetchWishlist() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("Користувач не авторизований");
+        return;
+      }
+      try {
+        const wishlistResponse = await axios.get("http://26.235.139.202:8080/api/wishlist", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const wishlistItems = Array.isArray(wishlistResponse.data.products)
+          ? wishlistResponse.data.products
+          : [];
+        this.wishlist = wishlistItems.map((item) => item.id); // Оновлюємо список бажаного
+      } catch (error) {
+        console.error("Помилка завантаження списку бажаного:", error);
+      }
+    },
+    // Відкриття модального вікна
+    openModal() {
+      this.isModalOpen = true;
+    },
+    // Закриття модального вікна
+    closeModal() {
+      this.isModalOpen = false;
+    },
+    // Перевірка, чи товар є в списку бажаного
+    isInWishlist(productId) {
+      return this.wishlist.includes(productId);
+    },
+    // Додавання або видалення товару зі списку бажаного
+    async toggleWishlist(product) {
+      const profile = await this.checkAuthAndFetchProfile();
+      if (!profile) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+      if (this.isInWishlist(product.id)) {
+        // Видалити товар зі списку бажаного
+        try {
+          const token = localStorage.getItem("token");
+          await axios.delete(
+            `http://26.235.139.202:8080/api/wishlist/${product.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          this.wishlist = this.wishlist.filter((id) => id !== product.id); // Оновлюємо список бажаного
+          alert(`${product.name} видалено зі списку бажаного!`);
+        } catch (error) {
+          console.error("Помилка при видаленні з бажаного:", error);
+          alert("Не вдалося видалити товар зі списку бажаного.");
+        }
+      } else {
+        // Додати до списку бажаного
+        try {
+          const token = localStorage.getItem("token");
+          await axios.post(
+            "http://26.235.139.202:8080/api/wishlist",
+            { product_id: product.id },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          this.wishlist.push(product.id); // Оновлюємо список бажаного
+          alert(`${product.name} додано до списку бажаного!`);
+        } catch (error) {
+          console.error("Помилка при додаванні до списку бажаного:", error);
+          alert("Не вдалося додати товар до списку бажаного.");
+        }
+      }
+    },
+    // Перевірка автентифікації та отримання профілю користувача
+    async checkAuthAndFetchProfile() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return null; // Користувач не авторизований
+      }
+      try {
+        const response = await axios.get("http://26.235.139.202:8080/api/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return response.data; // Повертаємо дані профілю
+      } catch (error) {
+        console.error("Помилка авторизації:", error);
+        return null; // Помилка при перевірці
+      }
+    },
+    // Збільшення кількості товару
+    increaseQuantity() {
+      if (this.quantity < this.product.quantity) {
+        this.quantity++;
+      }
+    },
+    // Зменшення кількості товару
+    decreaseQuantity() {
+      if (this.quantity > 1) {
+        this.quantity--;
+      }
+    },
+    // Зміна розміру зображення
+    resizeImage() {
+      alert("Змінено розмір зображення!");
+    },
   },
-  decreaseQuantity() {
-    if (this.quantity > 1) {
-      this.quantity--;
-    }
-  },
-  toggleWishlist(product) {
-    if (this.isInWishlist(product.name)) {
-      this.wishlist = this.wishlist.filter((item) => item !== product.name);
-      alert(`${product.name} видалено зі списку бажаного!`);
-    } else {
-      this.wishlist.push(product.name);
-      alert(`${product.name} додано до списку бажаного!`);
-    }
-  },
-  isInWishlist(productName) {
-    return this.wishlist.includes(productName);
-  },
-  resizeImage() {
-    alert("Змінено розмір зображення!");
-  },
-  useTestData() {
-    this.product = {
-      id: 1,
-      name: "Керамічна ваза",
-      price: 450,
-      image_url: "https://via.placeholder.com/300",
-      sizes: [20, 25, 30],
-      is_available: true,
-      quantity: 10,
-      material: "Кераміка",
-      country_of_manufacture: "Україна",
-      type_of_fitting: "Латунь",
-      type_of_bead: "Скляний",
-      weight: "1 кг",
-      colors: "Білий, Золотий",
-      bead_producer_name: "GlassCo",
-    };
-  },
-},
-
   created() {
     const productIdFromRoute = this.$route.params.id;
     if (productIdFromRoute) {
       this.productId = productIdFromRoute;
-      
-      // Завантаження даних про продукт
+      // Завантаження даних про товар
       fetch(`http://26.235.139.202:8080/api/products/${this.productId}`)
         .then((response) => {
           if (!response.ok) {
@@ -239,19 +327,20 @@ export default {
           return response.json();
         })
         .then((data) => {
-          this.product = data.data || {}; // Переконуємося, що `data` існує
+          this.product = data.data || {};
         })
         .catch((error) => {
           console.error("Помилка при завантаженні даних:", error);
-
-          // Використовуємо тестові дані
-          this.useTestData();
         });
     }
-    
-  },
+    // Завантаження списку бажаного
+    this.fetchWishlist();
+  }
 };
 </script>
+
+
+
 
 
 <style scoped>
@@ -644,6 +733,41 @@ export default {
 .divider{
   width: 100px;
 }
-  
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+}
+
+.modal-image:hover {
+  transform: scale(1.1); /* Легке збільшення при наведенні */
+  transition: transform 0.2s ease-in-out;
+}
+
+
   </style>
   

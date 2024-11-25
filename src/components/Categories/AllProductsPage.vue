@@ -1,4 +1,4 @@
-<template> 
+<template>
   <section class="products-section">
     <aside class="sidebar">
       <FilterComponent />
@@ -10,7 +10,6 @@
           v-for="product in products"
           :key="product.id"
           :class="['product-card', { 'special-background': product.id === 3 || product.id === 5 }]">
-          <!-- Використовуємо router-link для створення переходу на сторінку продукту -->
           <router-link :to="`/productpage/${product.id}`" class="product-card-link">
             <div class="image-container">
               <img :src="product.image_url" :alt="product.name" class="product-image" />
@@ -18,39 +17,37 @@
             <div class="product-info">
               <h2 class="product-name">{{ product.name }}</h2>
               <p class="product-price">{{ product.price }} грн</p>
-              <div class="material-wishlist">
-                <p class="product-material">{{ product.bead_producer_name }}</p>
-                <div class="wishlist-icon" @click="toggleWishlist(product)">
-                  <svg
-                    v-if="isInWishlist(product.name)"
-                    class="filled-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <svg
-                    v-else
-                    class="empty-heart"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                  </svg>
-                </div>
-              </div>
-              <button class="buy-button">
-                <span>Купити</span>
-                <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
-              </button>
             </div>
           </router-link>
+          <p class="material-wishlist">
+            <span class="product-material">{{ product.bead_producer_name }}</span>
+            <span class="wishlist-icon" @click.stop="toggleWishlist(product)">
+              <svg
+                v-if="product.is_in_wishlist"
+                class="filled-heart"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+              <svg
+                v-else
+                class="empty-heart"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+              </svg>
+            </span>
+          </p>
+          <button class="buy-button">
+            <span>Купити</span>
+            <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
+          </button>
         </article>
       </div>
       <div class="pagination">
@@ -58,8 +55,7 @@
           v-for="page in totalPages"
           :key="page"
           @click="changePage(page)"
-          :class="{ 'active': currentPage === page }"
-        >
+          :class="{ 'active': currentPage === page }">
           {{ page }}
         </button>
       </div>
@@ -72,78 +68,120 @@
 
 
 <script>
-import axios from 'axios'; // Імпортуємо бібліотеку для HTTP-запитів
-import { defineAsyncComponent } from 'vue'; // Імпортуємо функцію для динамічного завантаження компонентів
+import axios from 'axios';
+import { defineAsyncComponent } from 'vue';
 
 export default {
-  name: 'AllProducts', // Ім'я компонента
+  name: 'AllProducts',
   components: {
-    // Динамічне підключення компонентів для фільтрації та відображення категорій
     FilterComponent: defineAsyncComponent(() => import('../FilterComponent.vue')),
     CategoryProduct: defineAsyncComponent(() => import('../CategoryProduct.vue')),
   },
   data() {
     return {
-      products: [], // Масив продуктів
-      currentPage: 1, // Поточна сторінка
-      totalPages: 1, // Загальна кількість сторінок
-      itemsPerPage: 15, // Кількість продуктів на сторінку
-      wishlist: [], // Список бажаних продуктів
+      products: [],
+      currentPage: 1,
+      totalPages: 1,
+      itemsPerPage: 15,
+      wishlist: [], // Список ID продуктів у списку бажаного
     };
   },
   methods: {
     async fetchProducts(page = 1) {
-      // Завантаження продуктів із сервера
       try {
         const response = await axios.get(`http://26.235.139.202:8080/api/products?page=${page}`);
-        this.products = response.data.data; // Збереження отриманого списку продуктів
-        this.totalPages = response.data.meta.last_page; // Збереження загальної кількості сторінок
-        this.currentPage = response.data.meta.current_page; // Оновлення поточної сторінки
+        this.products = response.data.data;
+        this.totalPages = response.data.meta.last_page;
+        this.currentPage = response.data.meta.current_page;
+
+        // Завантажуємо список бажаного після отримання продуктів
+        await this.fetchWishlist();
       } catch (error) {
-        console.error('Помилка завантаження продуктів:', error); // Логування помилки
+        console.error('Помилка завантаження продуктів:', error);
       }
     },
+    async fetchWishlist() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.warn('Користувач не авторизований');
+    return;
+  }
+  try {
+    const response = await axios.get('http://26.235.139.202:8080/api/wishlist', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Перевіряємо, чи ключ `products` існує в відповіді
+    if (response.data && response.data.products) {
+      this.wishlist = response.data.products.map((item) => item.id);
+    } else {
+      console.warn('Некоректна структура відповіді API для списку бажаного:', response.data);
+      this.wishlist = [];
+    }
+
+    // Синхронізуємо стан продуктів
+    this.products.forEach((product) => {
+      product.is_in_wishlist = this.isInWishlist(product.id);
+    });
+  } catch (error) {
+    console.error('Помилка завантаження списку бажаного:', error);
+  }
+
+},
+
+    isInWishlist(productId) {
+      return this.wishlist.includes(productId);
+    },
+    async toggleWishlist(product) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Будь ласка, увійдіть у свій обліковий запис.');
+    this.$router.push('/login');
+    return;
+  }
+  try {
+    if (this.isInWishlist(product.id)) {
+      // Видалення зі списку бажаного
+      await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      this.wishlist = this.wishlist.filter((id) => id !== product.id);
+    } else {
+      // Додавання до списку бажаного
+      await axios.post(
+        'http://26.235.139.202:8080/api/wishlist',
+        { product_id: product.id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      this.wishlist.push(product.id);
+    }
+    // Оновлюємо стан продукту напряму
+    product.is_in_wishlist = this.isInWishlist(product.id);
+  } catch (error) {
+    console.error('Помилка при оновленні списку бажаного:', error);
+  }
+},
+
+
     changePage(page) {
-      // Зміна сторінки (перевіряється діапазон)
       if (page > 0 && page <= this.totalPages) {
         this.fetchProducts(page);
       }
     },
-    isInWishlist(productName) {
-      // Перевіряє, чи знаходиться продукт у списку бажаного
-      return this.wishlist.includes(productName);
-    },
-    toggleWishlist(product) {
-      // Додає або видаляє продукт зі списку бажаного
-      if (this.isInWishlist(product.name)) {
-        this.wishlist = this.wishlist.filter(item => item !== product.name); // Видалення
-        alert(`${product.name} видалено зі списку бажаного!`);
-      } else {
-        this.wishlist.push(product.name); // Додавання
-        alert(`${product.name} додано до списку бажаного!`);
-      }
-    },
   },
   mounted() {
-    // Завантажує продукти при монтуванні компонента
     this.fetchProducts();
   },
 };
 </script>
 
 
-<style scoped>
-@font-face {
-  font-family: 'KyivType Titling';
-  src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
-  font-weight: 900;
-  font-style: normal;
-}
 
+<style scoped>
 .products-section {
   display: flex;
-  padding: 20px;
   justify-content: center;
+  padding: 20px;
   margin-top: 150px;
 }
 
@@ -182,7 +220,8 @@ export default {
   justify-content: space-between;
   overflow: hidden;
   width: 280px;
-  height: 390px;
+  height: auto;
+  min-height: 360px; /* Якщо хочете зберегти мінімальну висоту */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -194,7 +233,7 @@ export default {
 
 .image-container {
   width: 100%;
-  height: 180px;
+  height: 210px;
 }
 
 .product-image {
@@ -210,23 +249,24 @@ export default {
 
 .product-info {
   color: #333;
-  padding: 10px;
+  padding: 15px;
   font-family: 'Merriweather', sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
   text-align: left;
-  text-decoration: none;
-  color: inherit;
-  gap: 10px; 
-  position: relative; 
+  gap: 5px;
+}
+
+.product-name, 
+.product-price, 
+.product-material {
+  margin: 0;
+  line-height: 1.8; /* Компактний текст */
 }
 
 .product-name {
   font-size: 18px;
   font-weight: bold;
-  margin-bottom: 5px; 
 }
 
 .product-price {
@@ -234,30 +274,65 @@ export default {
   font-weight: 600;
   font-size: 20px;
   color: #a01212;
-  margin-top: -230px; 
 }
 
 .product-material {
   font-size: 16px;
   color: #808080;
-  margin-top: -210px; 
+}
+
+.buy-button {
+  border-radius: 7px;
+  background-color: #6b1f1f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 6px;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  width: 250px;
+  font-family: 'Merriweather', sans-serif;
+  font-size: 18px;
+  text-transform: none;
+  padding-left: 15px;
+  transition: background-color 0.3s ease;
+  margin-left: 15px;
+  transform: translateY(-4px);
+}
+
+.buy-button:hover {
+  background-color: #a01212;
+}
+
+.buy-button span {
+  text-align: left;
+}
+
+.buy-button img {
+  width: 20px;
+  height: 15px;
 }
 
 .material-wishlist {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Розташування тексту і сердечка */
   align-items: center;
-  position: absolute; 
-  width: 100%;
-  margin-top: 220px;
+  margin-left: 14px;
+  margin-right: 14px;
+  transform: translateY(-20px);
 }
+
+.product-material {
+  font-size: 18px;
+  color: #808080;
+}
+
 .wishlist-icon {
-  width: 30px;
-  height: 30px;
+  width: 24px; /* Розмір іконки */
+  height: 24px;
   cursor: pointer;
   transition: transform 0.3s ease;
-  margin-left: -100px;
-  
 }
 
 .wishlist-icon:hover {
@@ -272,46 +347,6 @@ export default {
   stroke: #B3B3B3;
   stroke-width: 2;
   fill: none;
-}
-
-.buy-button {
-  border-radius: 10px;
-  background-color: #6b1f1f;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 6px;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  width: 100%;
-  font-family: 'Merriweather', sans-serif;
-  font-size: 18px;
-  text-transform: none;
-  padding-left: 15px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  margin-top: -190px; 
-}
-
-.buy-button:hover {
-  background-color: #a01212;
-  transform: translateY(-2px);
-}
-
-.buy-button span {
-  text-align: left;
-}
-
-.buy-button img {
-  width: 20px;
-  height: 15px;
-  margin-left: auto;
-}
-
-.button-icon {
-  width: 10px;
-  height: 10px;
-  margin-right: 5px;
 }
 
 .pagination {
@@ -333,19 +368,20 @@ export default {
 }
 
 .pagination button:hover {
-  background-color: #6b1f1f; 
-  color: white; 
+  background-color: #6b1f1f;
+  color: white;
   transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .pagination button.active {
   background-color: #6b1f1f;
   color: white;
 }
+
 .product-card-link {
-  text-decoration: none; 
-  color: inherit; 
+  text-decoration: none;
+  color: inherit;
 }
 
 </style>

@@ -73,6 +73,6 @@ export default {
 }
 
 .change-password-button:hover {
-  background-color: #5a1616;
+  background-color: #a01212;
 }
 </style>

@@ -1,46 +1,123 @@
-<template> 
+<template>
   <div class="wishlist">
     <h2 class="wishlist-title">Список бажань</h2>
-    <div v-if="items.length === 0" class="no-items">
+    <div v-if="loading" class="loading">
+      Завантаження...
+    </div>
+    <div v-else-if="items.length === 0" class="no-items">
       Ваш список бажань порожній :(
     </div>
     <div v-else>
-      <div v-for="(item, index) in items" :key="index" class="wishlist-item">
-        <span class="item-number">{{ index + 1 }}.</span>
-        <div class="item-content">
-          <img :src="item.imageSrc" alt="Product Image" class="item-image"/>
-          <div class="item-details">
-            <div class="item-header">
-              <h3 class="item-name">{{ item.title }}</h3>
-              <button class="remove-button" @click="removeItem(index)" aria-label="Remove item">X</button>
+      <div class="wishlist-items">
+        <div v-for="(item, index) in items" :key="index" class="wishlist-item">
+          <router-link :to="`/productpage/${item.id}`" class="product-link">
+            <div class="item-content">
+              <span class="item-number">{{ index + 1 }}.</span>
+              <img :src="item.imageSrc" alt="Product Image" class="item-image" />
+              <div class="item-details">
+                <h3 class="item-name">{{ item.title }}</h3>
+                <p class="item-price">{{ item.price }}₴</p>
+                <button class="buy-button" @click="buyItem">Купити</button>
+              </div>
             </div>
-            <p class="item-price">{{ item.price }}₴ / за штуку</p>
-            <button class="buy-button" @click="buyItem">Купити</button>
-          </div>
+          </router-link>
+          <button class="remove-button" @click.stop="removeItem(index)" aria-label="Remove item">X</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
+
 <script>
+import axios from "axios";
+
 export default {
-  name: 'UserWishlist',
+  name: "UserWishlist",
   data() {
     return {
-      items: [
-        { title: 'Товар 1', price: '750', imageSrc: 'path_to_image' },
-        { title: 'Товар 2', price: '150', imageSrc: 'path_to_image' },
-      ],
+      items: [],
+      loading: false,
     };
   },
   methods: {
-    removeItem(index) {
-      this.items.splice(index, 1);
+    async fetchWishlist() {
+      this.loading = true;
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+
+      try {
+        const wishlistResponse = await axios.get("http://26.235.139.202:8080/api/wishlist", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Дані, отримані з API:", wishlistResponse.data);
+
+        const wishlistItems = Array.isArray(wishlistResponse.data.products) ? wishlistResponse.data.products : [];
+
+        if (wishlistItems.length > 0) {
+          this.items = wishlistItems.map((item) => ({
+            id: item.id, // Додаємо ідентифікатор
+            title: item.name,
+            price: item.price,
+            imageSrc: item.image_url || "default_image_path",
+          }));
+
+        } else {
+          this.items = [];
+          alert("У вашому списку бажаного поки що немає товарів.");
+        }
+      } catch (error) {
+        console.error("Помилка завантаження списку бажань:", error);
+        alert("Не вдалося завантажити ваш список бажаного.");
+      } finally {
+        this.loading = false;
+      }
     },
+    async removeItem(index) {
+  const itemToRemove = this.items[index];
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Будь ласка, увійдіть у свій обліковий запис.");
+    this.$router.push("/login");
+    return;
+  }
+
+  try {
+    const response = await axios.delete(`http://26.235.139.202:8080/api/wishlist/${itemToRemove.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Відповідь API при видаленні:", response.data);
+
+    // Якщо видалення успішне, оновлюємо список локально
+    this.items.splice(index, 1);
+
+    // Виводимо алерт про успішне видалення
+    alert(`Елемент "${itemToRemove.title}" успішно видалено зі списку бажаного.`);
+  } catch (error) {
+    console.error("Помилка при видаленні елемента:", error);
+    alert("Не вдалося видалити елемент зі списку бажаного.");
+  }
+},
+
+
     buyItem() {
-      this.$router.push('/cart');
+      this.$router.push("/cart");
     },
+  },
+  mounted() {
+    this.fetchWishlist();
   },
 };
 </script>
@@ -50,72 +127,103 @@ export default {
 
 * {
   font-family: 'Merriweather', serif;
+  box-sizing: border-box;
+}
+
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex; /* Вирівнюємо елементи flex */
+  gap: 20px;
+  align-items: center;
 }
 
 .wishlist {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  margin-left: -10px;
 }
 
 .wishlist-title {
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
   text-align: left;
-  margin-bottom: 10px;
 }
 
 .no-items {
   font-size: 16px;
   color: #666;
-  text-align: left;
-  margin-top: 10px;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.wishlist-items {
+  max-height: 500px; /* Встановлюємо максимальну висоту для прокручуваного контейнера */
+  overflow-y: auto; /* Додаємо вертикальний скрол */
+  padding-right: 10px; /* Для відступу від скролбару */
+}
+
+/* Стиль для скроллбару */
+.wishlist-items::-webkit-scrollbar {
+  width: 8px;
+}
+
+.wishlist-items::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.wishlist-items::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .wishlist-item {
   display: flex;
-  align-items: flex-start;
   background-color: #F5EAE9;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
   position: relative;
+  transition: transform 0.3s;
+}
+
+.wishlist-item:hover {
+  transform: scale(1.02);
 }
 
 .item-number {
   font-family: 'Montserrat', sans-serif;
-  font-size: 50px;
+  font-size: 40px;
   font-weight: 600;
   color: #333;
-  margin-right: 20px;
-  margin-top: 50px;
-  margin-left: -80px;
 }
 
 .item-content {
   display: flex;
   gap: 20px;
+  align-items: center;
+  width: 100%;
 }
 
 .item-image {
-  width: 180px;
-  height: 180px;
-  margin-right: 20px;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .item-details {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-.item-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  width: 100%;
 }
 
 .item-name {
-  font-size: 20px;
+  font-size: 18px;
   font-family: 'Merriweather', serif;
   font-weight: 700;
   color: #333;
@@ -123,10 +231,9 @@ export default {
 
 .item-price {
   font-family: 'Inter', sans-serif;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #A01212;
-  margin-bottom: 10px;
 }
 
 .buy-button {
@@ -138,25 +245,35 @@ export default {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  align-self: flex-end;
-  margin-left: 450px;
+  align-self: flex-start;
+  margin-top: 10px;
+  transition: background-color 0.3s;
 }
 
 .buy-button:hover {
-  background-color: #8B0E0E;
+  background-color: #a01212;
 }
 
 .remove-button {
   background-color: #6B1F1F;
   color: #C4AEAC;
   font-size: 16px;
-  border: none;
+  border-radius: 5px;
   width: 30px;
   height: 30px;
-  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.remove-button:hover {
+  background-color: #8B0E0E;
 }
 </style>
