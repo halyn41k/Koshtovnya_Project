@@ -7,17 +7,24 @@
         <div class="item-header">
           <div class="item-info">
             <h3 class="item-title">{{ title }}</h3>
-            <p class="item-price">{{ price }} / за штуку</p>
+            <p class="item-price">{{ price }}₴ / за штуку</p>
           </div>
           <button @click="removeItem" class="remove-button" aria-label="Видалити товар">Х</button>
         </div>
         <div class="item-controls">
           <p class="item-quantity">Кількість: {{ quantity }}</p>
           <div class="quantity-controls">
-            <button @click="increaseQuantity" class="quantity-button increase" aria-label="Збільшити кількість">+</button>
-            <button @click="decreaseQuantity" class="quantity-button decrease" aria-label="Зменшити кількість">-</button>
+            <!-- Приклад кнопок для зміни кількості -->
+            <button 
+  class="quantity-button increase" 
+  @click="increaseQuantity">+</button>
+<button 
+  class="quantity-button decrease" 
+  @click="decreaseQuantity">-</button>
+
+
           </div>
-          <p class="item-total">{{ totalPrice }}</p>
+          <p class="item-total">Загальна: {{ totalPrice }}₴</p>
         </div>
       </div>
     </div>
@@ -28,12 +35,12 @@
 export default {
   name: 'CartItem',
   props: {
-    id: { type: String, required: true }, // ID товару
-    itemNumber: { type: Number, required: true }, // Номер товару
-    imageSrc: { type: String, required: true }, // Зображення товару
-    title: { type: String, required: true }, // Назва товару
-    price: { type: Number, required: true }, // Ціна товару
-    quantity: { type: Number, required: true } // Кількість товару
+    id: { type: String, required: true },
+    itemNumber: { type: Number, required: true },
+    imageSrc: { type: String, required: true },
+    title: { type: String, required: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true },
   },
   computed: {
     totalPrice() {
@@ -42,20 +49,19 @@ export default {
   },
   methods: {
     increaseQuantity() {
-      this.$emit('change-quantity', { id: this.id, quantity: this.quantity + 1 });
-    },
-    decreaseQuantity() {
-      if (this.quantity > 1) {
-        this.$emit('change-quantity', { id: this.id, quantity: this.quantity - 1 });
-      }
-    },
-    removeItem() {
-      this.$emit('remove-item', this.id);
+    this.$emit('change-quantity', { id: this.id, quantity: this.quantity + 1, operation: 'increase' });
+  },
+  decreaseQuantity() {
+    if (this.quantity > 1) {
+      this.$emit('change-quantity', { id: this.id, quantity: this.quantity - 1, operation: 'decrease' });
     }
+  },
+  removeItem() {
+    this.$emit('remove-item', this.id);
+  }
   }
 };
 </script>
-
 
 
 <style scoped>
@@ -174,7 +180,7 @@ color: rgba(107, 31, 31, 1);
 
 .item-total {
 color: rgba(160, 18, 18, 1);
-font-size: 20px;
+font-size: 16px;
 font-family: Inter, sans-serif;
 font-weight: 600;
 }

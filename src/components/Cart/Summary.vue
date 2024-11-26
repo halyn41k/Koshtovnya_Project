@@ -1,36 +1,46 @@
 <template>
-    <div class="order-summary">
-      <h2 class="summary-title">Сума до оплати</h2>
-      <div class="summary-details">
-        <div class="summary-row">
-          <span>Проміжний підсумок</span>
-          <span class="price">2700₴</span>
-        </div>
-        <div class="summary-row">
-          <span>Доставка</span>
-          <span class="price">0₴</span>
-        </div>
-        <div class="summary-row total">
-          <span>Загальна сума</span>
-          <span class="price">2700₴</span>
-        </div>
+  <div class="order-summary">
+    <h2 class="summary-title">Сума до оплати</h2>
+    <div class="summary-details">
+      <div class="summary-row">
+        <span>Проміжний підсумок</span>
+        <span class="price">{{ totalSum }}₴</span>
       </div>
-      <button class="payment-button" @click="goToPayment">
-        <span>Перейти до оплати</span>
-        <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Payment icon" class="button-icon" />
-      </button>
+      <div class="summary-row">
+        <span>Доставка</span>
+        <span class="price">0₴</span>
+      </div>
+      <div class="summary-row total">
+        <span>Загальна сума</span>
+        <span class="price">{{ totalSum }}₴</span>
+      </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'OrderSummary',
-    methods: {
-      goToPayment() {
-        this.$router.push('/payment');
-      }
+    <button class="payment-button" @click="goToPayment">
+      <span>Перейти до оплати</span>
+    </button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Summary',
+  props: {
+    cartItems: {
+      type: Array,
+      required: true
+    }
+  },
+  computed: {
+    totalSum() {
+      return this.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    }
+  },
+  methods: {
+    goToPayment() {
+      this.$router.push('/payment');
     }
   }
+}
   </script>
   
   <style scoped>

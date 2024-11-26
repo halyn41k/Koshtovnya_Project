@@ -52,8 +52,10 @@
         </router-link>
 
         <router-link to="/cart" class="cart-icon">
-          <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon" />
-        </router-link>
+        <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon" />
+        <span class="cart-badge" v-if="cartCount > 0">{{ cartCount }}</span>
+      </router-link>
+
       </div>
     </div>
 
@@ -70,12 +72,22 @@
   </header>
 </template>
 
+
 <script>
 import SearchResults from './SearchResults.vue';
+import axios from 'axios';
 
 export default {
   components: {
     SearchResults,
+  },
+  data() {
+    return {
+      selectedLanguage: 'uk',
+      selectedCurrency: 'UAH',
+      cartCount: 0, // Лічильник товарів у кошику
+      searchQuery: '', // Пошуковий запит
+    };
   },
   computed: {
     currentFlag() {
@@ -85,21 +97,33 @@ export default {
     },
   },
   methods: {
+    async fetchCartCount() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await axios.get('http://26.235.139.202:8080/api/cart/cart-count', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        this.cartCount = response.data.cart_count || 0; // Оновлення значення з API
+      } catch (error) {
+        console.error('Помилка завантаження кількості товарів у кошику:', error);
+      }
+    },
     startSearch() {
       console.log('Searching:', this.searchQuery);
     },
     changeLanguage() {
-      this.$i18n.locale = this.selectedLanguage; // Зміна мови
+      this.$i18n.locale = this.selectedLanguage;
     },
   },
-  data() {
-    return {
-      selectedLanguage: 'uk', // Початково українська
-      selectedCurrency: 'UAH'
-    };
+  mounted() {
+    this.fetchCartCount(); // Завантаження початкового значення
   },
 };
 </script>
+
 
 
 <style scoped>
@@ -379,5 +403,43 @@ body {
 .search-results::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #a01212;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: bounce 0.3s ease;
+}
+
+.cart-icon.shake {
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+}
+
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
 
 </style>
