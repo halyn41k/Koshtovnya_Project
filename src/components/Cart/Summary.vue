@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: 'Summary',
+  name: 'SummaryCart',
   props: {
     cartItems: {
       type: Array,

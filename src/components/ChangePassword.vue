@@ -96,18 +96,39 @@
       };
     },
     methods: {
-      // Метод для обробки зміни пароля
-      submitPasswordChange() {
-        if (this.newPassword === this.confirmPassword) {
-          // Якщо новий пароль співпадає з підтвердженням
-          console.log('Поточний пароль:', this.currentPassword); // Лог поточного пароля
-          console.log('Новий пароль:', this.newPassword); // Лог нового пароля
-          this.$router.push('/account'); // Перенаправлення на сторінку акаунта
+  async submitPasswordChange() {
+    if (this.newPassword === this.confirmPassword) {
+      try {
+        const response = await fetch('http://26.235.139.202:8080/api/change-password', {
+  method: 'PATCH', // Зміна методу на PATCH
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem('token')}`, // Токен для авторизації, якщо потрібен
+  },
+  body: JSON.stringify({
+    current_password: this.currentPassword,
+    new_password: this.newPassword,
+    new_password_confirmation: this.confirmPassword,
+  }),
+});
+
+
+        if (response.ok) {
+          const data = await response.json();
+          alert('Пароль успішно змінено!');
+          this.$router.push('/account'); // Перенаправлення після успішної зміни
         } else {
-          // Якщо паролі не співпадають
-          alert('Новий пароль і підтвердження пароля не збігаються.');
+          const errorData = await response.json();
+          alert(`Помилка: ${errorData.message || 'Щось пішло не так.'}`);
         }
-      },
+      } catch (error) {
+        console.error('Помилка при зміні паролю:', error);
+        alert('Помилка під час з\'єднання з сервером. Спробуйте ще раз.');
+      }
+    } else {
+      alert('Новий пароль і підтвердження пароля не збігаються.');
+    }
+  },
       // Метод для переключення видимості поточного пароля
       toggleCurrentPasswordVisibility() {
         this.showCurrentPassword = !this.showCurrentPassword;

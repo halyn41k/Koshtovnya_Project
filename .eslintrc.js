@@ -15,5 +15,7 @@ module.exports = {
   rules: {
     // Додати правило для дозволу непомічених імпортів
     'no-unused-vars': 'warn',  // Попередження замість помилки для невикористаних змінних
+    'vue/multi-word-component-names': 'off',
+
   },
 };
