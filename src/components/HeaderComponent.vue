@@ -7,26 +7,37 @@
       </ul>
 
       <div class="language-currency">
+        <!-- Вибір мови -->
         <div class="language">
-          <img :src="currentFlag" :alt="selectedLanguage + ' Flag'" class="flag">
-          <select v-model="selectedLanguage" @change="changeLanguage" class="dropdown no-border">
-            <option value="uk">Українська</option>
-            <option value="en">English</option>
-          </select>
+          <img :src="currentFlag" :alt="selectedLanguage + ' Flag'" class="flag" />
+          <div class="dropdown-container" @click="toggleLanguageDropdown">
+            <select v-model="selectedLanguage" class="dropdown no-border" @change="changeLanguage">
+              <option value="uk">Українська</option>
+              <option value="en">English</option>
+            </select>
+            <span class="arrow" :class="{ 'open': isLanguageDropdownOpen }"></span>
+          </div>
         </div>
 
+        <!-- Вибір валюти -->
         <div class="currency">
-          <select v-model="selectedCurrency" class="dropdown no-border">
-            <option value="UAH">UAH ₴</option>
-            <option value="USD">USD $</option>
-          </select>
+          <div class="dropdown-container" @click="toggleCurrencyDropdown">
+            <select v-model="selectedCurrency" class="dropdown no-border" @change="changeCurrency">
+              <option value="UAH">UAH ₴</option>
+              <option value="USD">USD $</option>
+            </select>
+            <span class="arrow" :class="{ 'open': isCurrencyDropdownOpen }"></span>
+          </div>
         </div>
-        <router-link :to="{ path: '/account', query: { tab: 'wishlist' } }" class="wishlist">{{ $t('wishlist') }}</router-link>
+
+        <!-- Список бажаних товарів -->
+        <router-link :to="{ path: '/account', query: { tab: 'wishlist' } }" class="wishlist">
+          {{ $t('wishlist') }}
+        </router-link>
       </div>
     </div>
 
     <div class="separator"></div>
-
     <div class="main-header">
       <div class="search-bar">
         <input
@@ -43,7 +54,7 @@
 
       <router-link to="/" class="logo">
         <img src="@/assets/logo.png" alt="Logo" />
-        <h1>Коштовня</h1>
+        <h1>{{ $t('logo') }}</h1>
       </router-link>
 
       <div class="user-cart">
@@ -52,13 +63,13 @@
         </router-link>
 
         <router-link to="/cart" class="cart-icon">
-        <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon" />
-        <span class="cart-badge" v-if="cartCount > 0">{{ cartCount }}</span>
-      </router-link>
-
+          <img src="@/assets/cart-svgrepo-com.svg" alt="Cart Icon" class="icon" />
+          <span class="cart-badge" v-if="cartCount > 0">{{ cartCount }}</span>
+        </router-link>
       </div>
     </div>
 
+    <!-- Навігація -->
     <nav class="nav-menu">
       <ul>
         <li><router-link to="/bracelets">{{ $t('bracelets') }}</router-link></li>
@@ -72,7 +83,6 @@
   </header>
 </template>
 
-
 <script>
 import SearchResults from './SearchResults.vue';
 import axios from 'axios';
@@ -85,8 +95,10 @@ export default {
     return {
       selectedLanguage: 'uk',
       selectedCurrency: 'UAH',
-      cartCount: 0, // Лічильник товарів у кошику
-      searchQuery: '', // Пошуковий запит
+      cartCount: 0,
+      searchQuery: '',
+      isLanguageDropdownOpen: false,
+      isCurrencyDropdownOpen: false,
     };
   },
   computed: {
@@ -106,7 +118,7 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        this.cartCount = response.data.cart_count || 0; // Оновлення значення з API
+        this.cartCount = response.data.cart_count || 0;
       } catch (error) {
         console.error('Помилка завантаження кількості товарів у кошику:', error);
       }
@@ -116,10 +128,20 @@ export default {
     },
     changeLanguage() {
       this.$i18n.locale = this.selectedLanguage;
+      this.isLanguageDropdownOpen = false; // Закриваємо меню після вибору
+    },
+    changeCurrency() {
+      this.isCurrencyDropdownOpen = false; // Закриваємо меню після вибору
+    },
+    toggleLanguageDropdown() {
+      this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
+    },
+    toggleCurrencyDropdown() {
+      this.isCurrencyDropdownOpen = !this.isCurrencyDropdownOpen;
     },
   },
   mounted() {
-    this.fetchCartCount(); // Завантаження початкового значення
+    this.fetchCartCount();
   },
 };
 </script>
@@ -182,7 +204,7 @@ body {
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 10px; 
+  gap: 15px; 
 }
 
 .nav-links a {
@@ -195,19 +217,75 @@ body {
 .language-currency {
   display: flex;
   align-items: center;
-  gap: 10px; 
+  gap: 30px;
 }
 
-.language {
+.language, .currency {
   display: flex;
   align-items: center;
-  gap: 5px;
+  position: relative;
 }
 
 .language .flag {
-  width: 15px; 
-  height: 10px;
+  width: 20px;
+  height: 15px;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-container select {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 25px 5px 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dropdown-container select:hover,
+.dropdown-container select:focus {
+  border-color: #6b1f1f;
+  box-shadow: 0 0 5px rgba(107, 31, 31, 0.4);
+  outline: none;
+}
+
+
+
+.language:hover .dropdown-container select,
+.currency:hover .dropdown-container select {
+  background-color: #fff7f6;
+  border-color: #e17f7f;
+}
+
+.language .dropdown-container select:focus,
+.currency .dropdown-container select:focus {
+  border-color: #6b1f1f;
+  box-shadow: 0 0 5px rgba(107, 31, 31, 0.5);
+}
+
+.dropdown-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.language:hover .flag,
+.currency:hover .arrow {
+  opacity: 0.8;
+}
+
+.flag {
+  margin-right: 10px;
+}
+
 
 .no-border {
   border: none;
@@ -440,6 +518,91 @@ body {
     transform: scale(1.2);
   }
 }
+.nav-links a,
+.wishlist {
+    color: #333; /* Основний колір тексту */
+    text-decoration: none; /* Прибрали підкреслення */
+    position: relative; /* Для створення псевдоелементів */
+    display: inline-block;
+    transition: color 0.3s ease;
+}
 
+.nav-links a::after, 
+.wishlist::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px; /* Відступ від тексту */
+    width: 0;
+    height: 1.5px; /* Товщина лінії */
+    background: linear-gradient(90deg, #420d0d, #e17f7f); /* Градієнт */
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover, 
+.wishlist:hover {
+    color: #6B1F1F; /* Зміна кольору тексту */
+}
+
+.nav-links a:hover::after, 
+.wishlist:hover::after {
+    width: 100%; /* Розтягування лінії під текстом */
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 5px 10px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
+}
+
+.dropdown-toggle:hover {
+  background-color: #e6e6e6;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  z-index: 1000;
+}
+.arrow {
+  position: absolute;
+  top: 5px;
+  right: -16px;
+  width: 8px;
+  height: 8px;
+  border-left: 2px solid #333;
+  border-bottom: 2px solid #333;
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform 0.3s ease;
+  transform: rotate(-45deg);
+}
+
+.arrow.open {
+  transform: translateY(-50%) rotate(-135deg);
+  transform: rotate(130deg);
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
 
 </style>

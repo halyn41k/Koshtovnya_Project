@@ -101,10 +101,24 @@
       </h2>
       <form @submit.prevent="handleSubmit">
         <label for="email" class="form-label">Електронна пошта</label>
-        <input type="email" id="email" v-model="form.email" required class="form-input" placeholder="Ваша електронна адреса" />
+        <input 
+          type="email" 
+          id="email" 
+          v-model="form.email" 
+          required 
+          class="form-input" 
+          placeholder="Ваша електронна адреса" 
+        />
 
         <label for="message" class="form-label">Повідомлення</label>
-        <textarea id="message" v-model="form.message" required class="form-textarea" placeholder="Ваше повідомлення"></textarea>
+        <textarea 
+          id="message" 
+          v-model="form.message" 
+          required 
+          class="form-textarea" 
+          placeholder="Ваше повідомлення"
+        ></textarea>
+        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 
         <button type="submit" class="form-submit">Надіслати</button>
       </form>
@@ -122,6 +136,7 @@ export default {
         email: '',
         message: '',
       },
+      errorMessage: '', // Для повідомлення про помилки
     };
   },
   methods: {
@@ -129,6 +144,20 @@ export default {
       this.faqOpen[index] = !this.faqOpen[index];
     },
     handleSubmit() {
+      const trimmedMessage = this.form.message.trim();
+      
+      // Валідація
+      if (trimmedMessage.length < 10 || trimmedMessage.length > 200) {
+        this.errorMessage = 'Повідомлення має містити від 10 до 200 символів.';
+        return;
+      }
+      if (!trimmedMessage) {
+        this.errorMessage = 'Повідомлення не може складатися лише з пробілів.';
+        return;
+      }
+
+      // Успішна валідація
+      this.errorMessage = ''; // Очистити попередні помилки
       console.log('Form submitted:', this.form);
       this.form.email = '';
       this.form.message = '';
@@ -137,7 +166,6 @@ export default {
   },
 };
 </script>
-
 
 
 <style scoped>
@@ -441,5 +469,11 @@ export default {
   .about-us__process-image {
     width: 100%;
   }
+
+  .error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
 }
 </style>

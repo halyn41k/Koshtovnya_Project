@@ -2,6 +2,7 @@ import { createI18n } from 'vue-i18n';
 
 const messages = {
     en: {
+      logo: 'Kostovnya',
       handmadeProducts: 'Handmade beaded products',
       exclusiveJewelry: 'Exclusive necklaces, bracelets, and more',
       viewProducts: 'View products',
@@ -24,7 +25,14 @@ const messages = {
       sylyanky: 'Sylyanky',
       earrings: 'Earrings',
       belts: 'Belts',
-      shopByCategory: 'Shop by Category'
+      shopByCategory: 'Shop by Category',
+      userAccount: 'User account',
+      links: 'LINKS',
+      contactUs: 'CONTACT US',
+      followUs: 'FOLLOW US',
+      description: 'We create unique handmade beadwork, preserving the traditions of Ukrainian culture. Here you will find items full of authenticity and beauty.',
+      address: 'Stepana Bandery 22, Kolomyia',
+      
     },
     uk: {
       handmadeProducts: 'Вироби ручної роботи з бісеру',
@@ -49,7 +57,14 @@ const messages = {
       sylyanky: 'Силянки',
       earrings: 'Сережки',
       belts: 'Пояси', 
-      shopByCategory: 'Придбайте за категорією'   
+      shopByCategory: 'Придбайте за категорією',   
+      userAccount: 'Кабінет користувача',
+      links: 'ПОСИЛАННЯ',
+      contactUs: 'ЗВ\'ЯЖІТЬСЯ З НАМИ',
+      followUs: 'СЛІДКУЙТЕ ЗА НАМИ',
+      description: 'Ми виготовляємо унікальні прикраси ручної роботи з бісеру, зберігаючи традиції української культури. У нас ви знайдете вироби, сповнені автентичності та краси.',
+      address: 'вул. Степана Бандери 22, Коломия',
+      logo: 'Коштовня',
     }
   };
   

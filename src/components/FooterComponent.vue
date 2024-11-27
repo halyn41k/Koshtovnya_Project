@@ -4,54 +4,66 @@
       <div class="logo-section">
         <router-link to="/" class="logo-wrapper">
           <img src="@/assets/logo.svg" alt="Коштовня Лого" class="logo-image" />
-          <h1 class="logo-title">Коштовня</h1>
+          <h1 class="logo-title">{{ $t('logo') }}</h1>
         </router-link>
-        <p class="description">
-          Ми виготовляємо унікальні прикраси ручної роботи з бісеру, зберігаючи традиції української культури. У нас ви знайдете вироби, сповнені автентичності та краси.
-        </p>
+        <p class="description">{{ $t('description') }}</p>
       </div>
-
       <div class="footer-links">
         <div class="nav-section">
-          <h2 class="nav-title">ПОСИЛАННЯ</h2>
+          <h2 class="nav-title">{{ $t('links') }}</h2>
           <ul class="footer-list">
-            <li><router-link to="/aboutus" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Про нас</router-link></li>
-            <li><router-link to="/aboutdelivery" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Про Оплату | Доставку</router-link></li>
-            <li><router-link to="/account" class="footer-link"><img src="@/assets/arrow.png" class="icon-left" alt="arrow"> Кабінет користувача</router-link></li>
+            <li>
+              <router-link to="/aboutus" class="footer-link">
+                <img src="@/assets/arrow.png" class="icon-left" alt="arrow" />
+                {{ $t('aboutUs') }}
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/aboutdelivery" class="footer-link">
+                <img src="@/assets/arrow.png" class="icon-left" alt="arrow" />
+                {{ $t('aboutDelivery') }}
+              </router-link>
+            </li>
+            <li>
+              <router-link to="/account" class="footer-link">
+                <img src="@/assets/arrow.png" class="icon-left" alt="arrow" />
+                {{ $t('userAccount') }}
+              </router-link>
+            </li>
           </ul>
         </div>
 
         <div class="nav-section">
-          <h2 class="nav-title">ЗВ'ЯЖІТЬСЯ З НАМИ</h2>
+          <h2 class="nav-title">{{ $t('contactUs') }}</h2>
           <address class="contact-info">
             <div class="contact-item">
-              <img src="@/assets/mark.png" class="icon-left" alt="address">
-              <p class="address">вул. Степана Бандери 22, Коломия</p>
+              <img src="@/assets/mark.png" class="icon-left" alt="address" />
+              <p class="address">{{ $t('address') }}</p>
             </div>
             <div class="divider"></div>
             <div class="contact-item">
-              <img src="@/assets/telephone.png" class="icon-left" alt="phone">
+              <img src="@/assets/telephone.png" class="icon-left" alt="phone" />
               <p class="phone">+380123456789</p>
             </div>
             <div class="divider"></div>
             <div class="contact-item">
-              <img src="@/assets/list.png" class="icon-left" alt="email">
+              <img src="@/assets/list.png" class="icon-left" alt="email" />
               <p class="email">koshtovnya@mail.com</p>
             </div>
           </address>
         </div>
 
         <div class="nav-section">
-          <h2 class="nav-title">СЛІДКУЙТЕ ЗА НАМИ</h2>
+          <h2 class="nav-title">{{ $t('followUs') }}</h2>
           <div class="social-links">
             <a href="https://www.instagram.com" target="_blank" class="social-link">
-              <img src="@/assets/instagram.png" alt="Instagram" class="social-icon">
+              <img src="@/assets/instagram.png" alt="Instagram" class="social-icon" />
             </a>
             <a href="https://www.facebook.com" target="_blank" class="social-link">
-              <img src="@/assets/facebook.png" alt="Facebook" class="social-icon">
+              <img src="@/assets/facebook.png" alt="Facebook" class="social-icon" />
             </a>
             <a href="https://www.tiktok.com" target="_blank" class="social-link">
-              <img src="@/assets/tiktok.png" alt="TikTok" class="social-icon">
+              <img src="@/assets/tiktok.png" alt="TikTok" class="social-icon" />
             </a>
           </div>
         </div>
@@ -59,6 +71,8 @@
     </div>
   </footer>
 </template>
+
+
 
 <script>
 export default {
@@ -133,12 +147,13 @@ export default {
 }
 
 .description {
-  margin-top: -20px;
   font-size: 16px;
   color: black;
   margin-top: 10px;
   font-family: 'Montserrat', serif;
   text-align: left;
+  line-height: 1.6; 
+  
 }
 
 .footer-links {

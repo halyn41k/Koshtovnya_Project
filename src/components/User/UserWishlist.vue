@@ -109,6 +109,33 @@ export default {
     alert('Не вдалося додати товар до кошика.');
   }
 },
+async removeItem(index) {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Будь ласка, увійдіть у свій обліковий запис.");
+      this.$router.push("/login");
+      return;
+    }
+
+    try {
+      const itemId = this.items[index].id; // ID товару, який треба видалити
+      const response = await axios.delete(`http://26.235.139.202:8080/api/wishlist/${itemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.status === 200) {
+        // Видаляємо товар з локального списку
+        this.items.splice(index, 1); // Видаляємо товар за індексом
+        alert("Товар видалено з бажаного.");
+      } else {
+        alert("Не вдалося видалити товар.");
+      }
+
+    } catch (error) {
+      console.error("Помилка при видаленні товару:", error);
+      alert("Не вдалося видалити товар з бажаного.");
+    }
+  },
 
   },
 
