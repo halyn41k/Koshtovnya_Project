@@ -2,7 +2,7 @@
   <section class="reviews-section">
     <h2 class="specifications-title">Відгуки</h2>
 
-    <!-- Якщо відгуки є -->
+    <!-- Список відгуків -->
     <ul v-if="reviews?.length > 0" class="reviews-list">
       <li v-for="review in reviews" :key="review.id" class="review-item">
         <div class="review-header">
@@ -26,12 +26,14 @@
         <p class="review-comment">{{ review.comment }}</p>
         <button class="reply-button" @click="replyToReview(review.id)">Відповісти</button>
 
+        <!-- Форма для відповіді -->
         <div v-if="replyTo === review.id" class="reply-form">
           <textarea v-model="replyText" placeholder="Напишіть відповідь..." required></textarea>
           <button class="reply-submit" @click="submitReply">Відправити</button>
         </div>
 
-        <ul v-if="review.replies" class="reply-list">
+        <!-- Відповіді -->
+        <ul v-if="review.replies?.length" class="reply-list">
           <li v-for="reply in review.replies" :key="reply.id" class="reply-item">
             <h5>{{ reply.user_first_name }} {{ reply.user_last_name }}</h5>
             <p class="reply-date">{{ formatReviewDate(reply.date) }}</p>
@@ -43,65 +45,44 @@
 
     <p v-else class="no-reviews">Немає відгуків для цього товару.</p>
 
+    <!-- Форма для нового відгуку -->
     <button class="review-button" @click="toggleReviewForm">Додати відгук</button>
     <div v-if="showReviewForm" class="review-form">
       <h3>Напишіть відгук</h3>
-
-      <!-- Рейтинг -->
       <div class="rating-selector">
         <label for="rating">Рейтинг:</label>
-        <div class="rating-stars" @mouseleave="resetRating">
+        <div class="rating-stars">
           <span
             v-for="n in 5"
             :key="n"
             class="star"
-            :class="{ filled: n <= (hoverRatingValue !== null ? hoverRatingValue : newReview.rating) }"
+            :class="{ filled: n <= newReview.rating }"
             @mouseover="hoverRating(n)"
+            @mouseleave="resetRating"
             @click="setRating(n)"
           >
             &#9733;
           </span>
         </div>
       </div>
-
-      <!-- Коментар -->
       <textarea v-model="newReview.comment" placeholder="Ваш коментар" required></textarea>
       <button @click="submitReview" class="review-submit">Відправити</button>
     </div>
 
     <!-- Пагінація -->
-<!-- Пагінація -->
-<div class="pagination">
-  <!-- Стрілка "Назад" -->
-  <button
-    :disabled="currentPage === 1"
-    @click="goToPage(currentPage - 1)"
-    class="page-button"
-  >
-    &lt;
-  </button>
-
-  <!-- Номери сторінок -->
-  <button
-    v-for="page in pagesArray"
-    :key="page"
-    :class="{ active: page === currentPage }"
-    @click="goToPage(page)"
-    class="page-button"
-  >
-    {{ page }}
-  </button>
-
-  <!-- Стрілка "Вперед" -->
-  <button
-    :disabled="currentPage === totalPages"
-    @click="goToPage(currentPage + 1)"
-    class="page-button"
-  >
-    &gt;
-  </button>
-</div>
-
+    <div class="pagination">
+      <button :disabled="currentPage === 1" @click="goToPage(currentPage - 1)" class="page-button">&lt;</button>
+      <button
+        v-for="page in pagesArray"
+        :key="page"
+        :class="{ active: page === currentPage }"
+        @click="goToPage(page)"
+        class="page-button"
+      >
+        {{ page }}
+      </button>
+      <button :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)" class="page-button">&gt;</button>
+    </div>
   </section>
 </template>
 
@@ -127,96 +108,150 @@ export default {
       currentPage: 1,
       reviewsPerPage: 5,
       totalReviews: 0,
+      loading: false, // додано для контролю стану завантаження
     };
   },
   computed: {
-    computed: {
-  totalPages() {
-    return Math.ceil(this.totalReviews / this.reviewsPerPage);
-  },
-  pagesArray() {
-    return Array.from({ length: this.totalPages }, (_, index) => index + 1);
-  },
-},
-
+    totalPages() {
+      return Math.ceil(this.totalReviews / this.reviewsPerPage);
+    },
+    pagesArray() {
+      return Array.from({ length: this.totalPages }, (_, index) => index + 1);
+    },
   },
   methods: {
-    parseDate(dateString) {
-      const parts = dateString.split(/[/.-]/);
-      if (parts.length === 3) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-      return dateString;
-    },
-    formatReviewDate(dateString) {
-      const parsedDate = this.parseDate(dateString);
+    async fetchReviews(page = 1) {
       try {
-        const date = new Date(parsedDate);
-        if (isNaN(date)) {
-          throw new Error("Invalid date");
-        }
-        return new Intl.DateTimeFormat('uk-UA', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }).format(date);
+        const response = await fetch(`http://26.235.139.202:8080/api/products/${this.productId}/reviews?page=${page}&limit=${this.reviewsPerPage}`);
+        const data = await response.json();
+        this.reviews = data?.data ?? [];
+        this.totalReviews = data?.total ?? 0;
+        this.currentPage = page;
       } catch (error) {
-        console.error("Помилка форматування дати:", error.message);
-        return "Невідома дата";
+        console.error("Помилка при завантаженні відгуків:", error.message);
+        this.reviews = [];
       }
     },
-    toggleReviewForm() {
-      this.showReviewForm = !this.showReviewForm;
-    },
-    submitReview() {
-      if (this.newReview.comment.trim() === "") {
-        alert("Будь ласка, введіть коментар.");
+    async submitReview() {
+      if (!this.newReview.comment.trim() || this.newReview.rating < 1) {
+        alert("Будь ласка, введіть коментар та виберіть рейтинг.");
         return;
       }
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+      this.loading = true;
 
-      const newReviewData = {
-        id: Date.now(),
-        product_id: this.productId,
-        comment: this.newReview.comment,
-        rating: this.newReview.rating,
-        user_first_name: "Тест",
-        user_last_name: "Користувач",
-        date: new Date().toISOString(),
-      };
+      try {
+        // Логування тіла запиту
+        console.log("Запит:", JSON.stringify({
+          comment: this.newReview.comment,
+          rating: this.newReview.rating,
+        }));
 
-      this.reviews.unshift(newReviewData);
-      this.totalReviews++;
-      this.newReview.comment = "";
-      this.showReviewForm = false;
+        const response = await fetch(`http://26.235.139.202:8080/api/products/${this.productId}/reviews`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            comment: this.newReview.comment,
+            rating: this.newReview.rating,
+          }),
+        });
+
+        // Перевірка статусу відповіді
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Помилка відповіді сервера:", errorText);
+          alert(`Не вдалося додати відгук: ${response.status} ${response.statusText}`);
+          return;
+        }
+
+        // Спроба парсингу JSON
+        let responseData;
+        try {
+          responseData = await response.json();
+          console.log("Відповідь сервера:", responseData);
+        } catch (error) {
+          const responseText = await response.text();
+          console.error("Помилка парсингу JSON:", error);
+          console.error("Текст відповіді сервера:", responseText);
+          alert("Сервер повернув некоректну відповідь.");
+          return;
+        }
+
+        // Якщо все добре
+        alert("Ваш відгук успішно додано!");
+        this.fetchReviews(this.currentPage); // Оновлення списку відгуків
+        this.newReview.comment = ""; // Скидання форми
+        this.newReview.rating = 5;
+        this.showReviewForm = false;
+        this.loading = false;
+      } catch (error) {
+        console.error("Помилка при додаванні відгуку:", error);
+        alert("Виникла проблема з додаванням відгуку.");
+        this.loading = false;
+      }
     },
-    replyToReview(reviewId) {
-      this.replyTo = reviewId;
-      this.replyText = "";
-    },
-    submitReply() {
+
+    async submitReply() {
       if (!this.replyText.trim()) {
         alert("Введіть текст відповіді.");
         return;
       }
-
-      const replyData = {
-        id: Date.now(),
-        parentReviewId: this.replyTo,
-        comment: this.replyText,
-        user_first_name: "Адмін",
-        user_last_name: "Адміненко",
-        date: new Date().toISOString(),
-      };
-
-      const reviewIndex = this.reviews.findIndex((review) => review.id === this.replyTo);
-      if (reviewIndex !== -1) {
-        if (!this.reviews[reviewIndex].replies) {
-          this.reviews[reviewIndex].replies = [];
-        }
-        this.reviews[reviewIndex].replies.push(replyData);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
       }
+      this.loading = true;
 
-      this.replyTo = null;
+      try {
+        const response = await fetch(`http://26.235.139.202:8080/api/reviews/${this.replyTo}/reply`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            comment: this.replyText,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Помилка відповіді сервера:", errorText);
+          alert(`Помилка: ${response.status} ${response.statusText}`);
+          return;
+        }
+
+        const data = await response.json();
+        alert("Відповідь успішно додано!");
+        console.log("Дані відповіді:", data);
+        this.fetchReviews(this.currentPage);
+        this.replyTo = null;
+        this.replyText = "";
+        this.loading = false;
+      } catch (error) {
+        console.error("Помилка при додаванні відповіді:", error);
+        alert("Виникла проблема з додаванням відповіді.");
+        this.loading = false;
+      }
+    },
+
+    toggleReviewForm() {
+      this.showReviewForm = !this.showReviewForm;
+    },
+    replyToReview(reviewId) {
+      this.replyTo = reviewId;
       this.replyText = "";
     },
     hoverRating(n) {
@@ -228,22 +263,46 @@ export default {
     setRating(n) {
       this.newReview.rating = n;
     },
-    fetchReviews(page = 1) {
-      fetch(`http://26.235.139.202:8080/api/products/${this.productId}/reviews?page=${page}&limit=${this.reviewsPerPage}`)
-        .then((response) => response.json())
-        .then((data) => {
-          this.reviews = data?.data ?? [];
-          this.totalReviews = data?.total ?? 0;
-          this.currentPage = page;
-        })
-        .catch((error) => {
-          console.error("Помилка при завантаженні відгуків:", error.message);
-          this.reviews = [];
-        });
-    },
     goToPage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.fetchReviews(page);
+      }
+    },
+    parseDate(dateString) {
+      const isoDate = new Date(dateString);
+      if (!isNaN(isoDate.getTime())) {
+        return isoDate;
+      }
+
+      const regex = /(\d+)\s(\S+)\s(\d{4}),\s(\d{1,2}):(\d{2})/;
+      const match = dateString.match(regex);
+      if (match) {
+        const [_, day, month, year, hours, minutes] = match;
+        const months = [
+          "січня", "лютого", "березня", "квітня", "травня", "червня",
+          "липня", "серпня", "вересня", "жовтня", "листопада", "грудня",
+        ];
+        const monthIndex = months.indexOf(month.toLowerCase());
+        if (monthIndex !== -1) {
+          return new Date(year, monthIndex, day, hours, minutes);
+        }
+      }
+
+      throw new Error("Invalid date format");
+    },
+    formatReviewDate(dateString) {
+      try {
+        const date = this.parseDate(dateString);
+        return new Intl.DateTimeFormat("uk-UA", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(date);
+      } catch (error) {
+        console.error("Помилка форматування дати:", error.message, dateString);
+        return "Невідома дата";
       }
     },
   },
@@ -252,6 +311,7 @@ export default {
   },
 };
 </script>
+
 
 
 
