@@ -211,7 +211,7 @@ describe('CategoryProduct.vue', () => {
     consoleErrorMock.mockRestore();
   });
   
-  it('TC5.2: API повертає масив категорій із неповними даними (без image_url або name)', async () => {
+  it('API повертає масив категорій із неповними даними (без image_url або name)', async () => {
     // Імітуємо, що API повертає масив категорій із даними, де поля містять значення
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
@@ -250,7 +250,7 @@ describe('CategoryProduct.vue', () => {
     expect(categoryItems[1].find('.category-title').text()).toBe('Category 2');
   });  
 
-  it('TC4.1: Відображення запасних категорій, якщо сервер API повертає помилку 500', async () => {
+  it('Відображення запасних категорій, якщо сервер API повертає помилку 500', async () => {
     // Імітуємо помилку 500 від API
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
@@ -292,7 +292,7 @@ describe('CategoryProduct.vue', () => {
     consoleErrorMock.mockRestore();
   });
 
-  it('TC4.2: Відображення запасних категорій, якщо API повертає некоректну відповідь (не JSON)', async () => {
+  it('Відображення запасних категорій, якщо API повертає некоректну відповідь (не JSON)', async () => {
     // Імітуємо, що API повертає некоректну відповідь
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
@@ -336,7 +336,7 @@ describe('CategoryProduct.vue', () => {
     consoleErrorMock.mockRestore();
   });
   
-  it('TC4.3: Відображення запасних категорій, якщо API недоступне або тайм-аут', async () => {
+  it('Відображення запасних категорій, якщо API недоступне або тайм-аут', async () => {
     // Імітуємо помилку тайм-ауту або недоступності API
     global.fetch.mockImplementationOnce(() => 
       Promise.reject(new Error('Failed to fetch')) // Помилка недоступності або тайм-ауту
@@ -377,5 +377,76 @@ describe('CategoryProduct.vue', () => {
     consoleErrorMock.mockRestore();
   });
   
-
+  it('Відображення зображення, назви, та стрілки у кожному елементі категорії', async () => {
+    // Чекаємо завершення асинхронного виклику fetchCategories
+    await wrapper.vm.$nextTick();
+  
+    // Отримуємо всі елементи категорій
+    const categoryItems = wrapper.findAll('.category-item');
+  
+    // Перевіряємо, що всі елементи категорій правильно відображаються
+    categoryItems.forEach((item, index) => {
+      // Перевірка наявності зображення
+      const image = item.find('.category-image');
+      expect(image.exists()).toBe(true);
+      expect(image.attributes('src')).toBe(wrapper.vm.categories[index].image_url);
+  
+      // Перевірка наявності назви
+      const title = item.find('.category-title');
+      expect(title.exists()).toBe(true);
+      expect(title.text()).toBe(wrapper.vm.categories[index].name);
+  
+      // Перевірка наявності стрілки
+      const arrow = item.find('.arrow');
+      expect(arrow.exists()).toBe(true);
+      expect(arrow.text()).toBe('→');
+    });
+  });
+  
+  it('Відображення квадратів у перших, третіх і п’ятих категоріях', async () => {
+    // Чекаємо завершення асинхронного виклику fetchCategories
+    await wrapper.vm.$nextTick();
+  
+    // Отримуємо всі елементи категорій
+    const categoryItems = wrapper.findAll('.category-item');
+  
+    // Перевіряємо, що кількість категорій відповідає кількості у масиві
+    expect(categoryItems.length).toBe(wrapper.vm.categories.length);
+  
+    // Перевіряємо першу, третю та п’яту категорії на наявність квадратів
+    [0, 2, 4].forEach((index) => {
+      // Перевіряємо, чи існує категорія за цим індексом
+      if (categoryItems[index]) {
+        const lightSquare = categoryItems[index].find('.light-square');
+        const darkSquare = categoryItems[index].find('.dark-square');
+  
+        // Перевірка наявності квадратів
+        expect(lightSquare.exists()).toBe(true);
+        expect(darkSquare.exists()).toBe(true);
+      }
+    });
+  
+    // Перевіряємо, що у інших категорій квадратів немає
+    [1, 3, 5].forEach((index) => {
+      // Перевіряємо, чи існує категорія за цим індексом
+      if (categoryItems[index]) {
+        const lightSquare = categoryItems[index].find('.light-square');
+        const darkSquare = categoryItems[index].find('.dark-square');
+  
+        // Перевірка відсутності квадратів
+        expect(lightSquare.exists()).toBe(false);
+        expect(darkSquare.exists()).toBe(false);
+      }
+    });
+  });
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 });
