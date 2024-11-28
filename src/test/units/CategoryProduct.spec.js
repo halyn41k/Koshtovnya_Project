@@ -183,5 +183,71 @@ describe('CategoryProduct.vue', () => {
     });
   });
   
+  it('API повертає порожній масив категорій', async () => {
+    // Імітуємо, що API повертає порожній масив
+    global.fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        headers: {
+          get: jest.fn().mockReturnValue('application/json'),
+        },
+        json: () => Promise.resolve({ data: [] }), // Порожній масив
+      })
+    );
+  
+    // Виклик fetchCategories для отримання даних
+    await wrapper.vm.fetchCategories();
+  
+    // Перевіряємо, що масив категорій порожній
+    expect(wrapper.vm.categories).toEqual([]);
+  
+    // Перевіряємо, що DOM-елементи категорій не відображаються
+    const categoryItems = wrapper.findAll('.category-item');
+    expect(categoryItems.length).toBe(0);
+  
+    // Перевіряємо, чи не виникає помилок в консолі
+    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
+    expect(consoleErrorMock).not.toHaveBeenCalled();
+    consoleErrorMock.mockRestore();
+  });
+  
+  it('TC5.2: API повертає масив категорій із неповними даними (без image_url або name)', async () => {
+    // Імітуємо, що API повертає масив категорій із даними, де поля містять значення
+    global.fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: true,
+        headers: {
+          get: jest.fn().mockReturnValue('application/json'),
+        },
+        json: () => Promise.resolve({
+          data: [
+            { id: 1, name: 'Category 1', image_url: 'test-url-1' }, // Повне значення
+            { id: 2, name: 'Category 2', image_url: 'test-url-2' }, // Повне значення
+          ],
+        }),
+      })
+    );
+  
+    // Викликаємо fetchCategories і чекаємо результату
+    await wrapper.vm.$nextTick();
+  
+    // Очікуємо, що компонент використовує API-відповідь без змін
+    expect(wrapper.vm.categories).toEqual([
+      { id: 1, name: 'Category 1', image_url: 'test-url-1', url: '/bracelets' },
+      { id: 2, name: 'Category 2', image_url: 'test-url-2', url: '/herdany' },
+    ]);
+  
+    // Перевіряємо, що DOM відображає ці дані
+    const categoryItems = wrapper.findAll('.category-item');
+    expect(categoryItems.length).toBe(2);
+  
+    // Перевіряємо перший елемент
+    expect(categoryItems[0].find('img').attributes('src')).toBe('test-url-1');
+    expect(categoryItems[0].find('.category-title').text()).toBe('Category 1');
+  
+    // Перевіряємо другий елемент
+    expect(categoryItems[1].find('img').attributes('src')).toBe('test-url-2');
+    expect(categoryItems[1].find('.category-title').text()).toBe('Category 2');
+  });  
 
 });
