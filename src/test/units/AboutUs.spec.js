@@ -14,7 +14,8 @@ describe('AboutUs.vue', () => {
  
   // Мок 
   beforeAll(() => { 
-    window.alert = jest.fn(); 
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'log').mockImplementation(() => {}); // Мокаємо console.log
   }); 
  
   it('повинен відображати головний заголовок', () => { 
