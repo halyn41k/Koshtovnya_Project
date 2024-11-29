@@ -61,8 +61,19 @@
                   </div>
                 </div>
 
-                <button class="buy-button">
+                <button 
+                  v-if="product.is_available" 
+                  class="buy-button"
+                >
                   <span class="buy-text">Купити</span>
+                </button>
+
+                <button 
+                  v-else 
+                  class="notify-button" 
+                  @click="notifyWhenAvailable"
+                >
+                  <span class="notify-text">Повідомити про наявність</span>
                 </button>
 
                 <!-- Сердечко (вибір у список бажаного) -->
@@ -297,6 +308,50 @@ export default {
         return null; // Помилка при перевірці
       }
     },
+    async notifyWhenAvailable() {
+    const profile = await this.checkAuthAndFetchProfile();
+    if (!profile) {
+      alert("Будь ласка, увійдіть у свій обліковий запис.");
+      this.$router.push("/login");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Будь ласка, увійдіть у свій обліковий запис.");
+      this.$router.push("/login");
+      return;
+    }
+
+    try {
+      await axios.post(
+        "http://26.235.139.202:8080/api/notification", 
+        { 
+          product_id: this.productId 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      alert(`Ви будете повідомлені, коли ${this.product.name} з'явиться в наявності!`);
+    } catch (error) {
+      console.error("Помилка при реєстрації сповіщення:", error);
+      
+      // More specific error handling
+      if (error.response) {
+        if (error.response.status === 422) {
+          alert("Ви вже підписані на сповіщення про цей товар.");
+        } else {
+          alert("Не вдалося підписатися на сповіщення. Спробуйте пізніше.");
+        }
+      } else {
+        alert("Помилка мережі. Перевірте підключення.");
+      }
+    }
+  },
     // Збільшення кількості товару
     increaseQuantity() {
       if (this.quantity < this.product.quantity) {
@@ -768,6 +823,24 @@ export default {
   transition: transform 0.2s ease-in-out;
 }
 
+.notify-button {
+  max-width: 250px;
+  display: flex;
+  justify-content: center;
+  padding: 12px 17px;
+  width: 250px;
+  color: #FFF;
+  align-items: center;
+  background: #A01212; /* Darker red to differentiate from buy button */
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'Merriweather', serif;
+  text-align: center;
+}
 
+.notify-button:hover {
+  background: #6B1F1F; /* Even darker shade on hover */
+}
   </style>
   

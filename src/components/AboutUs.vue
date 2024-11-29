@@ -10,25 +10,25 @@
     
     <section class="about-us__content">
       <div class="about-us__text-section">
-        <h2 class="section-title">Історія заснування "Коштовня"</h2>
-        <p class="about-us__text">
+        <h2 class="section-title fade-in">Історія заснування "Коштовня"</h2>
+        <p class="about-us__text fade-in">
           У 2015 році зародилася ідея, яка почалася з простого захоплення — створення традиційних герданів із бісеру.
             Спочатку це було заняттям для душі, відтворюючи автентичні візерунки та орнаменти. Кожен виріб випромінював
             свою унікальну енергію, об'єднуючи традиційні українські мотиви з сучасними елементами. Це дозволяло
             створювати прикраси, які мали не лише естетичну цінність, але й несли в собі глибокий символізм.
         </p>
       </div>
-      <div class="about-us__image-wrapper">
+      <div class="about-us__image-wrapper fade-in">
         <img src="@/assets/ukrainepattern.png" alt="Традиційні гердани та прикраси" class="about-us__image" loading="lazy" />
       </div>
     </section>
     
-    <section class="about-us__growth">
+    <section class="about-us__growth fade-in">
       <div class="about-us__image-container">
-        <img src="@/assets/woman.png" alt="Розвиток бренду Коштовня" class="about-us__background-image with-frame" />
+        <img src="@/assets/woman.png" alt="Розвиток бренду Коштовня" class="about-us__background-image with-frame fade-in" />
       </div>
-      <div class="about-us__text-content">
-        <p class="about-us__description">
+      <div class="about-us__text-content fade-in">
+        <p class="about-us__description fade-in">
           Із часом прикраси почали привертати увагу друзів, знайомих, а потім і ширшого кола людей. Інтерес до виробів
             ручної роботи зростав, і це стало поштовхом до розвитку маленького бізнесу. Тоді стало зрозуміло, що це більше,
             ніж просто хобі, і цей проект має потенціал вирости в щось більше.
@@ -40,7 +40,7 @@
     </section>
     
     <footer class="about-us__footer">
-      <p class="about-us__conclusion">
+      <p class="about-us__conclusion fade-in">
         "Коштовня" виросла з простого захоплення у справжній бренд, де кожна прикраса створюється з душею та повагою до
             традицій. У виробах поєднується багатовікова українська культура та сучасні тенденції, що робить кожну річ
             унікальною і неповторною.
@@ -48,7 +48,7 @@
     </footer>
 
     <!-- FAQ Section -->
-    <section class="faq-section">
+    <section class="faq-section fade-in">
       <h2 class="faq-title">
         <div class="line"></div>
         <span>Часті запитання</span>
@@ -139,7 +139,26 @@ export default {
       errorMessage: '', // Для повідомлення про помилки
     };
   },
+  mounted() {
+  this.observeElements();
+},
   methods: {
+    observeElements() {
+    const elements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target); // Зупинити спостереження після появи
+          }
+        });
+      },
+      { threshold: 0.1 } // Показувати при 10% видимості
+    );
+
+    elements.forEach((el) => observer.observe(el));
+  },
     toggleFAQ(index) {
       this.faqOpen[index] = !this.faqOpen[index];
     },
@@ -445,6 +464,18 @@ export default {
 .form-submit:hover {
   background-color: #8e0e0e;
 }
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* Responsive adjustments */
 @media (max-width: 991px) {
   .about-us {

@@ -11,17 +11,17 @@
         <section class="delivery-section">
           <div class="text-and-image">
             <div class="text-content">
-              <h2 class="section-title">Доставка</h2>
-              <p class="delivery-description">
+              <h2 class="section-title fade-in">Доставка</h2>
+              <p class="delivery-description fade-in">
                 Ми здійснюємо доставку по всій території України за допомогою таких перевізників:
               </p>
-              <p><b>- Нова Пошта</b></p>
+              <p><b>- Нова Пошта </b></p> 
               <p><b>- Укрпошта</b></p>
-              <section class="delivery-conditions">
+              <section class="delivery-conditions fade-in">
                 <h2 class="section-title">1. Умови доставки:</h2>
                 <ul class="delivery-list">
                   <li class="delivery-item">
-                    <h4 class="delivery-company">
+                    <h4 class="delivery-company ">
                       • Нова Пошта
                       <img src="@/assets/novapost.png" alt="Нова Пошта" class="company-icon" />
                     </h4>
@@ -53,7 +53,7 @@
           </div>
         </section>
   
-        <section class="payment-section">
+        <section class="payment-section fade-in">
           <h2 class="section-title">2. Оплата</h2>
           <div class="text-and-image">
             <div class="text-content">
@@ -85,7 +85,7 @@
           </div>
         </section>
   
-        <section class="additional-conditions">
+        <section class="additional-conditions fade-in">
           <h3 class="subsection-title">Додаткові умови:</h3>
           <ul class="conditions-list">
             <li class="condition-item">
@@ -98,13 +98,40 @@
         </section>
       </main>
   
-      <footer class="info-footer">
+      <footer class="info-footer fade-in">
         <p class="thank-you-message">Дякуємо, що обрали наш магазин!</p>
       </footer>
   
       <div class="background-image"></div>
     </article>
   </template>
+
+<script>
+export default {
+  name: 'AboutDelivery',
+mounted() {
+  this.observeElements();
+},
+methods: {
+  observeElements() {
+    const elements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target); // Зупинити спостереження після появи
+          }
+        });
+      },
+      { threshold: 0.1 } // Показувати при 10% видимості
+    );
+
+    elements.forEach((el) => observer.observe(el));
+  },
+}
+}
+</script>
   
   <style scoped>
   @font-face {
@@ -266,6 +293,17 @@
     background-size: 80%;
     pointer-events: none;
   }
+  .fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
   
   @media (max-width: 991px) {
     .text-and-image {

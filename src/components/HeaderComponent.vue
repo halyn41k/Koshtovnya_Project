@@ -58,6 +58,7 @@
       </router-link>
 
       <div class="user-cart">
+
         <router-link to="/account" class="user-icon">
           <img src="@/assets/user-svgrepo-com (1).svg" alt="User Icon" class="icon" />
         </router-link>
@@ -69,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Навігація -->
     <nav class="nav-menu">
       <ul>
         <li><router-link to="/bracelets">{{ $t('bracelets') }}</router-link></li>
@@ -128,17 +128,19 @@ export default {
     },
     changeLanguage() {
       this.$i18n.locale = this.selectedLanguage;
-      this.isLanguageDropdownOpen = false; // Закриваємо меню після вибору
+      this.isLanguageDropdownOpen = true; // Закриваємо меню після вибору
     },
     changeCurrency() {
-      this.isCurrencyDropdownOpen = false; // Закриваємо меню після вибору
+      this.isCurrencyDropdownOpen = true; // Закриваємо меню після вибору
     },
     toggleLanguageDropdown() {
-      this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
-    },
-    toggleCurrencyDropdown() {
-      this.isCurrencyDropdownOpen = !this.isCurrencyDropdownOpen;
-    },
+    console.log("Language dropdown toggled:", this.isLanguageDropdownOpen);
+    this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
+  },
+  toggleCurrencyDropdown() {
+    console.log("Currency dropdown toggled:", this.isCurrencyDropdownOpen);
+    this.isCurrencyDropdownOpen = !this.isCurrencyDropdownOpen;
+  },
   },
   mounted() {
     this.fetchCartCount();

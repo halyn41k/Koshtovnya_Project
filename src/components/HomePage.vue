@@ -1,55 +1,55 @@
 <template>
   <div class="main-container">
-    <div class="welcome-image"></div>
+    <div class="welcome-image fade-in"></div>
 
     <div class="text-container">
-      <div class="handmade-beaded-products">
+      <div class="handmade-beaded-products fade-in">
         {{ $t('handmadeProducts') }}
       </div>
-      <div class="exclusive-necklaces-bracelets-earrings">
+      <div class="exclusive-necklaces-bracelets-earrings fade-in">
         {{ $t('exclusiveJewelry') }}
       </div>
-      <router-link to="/allproduct" class="view-products-button">
+      <router-link to="/allproduct" class="view-products-button fade-in">
         <button class="view-products-button">{{ $t('viewProducts') }}</button>
       </router-link>
     </div>
 
-    <div class="content-container">
-      <div class="left-image-container">
-        <div class="girl-image"></div>
+    <div class="content-container fade-in">
+      <div class="left-image-container fade-in">
+        <div class="girl-image fade-in"></div>
         <div class="pattern-image"></div>
       </div>
-      <div class="right-text-container">
-        <div class="quote-text">
-          <span class="ukrainian-heritage">
+      <div class="right-text-container fade-in">
+        <div class="quote-text fade-in">
+          <span class="ukrainian-heritage fade-in">
             {{ $t('quoteText') }}
           </span>
         </div>
-        <span class="gnat-khotkevich">{{ $t('gnatKhotkevich') }}</span>
+        <span class="gnat-khotkevich fade-in">{{ $t('gnatKhotkevich') }}</span>
       </div>
     </div>
 
     <section>
-      <PopularProducts />
+      <PopularProducts fade-in/>
     </section>
 
     <section>
-      <NewArrivals />
+      <NewArrivals fade-in/>
     </section>
 
-    <div class="instagram-section">
-  <div class="instagram-text-container">
-    <img src="@/assets/instapattern.png" alt="Instagram pattern" class="insta-pattern-image" />
+    <div class="instagram-section fade-in">
+  <div class="instagram-text-container fade-in">
+    <img src="@/assets/instapattern.png" alt="Instagram pattern" class="insta-pattern-image fade-in" />
     <p class="follow-text">
       {{ $t('followInsta') }}<br /> <!-- Використовуємо <br /> для переходу на новий рядок -->
       {{ $t('dontMissTheMost') }} <!-- Текст на другому рядку -->
     </p>
-    <p class="instagram-handle">
-      <span class="instagram-handle-link">@koshtovnya_jewelry</span>
+    <p class="instagram-handle fade-in">
+      <span class="instagram-handle-link fade-in">@koshtovnya_jewelry</span>
     </p>
   </div>
 
-  <div class="instagram-grid">
+  <div class="instagram-grid fade-in">
     <div class="instagram-image">
       <img src="@/assets/pic1.png" alt="Instagram Image 1" />
     </div>
@@ -76,7 +76,7 @@
     </div>
   </div>
 </div>
-    <CategoryProduct />
+    <CategoryProduct fade-in />
   </div>
 </template>
 
@@ -94,6 +94,8 @@ export default {
   mounted() {
     this.fetchPopularProducts(); // Завантаження популярних продуктів при монтуванні компонента
     this.fetchNewArrivals(); // Завантаження нових надходжень при монтуванні компонента
+    this.observeElements();
+
   },
   data() {
   return {
@@ -153,6 +155,22 @@ export default {
   };
 },
   methods: {
+    observeElements() {
+    const elements = document.querySelectorAll('.fade-in');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target); // Зупинити спостереження після появи
+          }
+        });
+      },
+      { threshold: 0.1 } // Показувати при 10% видимості
+    );
+
+    elements.forEach((el) => observer.observe(el));
+  },
     async fetchPopularProducts() { // Завантаження популярних товарів з API
       try {
         const response = await fetch("http://26.235.139.202:8080/api/popular-products"); // Запит до API
@@ -442,4 +460,15 @@ export default {
       margin-top: 15px;
     }
   }
+  .fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 </style>
