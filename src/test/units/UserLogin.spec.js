@@ -224,5 +224,46 @@ describe('UserLogin.vue', () => {
     expect(loginIcon.attributes('alt')).toBe('');
   });
   
+  it('Відображає повідомлення про помилку при невірних даних', async () => {
+    global.fetch.mockImplementationOnce(() =>
+      Promise.resolve({
+        ok: false,
+        status: 401,
+        json: () => Promise.resolve({ message: 'Не вдалося увійти. Перевірте ваші дані.' }),
+      })
+    );
   
+    const emailInput = wrapper.find('input#email');
+    const passwordInput = wrapper.find('input#password');
+    const loginForm = wrapper.find('form.login-form');
+  
+    await emailInput.setValue('wrong@example.com');
+    await passwordInput.setValue('wrongpassword');
+    await loginForm.trigger('submit.prevent');
+  
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/login',
+      expect.any(Object)
+    );
+    expect(global.alert).toHaveBeenCalledWith('Не вдалося увійти. Перевірте ваші дані.');
+  });
+  
+  it('Відображає повідомлення про помилку при проблемах із сервером', async () => {
+    global.fetch.mockImplementationOnce(() => Promise.reject(new Error('Server is down')));
+
+    const emailInput = wrapper.find('input#email');
+    const passwordInput = wrapper.find('input#password');
+    const loginForm = wrapper.find('form.login-form');
+
+    await emailInput.setValue('test@example.com');
+    await passwordInput.setValue('password123');
+    await loginForm.trigger('submit.prevent');
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/login',
+      expect.any(Object)
+    );
+    expect(global.alert).toHaveBeenCalledWith('Не вдалося увійти. Перевірте ваші дані.');
+    expect(console.error).toHaveBeenCalledWith('Помилка входу:', 'Server is down');
+  });
 }); 
