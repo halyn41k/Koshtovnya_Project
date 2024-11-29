@@ -32,8 +32,8 @@ describe('UserLogin.vue', () => {
   });
 
   afterAll(() => {
-    // Відновлюємо оригінальну поведінку console.error
-    console.error.mockRestore();
+    console.error.mockRestore(); // Відновлюємо оригінальну поведінку console.error
+    console.log.mockRestore(); // Відновлюємо оригінальну поведінку console.log
   });
 
   beforeEach(() => {
@@ -366,5 +366,34 @@ describe('UserLogin.vue', () => {
       expect(ariaLabel).toBeTruthy(); // Перевірка, що aria-label існує
       expect(ariaLabel.trim().length).toBeGreaterThan(0); // Перевірка, що aria-label не порожній
     });
+  });
+
+  it('Іконки для пароля відображаються правильно', () => {
+    const eyeOpenIcon = wrapper.find('.toggle-password-button span:first-child');
+    const eyeClosedIcon = wrapper.find('.toggle-password-button span:last-child');
+
+    expect(eyeOpenIcon.exists()).toBe(true);
+    expect(eyeClosedIcon.exists()).toBe(true);
+  });
+
+  it('Кнопка входу має правильний клас', () => {
+    const loginButton = wrapper.find('.login-button');
+    expect(loginButton.exists()).toBe(true);
+    expect(loginButton.classes()).toContain('login-button'); // Перевірка класу
+  });
+  
+  it('Інпути мають правильні класи', () => {
+    const inputs = wrapper.findAll('.form-input');
+    expect(inputs).toHaveLength(2); // Має бути два інпути
+    inputs.forEach(input => {
+      expect(input.classes()).toContain('form-input'); // Перевірка класу
+    });
+  });
+  
+  it('Текст має правильний клас та текст', () => {
+    const sectionTitle = wrapper.find('.section-title');
+    expect(sectionTitle.exists()).toBe(true);
+    expect(sectionTitle.text()).toBe('Вхід'); // Перевірка тексту
+    expect(sectionTitle.classes()).toContain('section-title'); // Перевірка класу
   });
 }); 
