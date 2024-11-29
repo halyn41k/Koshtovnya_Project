@@ -46,7 +46,8 @@ describe('UserLogin.vue', () => {
         },
         stubs: {
           'router-link': {
-            template: '<a><slot /></a>', // Мокаємо router-link
+            template: '<a :href="to"><slot /></a>', // Заглушка для router-link із генерацією href
+            props: ['to'],
           },
         },
       },
@@ -337,5 +338,33 @@ describe('UserLogin.vue', () => {
   
     // Очистка мока
     fetchMock.mockRestore();
+  });
+
+  it('посилання "Створіть його тут" веде на коректний роут /registration', () => {
+    // Знаходимо посилання
+    const registrationLink = wrapper.find('a.signup-link');
+
+    // Перевіряємо, що посилання існує
+    expect(registrationLink.exists()).toBe(true);
+
+    // Перевіряємо, що атрибут href вказує на правильний маршрут
+    expect(registrationLink.attributes('href')).toBe('/registration');
+  });
+   
+  it('Перевіряє, що всі елементи мають коректний aria-label', () => {
+    const emailInput = wrapper.find('#email');
+    const passwordInput = wrapper.find('#password');
+
+    expect(emailInput.attributes('aria-label')).toBe('Email');
+    expect(passwordInput.attributes('aria-label')).toBe('Пароль');
+  });
+
+  it('Перевіряє, що aria-label не порожній на інпут елементах', () => {
+    const inputs = wrapper.findAll('input');
+    inputs.forEach(input => {
+      const ariaLabel = input.attributes('aria-label');
+      expect(ariaLabel).toBeTruthy(); // Перевірка, що aria-label існує
+      expect(ariaLabel.trim().length).toBeGreaterThan(0); // Перевірка, що aria-label не порожній
+    });
   });
 }); 
