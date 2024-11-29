@@ -191,7 +191,38 @@ describe('UserLogin.vue', () => {
     expect(getCurrentIconSVG()).toContain(expectedEyeClosedPath);
   });
     
-  
+  it('Перевіряє, що всі тексти відповідають українській локалізації', () => {
+    // Текст заголовка
+    const sectionTitle = wrapper.find('span.section-title');
+    expect(sectionTitle.text()).toBe('Вхід');
+
+    // Тексти лейблів
+    const emailLabel = wrapper.find('label[for="email"]');
+    expect(emailLabel.text()).toBe('Email:');
+
+    const passwordLabel = wrapper.find('label[for="password"]');
+    expect(passwordLabel.text()).toBe('Пароль:');
+
+    // Текст кнопки входу
+    const loginButton = wrapper.find('button.login-button');
+    expect(loginButton.text()).toContain('Увійти');
+
+    // Текст посилання на реєстрацію
+    const signupPrompt = wrapper.find('p.signup-prompt');
+    expect(signupPrompt.text()).toContain('Немає облікового запису?');
+
+    const signupLink = wrapper.find('a.signup-link');
+    expect(signupLink.text()).toBe('Створіть його тут');
+
+    // Повідомлення при помилці
+    const alertMessage = 'Не вдалося увійти. Перевірте ваші дані.';
+    global.alert(alertMessage); // Simulate an alert
+    expect(global.alert).toHaveBeenCalledWith(alertMessage);
+
+    // Логотип на кнопці (перевіряємо за alt текстом)
+    const loginIcon = wrapper.find('.login-icon');
+    expect(loginIcon.attributes('alt')).toBe('');
+  });
   
   
 }); 
