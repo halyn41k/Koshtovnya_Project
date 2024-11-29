@@ -293,4 +293,49 @@ describe('UserLogin.vue', () => {
 
     expect(wrapper.vm.$router.push).toHaveBeenCalledWith({ name: 'AccountInfo' });
   });
+
+  it('викликає метод submitLogin при сабміті форми', async () => {
+    // Мокаємо метод submitLogin
+    const submitLoginMock = jest.fn();
+  
+    wrapper.vm.submitLogin = submitLoginMock; // Додаємо мок-метод до інстансу компонента
+  
+    // Знаходимо форму та імітуємо сабміт
+    await wrapper.find('.login-form').trigger('submit.prevent');
+  
+    // Перевіряємо, що метод submitLogin викликано
+    expect(submitLoginMock).toHaveBeenCalled();
+  });
+
+  it('надсилає правильні дані у запиті до API', async () => {
+    // Мокаємо глобальний fetch
+    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({ token: 'mock-token' }),
+    });
+  
+    // Вводимо тестові дані
+    const testEmail = 'test@example.com';
+    const testPassword = 'password123';
+    await wrapper.find('#email').setValue(testEmail);
+    await wrapper.find('#password').setValue(testPassword);
+  
+    // Сабмітимо форму
+    await wrapper.find('.login-form').trigger('submit.prevent');
+  
+    // Перевіряємо, що fetch був викликаний з правильними аргументами
+    expect(fetchMock).toHaveBeenCalledWith('http://26.235.139.202:8080/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: testEmail,
+        password: testPassword,
+      }),
+    });
+  
+    // Очистка мока
+    fetchMock.mockRestore();
+  });
 }); 
