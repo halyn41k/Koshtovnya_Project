@@ -14,6 +14,9 @@ global.fetch = jest.fn(() =>
   })
 );
 
+Storage.prototype.setItem = jest.fn();
+Storage.prototype.getItem = jest.fn(() => 'mock-token');
+
 // Мок для window.alert
 global.alert = jest.fn();
 
@@ -265,5 +268,29 @@ describe('UserLogin.vue', () => {
     );
     expect(global.alert).toHaveBeenCalledWith('Не вдалося увійти. Перевірте ваші дані.');
     expect(console.error).toHaveBeenCalledWith('Помилка входу:', 'Server is down');
+  });
+
+  it('Зберігає токен у localStorage після успішного входу', async () => {
+    const emailInput = wrapper.find('input#email');
+    const passwordInput = wrapper.find('input#password');
+    const loginForm = wrapper.find('form.login-form');
+
+    await emailInput.setValue('test@example.com');
+    await passwordInput.setValue('password123');
+    await loginForm.trigger('submit.prevent');
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/login',
+      expect.any(Object)
+    );
+    expect(localStorage.setItem).toHaveBeenCalledWith('token', 'mock-token');
+    expect(localStorage.getItem).toHaveBeenCalledWith('token');
+  });
+
+  it('Перенаправляє після успішного збереження токена', async () => {
+    const loginForm = wrapper.find('form.login-form');
+    await loginForm.trigger('submit.prevent');
+
+    expect(wrapper.vm.$router.push).toHaveBeenCalledWith({ name: 'AccountInfo' });
   });
 }); 
