@@ -1,6 +1,13 @@
-test.skip("Temporary skipped test", () => {});
-/*import { shallowMount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import AboutDelivery from '../../components/AboutDelivery.vue';
+
+// Мок для IntersectionObserver
+global.IntersectionObserver = class {
+  constructor() {}
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 
 describe('AboutDelivery.vue', () => {
   let wrapper;
@@ -10,7 +17,9 @@ describe('AboutDelivery.vue', () => {
   });
 
   afterEach(() => {
-    wrapper.unmount(); // Очищення після кожного тесту
+    if (wrapper) {
+      wrapper.unmount(); // Очищення після кожного тесту
+    }
   });
 
   it('повинен відображати головний заголовок', () => {
@@ -35,11 +44,8 @@ describe('AboutDelivery.vue', () => {
     const deliveryItems = wrapper.findAll('.delivery-item');
     expect(deliveryItems.length).toBe(2);
 
-    const novaPoshta = deliveryItems.at(0).find('.delivery-company').text();
-    expect(novaPoshta).toContain('Нова Пошта');
-
-    const ukrPost = deliveryItems.at(1).find('.delivery-company').text();
-    expect(ukrPost).toContain('Укрпошта');
+    expect(deliveryItems.at(0).find('.delivery-company').text()).toContain('Нова Пошта');
+    expect(deliveryItems.at(1).find('.delivery-company').text()).toContain('Укрпошта');
   });
 
   it('повинен відображати секцію "Оплата" з правильним заголовком', () => {
@@ -80,4 +86,3 @@ describe('AboutDelivery.vue', () => {
     expect(thankYouMessage.text()).toBe('Дякуємо, що обрали наш магазин!');
   });
 });
-*/
