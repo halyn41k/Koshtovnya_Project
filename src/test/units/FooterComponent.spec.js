@@ -10,14 +10,16 @@ describe('FooterComponent.vue', () => {
         mocks: {
           $t: (msg) => {
             const translations = {
-              logo: 'Коштовня Лого', // Тестовий переклад для логотипу
-              description: 'Опис компанії Коштовня', // Тестовий переклад для опису
+              logo: 'Коштовня Лого',
+              description: 'Опис компанії Коштовня',
               aboutUs: 'Про нас',
               aboutDelivery: 'Доставка',
               userAccount: 'Особистий кабінет',
               address: 'м. Київ, вул. Хрещатик, 1',
               phone: '+380123456789',
-              email: 'koshtовня@mail.com',
+              email: 'koshtovnya@mail.com',
+              followUs: 'Слідкуйте за нами',
+              contactUs: 'Зв’язатися з нами',
             };
             return translations[msg] || msg;
           },
@@ -137,4 +139,34 @@ describe('FooterComponent.vue', () => {
       // Додатково перевіряємо через snapshot чи стилі описані
     });
   });
+
+  it('Всі зображення мають атрибути alt із коректними значеннями', () => {
+    const images = wrapper.findAll('img');
+    const expectedAlts = [
+      'Коштовня Лого', 'arrow', 'arrow', 'arrow', 'address', 'phone',
+      'email', 'Instagram', 'Facebook', 'TikTok',
+    ];
+
+    expect(images.length).toBe(expectedAlts.length); // Перевірка кількості зображень
+
+    images.forEach((image, index) => {
+      expect(image.attributes('alt')).toBe(expectedAlts[index]); // Перевірка значення alt
+    });
+  });
+
+  it('має посилання соціальних мереж з правильними атрибутами', () => {
+    const socialLinks = [
+      { selector: 'a[href="https://www.instagram.com"]', url: 'https://www.instagram.com' },
+      { selector: 'a[href="https://www.facebook.com"]', url: 'https://www.facebook.com' },
+      { selector: 'a[href="https://www.tiktok.com"]', url: 'https://www.tiktok.com' },
+    ];
+  
+    socialLinks.forEach(({ selector, url }) => {
+      const link = wrapper.find(selector);
+      expect(link.exists()).toBe(true); // Перевірка, чи посилання існує
+      expect(link.attributes('href')).toBe(url); // Перевірка, чи правильний URL
+      expect(link.attributes('target')).toBe('_blank'); // Перевірка, чи відкривається в новій вкладці
+    });
+  });
+    
 });
