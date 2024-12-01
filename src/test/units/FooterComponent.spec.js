@@ -92,4 +92,23 @@ describe('FooterComponent.vue', () => {
     expect(emailElement.exists()).toBe(true); // Перевірка наявності елемента
     expect(emailElement.text()).toBe('koshtovnya@mail.com'); // Перевірка тексту
   });
+
+  it('повинен містити посилання на Instagram з правильним URL', () => {
+    const instagramLink = wrapper.find('a[href="https://www.instagram.com"]');
+    expect(instagramLink.exists()).toBe(true); // Перевірка, чи є посилання
+    expect(instagramLink.attributes('target')).toBe('_blank'); // Перевірка, чи відкривається в новій вкладці
+  });
+
+  it('повинен містити посилання на Facebook з правильним URL', () => {
+    const facebookLink = wrapper.find('a[href="https://www.facebook.com"]');
+    expect(facebookLink.exists()).toBe(true); // Перевірка, чи є посилання
+    expect(facebookLink.attributes('target')).toBe('_blank'); // Перевірка, чи відкривається в новій вкладці
+  });
+
+  it('повинен містити посилання на TikTok з правильним URL', () => {
+    const tiktokLink = wrapper.find('a[href="https://www.tiktok.com"]');
+    expect(tiktokLink.exists()).toBe(true); // Перевірка, чи є посилання
+    expect(tiktokLink.attributes('target')).toBe('_blank'); // Перевірка, чи відкривається в новій вкладці
+  });
+
 });
