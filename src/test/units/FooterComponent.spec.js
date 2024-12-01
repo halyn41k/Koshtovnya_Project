@@ -15,6 +15,9 @@ describe('FooterComponent.vue', () => {
               aboutUs: 'Про нас',
               aboutDelivery: 'Доставка',
               userAccount: 'Особистий кабінет',
+              address: 'м. Київ, вул. Хрещатик, 1',
+              phone: '+380123456789',
+              email: 'koshtovnya@mail.com',
             };
             return translations[msg] || msg;
           },
@@ -70,5 +73,23 @@ describe('FooterComponent.vue', () => {
       expect(link.attributes('href')).toBe(route); // Перевіряємо маршрут
       expect(link.text()).toBe(text); // Перевіряємо текст посилання
     });
+  });
+
+  it('повинен відображати правильну адресу', () => {
+    const addressElement = wrapper.find('.address');
+    expect(addressElement.exists()).toBe(true); // Перевірка наявності елемента
+    expect(addressElement.text()).toBe('м. Київ, вул. Хрещатик, 1'); // Перевірка тексту
+  });
+
+  it('повинен відображати правильний номер телефону', () => {
+    const phoneElement = wrapper.find('.phone');
+    expect(phoneElement.exists()).toBe(true); // Перевірка наявності елемента
+    expect(phoneElement.text()).toBe('+380123456789'); // Перевірка тексту
+  });
+
+  it('повинен відображати правильний email', () => {
+    const emailElement = wrapper.find('.email');
+    expect(emailElement.exists()).toBe(true); // Перевірка наявності елемента
+    expect(emailElement.text()).toBe('koshtovnya@mail.com'); // Перевірка тексту
   });
 });
