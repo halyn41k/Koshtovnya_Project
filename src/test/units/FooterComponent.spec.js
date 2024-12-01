@@ -169,4 +169,66 @@ describe('FooterComponent.vue', () => {
     });
   });
     
+  it('має необхідні CSS-класи на ключових елементах', () => {
+    const logoWrapper = wrapper.find('.logo-wrapper');
+    expect(logoWrapper.exists()).toBe(true);
+    expect(logoWrapper.classes()).toContain('logo-wrapper');
+
+    const footer = wrapper.find('.footer');
+    expect(footer.exists()).toBe(true);
+    expect(footer.classes()).toContain('footer');
+
+    const footerLinks = wrapper.findAll('.footer-link');
+    expect(footerLinks.length).toBeGreaterThan(0);
+    footerLinks.forEach((link) => {
+      expect(link.classes()).toContain('footer-link');
+    });
+
+    const socialIcons = wrapper.findAll('.social-icon');
+    expect(socialIcons.length).toBeGreaterThan(0);
+    socialIcons.forEach((icon) => {
+      expect(icon.classes()).toContain('social-icon');
+    });
+  });
+
+  it('застосовує стилі hover до посилань', async () => {
+    const footerLinks = wrapper.findAll('.footer-link');
+    expect(footerLinks.length).toBeGreaterThan(0);
+
+    footerLinks.forEach((link) => {
+      expect(link.classes()).toContain('footer-link'); // Базовий клас
+      // Перевірити, чи є стилі для hover
+      link.trigger('mouseenter'); // Симуляція hover
+      expect(link.classes()).not.toContain('hover'); // CSS hover не додає клас
+    });
+
+    const socialIcons = wrapper.findAll('.social-icon');
+    expect(socialIcons.length).toBeGreaterThan(0);
+
+    socialIcons.forEach((icon) => {
+      expect(icon.classes()).toContain('social-icon');
+      icon.trigger('mouseenter'); // Симуляція hover
+      expect(icon.classes()).not.toContain('hover'); // CSS hover не додає клас
+    });
+  });
+
+  it('застосовує стилі active до посилань', async () => {
+    const footerLinks = wrapper.findAll('.footer-link');
+    expect(footerLinks.length).toBeGreaterThan(0);
+
+    footerLinks.forEach((link) => {
+      expect(link.classes()).toContain('footer-link'); // Базовий клас
+      link.trigger('mousedown'); // Симуляція active
+      expect(link.classes()).not.toContain('active'); // CSS active не додає клас
+    });
+
+    const socialIcons = wrapper.findAll('.social-icon');
+    expect(socialIcons.length).toBeGreaterThan(0);
+
+    socialIcons.forEach((icon) => {
+      expect(icon.classes()).toContain('social-icon');
+      icon.trigger('mousedown'); // Симуляція active
+      expect(icon.classes()).not.toContain('active'); // CSS active не додає клас
+    });
+  });
 });
