@@ -22,31 +22,35 @@ const translations = {
   en: 'English',
 };
 
+const globalConfig = {
+  mocks: {
+    $t: (msg) => translations[msg] || msg, // Локалізація
+    $i18n: { locale: 'uk' }, // Поточна локаль
+  },
+  stubs: {
+    'router-link': {
+      props: ['to'],
+      template: '<a :href="to"><slot /></a>', // Простий стаб
+    },
+    'SearchResults': {
+      props: ['query'],
+      template: '<div class="search-results">{{ query }}</div>',
+    },
+  },
+};
+
 describe('HeaderComponent.vue', () => {
   let wrapper;
 
   beforeEach(() => {
+    // Ініціалізуємо компонент перед кожним тестом
     wrapper = mount(HeaderComponent, {
-      global: {
-        mocks: {
-          $t: (msg) => translations[msg] || msg,
-          $i18n: { locale: 'uk' }, // Замокали i18n
-        },
-        stubs: {
-          'router-link': {
-            props: ['to'],
-            template: '<a :href="to"><slot /></a>',
-          },
-          'SearchResults': {
-            props: ['query'],
-            template: '<div class="search-results">{{ query }}</div>',
-          },
-        },
-      },
+      global: globalConfig,
     });
   });
 
   afterEach(() => {
+    // Звільнення ресурсів після кожного тесту
     wrapper.unmount();
   });
 
@@ -147,5 +151,91 @@ describe('HeaderComponent.vue', () => {
     await languageDropdown.setValue('en'); // Змінюємо значення
 
     expect(changeLanguageSpy).toHaveBeenCalledTimes(1); // Перевіряємо виклик
+  });
+
+  it('рендерить випадаючий список валют', () => {
+    const currencyDropdown = wrapper.find('.currency .dropdown-container select');
+
+    // Перевірка, чи випадаючий список існує
+    expect(currencyDropdown.exists()).toBe(true);
+
+    // Перевірка, чи випадаючий список має правильні опції
+    const options = currencyDropdown.findAll('option');
+    expect(options.length).toBe(2); // Очікуємо 2 валюти
+    expect(options[0].attributes('value')).toBe('UAH');
+    expect(options[0].text()).toBe('UAH ₴');
+    expect(options[1].attributes('value')).toBe('USD');
+    expect(options[1].text()).toBe('USD $');
+  });
+
+  it('викликає метод changeCurrency при зміні валюти', async () => {
+    // Замінюємо метод на мок-функцію
+    const changeCurrencySpy = jest.fn();
+    wrapper.vm.changeCurrency = changeCurrencySpy;
+
+    // Знаходимо випадаючий список валюти
+    const currencyDropdown = wrapper.find('.currency .dropdown-container select');
+
+    // Змінюємо значення
+    await currencyDropdown.setValue('USD');
+
+    // Перевірка виклику changeCurrency
+    expect(changeCurrencySpy).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.selectedCurrency).toBe('USD'); // Перевіряємо, чи оновлено модель
+  });
+
+  it('відображає поле для введення пошукового запиту', () => {
+    // Знаходимо елемент поля вводу
+    const searchInput = wrapper.find('.search-bar input');
+
+    // Перевірка, чи елемент існує
+    expect(searchInput.exists()).toBe(true);
+
+    // Перевірка placeholder
+    expect(searchInput.attributes('placeholder')).toBe('Пошук...');
+  });
+
+  it('оновлює модель searchQuery при введенні тексту', async () => {
+    const searchInput = wrapper.find('.search-bar input');
+
+    // Імітуємо введення тексту
+    await searchInput.setValue('Тестовий запит');
+
+    // Перевіряємо, чи оновилася модель
+    expect(wrapper.vm.searchQuery).toBe('Тестовий запит');
+  });
+
+  it('викликає метод startSearch при натисканні Enter у пошуковому полі', async () => {
+    // Замінюємо метод startSearch на мок-функцію
+    wrapper.vm.startSearch = jest.fn();
+  
+    // Оновлюємо компонент
+    await wrapper.setData({ searchQuery: 'Тестовий запит' });
+  
+    // Знаходимо поле вводу пошуку
+    const searchInput = wrapper.find('.search-bar input');
+  
+    // Імітуємо натискання клавіші Enter
+    await searchInput.trigger('keyup.enter');
+  
+    // Перевіряємо, що метод startSearch викликано
+    expect(wrapper.vm.startSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it('викликає метод startSearch при кліку на іконку пошуку', async () => {
+    // Замінюємо метод startSearch на мок-функцію
+    wrapper.vm.startSearch = jest.fn();
+  
+    // Оновлюємо компонент
+    await wrapper.setData({ searchQuery: 'Тестовий запит' });
+  
+    // Знаходимо іконку пошуку
+    const searchIcon = wrapper.find('.search-icon');
+  
+    // Імітуємо клік по іконці пошуку
+    await searchIcon.trigger('click');
+  
+    // Перевіряємо, що метод startSearch викликано
+    expect(wrapper.vm.startSearch).toHaveBeenCalledTimes(1);
   });
 });
