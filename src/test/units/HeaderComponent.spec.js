@@ -30,7 +30,7 @@ const globalConfig = {
   stubs: {
     'router-link': {
       props: ['to'],
-      template: '<a :href="to"><slot /></a>', // Простий стаб
+      template: '<a :href="to"><slot /></a>',
     },
     'SearchResults': {
       props: ['query'],
@@ -238,4 +238,122 @@ describe('HeaderComponent.vue', () => {
     // Перевіряємо, що метод startSearch викликано
     expect(wrapper.vm.startSearch).toHaveBeenCalledTimes(1);
   });
+
+  it('відображає компонент SearchResults після введення пошукового запиту англійською мовою', async () => {
+    // Оновлюємо поточну мову на англійську
+    await wrapper.setData({ selectedLanguage: 'en' });
+  
+    // Встановлюємо тестовий запит
+    await wrapper.setData({ searchQuery: 'Test query' });
+  
+    // Знаходимо DOM-вузол SearchResults
+    const searchResults = wrapper.find('.search-results');
+  
+    // Перевіряємо, що SearchResults відображається
+    expect(searchResults.exists()).toBe(true);
+  
+    // Перевіряємо текст, переданий у проп `query`
+    expect(searchResults.text()).toBe('Test query');
+  });
+
+  it('рендерить значок користувача', () => {
+    // Знаходимо значок користувача
+    const userIcon = wrapper.find('.user-icon img');
+  
+    // Перевірка, чи значок існує
+    expect(userIcon.exists()).toBe(true);
+  
+    // Перевірка, чи значок має атрибут src
+    expect(userIcon.attributes('src')).toBeDefined(); // Перевірка наявності атрибута src
+    expect(userIcon.attributes('alt')).toBe('User Icon'); // Перевіряємо alt-атрибут
+  });
+  
+  it('рендерить значок кошика', () => {
+  // Знаходимо значок кошика
+  const cartIcon = wrapper.find('.cart-icon img');
+
+  // Перевірка, чи значок існує
+  expect(cartIcon.exists()).toBe(true);
+
+  // Перевірка атрибутів значка кошика
+  expect(cartIcon.attributes('src')).toBeDefined(); // Перевіряємо, що атрибут src існує
+  expect(cartIcon.attributes('alt')).toBe('Cart Icon'); // Перевіряємо alt-атрибут
+});
+
+it('відображає бейдж із кількістю товарів у кошику, якщо cartCount > 0', async () => {
+  // Встановлюємо кількість товарів у кошику
+  await wrapper.setData({ cartCount: 5 });
+
+  // Знаходимо бейдж кошика
+  const cartBadge = wrapper.find('.cart-badge');
+
+  // Перевіряємо, чи бейдж існує
+  expect(cartBadge.exists()).toBe(true);
+
+  // Перевіряємо текст бейджа
+  expect(cartBadge.text()).toBe('5');
+});
+
+it('не відображає бейдж, якщо cartCount === 0', async () => {
+  // Встановлюємо кількість товарів у кошику
+  await wrapper.setData({ cartCount: 0 });
+
+  // Знаходимо бейдж кошика
+  const cartBadge = wrapper.find('.cart-badge');
+
+  // Перевіряємо, що бейдж не відображається
+  expect(cartBadge.exists()).toBe(false);
+});
+
+it('змінює значення isLanguageDropdownOpen при кліку на випадаюче меню мови', async () => {
+  // Мокаємо console.log
+  const consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+  // Початковий стан
+  expect(wrapper.vm.isLanguageDropdownOpen).toBe(false);
+
+  // Знаходимо контейнер випадаючого меню мови
+  const languageDropdown = wrapper.find('.language .dropdown-container');
+
+  // Імітуємо клік на контейнер
+  await languageDropdown.trigger('click');
+
+  // Перевіряємо, що isLanguageDropdownOpen змінився на true
+  expect(wrapper.vm.isLanguageDropdownOpen).toBe(true);
+
+  // Імітуємо повторний клік на контейнер
+  await languageDropdown.trigger('click');
+
+  // Перевіряємо, що isLanguageDropdownOpen змінився на false
+  expect(wrapper.vm.isLanguageDropdownOpen).toBe(false);
+
+  // Відновлюємо оригінальний console.log
+  consoleLogMock.mockRestore();
+});
+
+it('змінює значення isCurrencyDropdownOpen при кліку на випадаюче меню валюти', async () => {
+  // Мокаємо console.log
+  const consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+  // Початковий стан
+  expect(wrapper.vm.isCurrencyDropdownOpen).toBe(false);
+
+  // Знаходимо контейнер випадаючого меню валюти
+  const currencyDropdown = wrapper.find('.currency .dropdown-container');
+
+  // Імітуємо клік на контейнер
+  await currencyDropdown.trigger('click');
+
+  // Перевіряємо, що isCurrencyDropdownOpen змінився на true
+  expect(wrapper.vm.isCurrencyDropdownOpen).toBe(true);
+
+  // Імітуємо повторний клік на контейнер
+  await currencyDropdown.trigger('click');
+
+  // Перевіряємо, що isCurrencyDropdownOpen змінився на false
+  expect(wrapper.vm.isCurrencyDropdownOpen).toBe(false);
+
+  // Відновлюємо оригінальний console.log
+  consoleLogMock.mockRestore();
+});
 });
