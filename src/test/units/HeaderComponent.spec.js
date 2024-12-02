@@ -7,37 +7,66 @@ jest.mock('axios', () => ({
 }));
 
 const translations = {
-  aboutUs: 'Про нас',
-  aboutDelivery: 'Доставка',
-  wishlist: 'Список бажань',
-  bracelets: 'Браслети',
-  herdany: 'Гердани',
-  dukats: 'Дукати',
-  sylyanky: 'Силянки',
-  earrings: 'Сережки',
-  belts: 'Пояси',
-  logo: 'Коштовня',
-  searchPlaceholder: 'Пошук...',
-  uk: 'Українська',
-  en: 'English',
+  uk: {
+    aboutUs: 'Про нас',
+    aboutDelivery: 'Доставка',
+    wishlist: 'Список бажань',
+    searchPlaceholder: 'Пошук...',
+    logo: 'Коштовня',
+    bracelets: 'Браслети',
+    herdany: 'Гердани',
+    dukats: 'Дукати',
+    sylyanky: 'Силянки',
+    earrings: 'Сережки',
+    belts: 'Пояси',
+  },
+  en: {
+    aboutUs: 'About Us',
+    aboutDelivery: 'About Delivery',
+    wishlist: 'Wishlist',
+    searchPlaceholder: 'Search...',
+    logo: 'My Shop',
+    bracelets: 'Bracelets',
+    herdany: 'Herdany',
+    dukats: 'Dukats',
+    sylyanky: 'Sylyanky',
+    earrings: 'Earrings',
+    belts: 'Belts',
+  },
 };
 
 const globalConfig = {
   mocks: {
-    $t: (msg) => translations[msg] || msg, // Локалізація
-    $i18n: { locale: 'uk' }, // Поточна локаль
+    $t: jest.fn((msg) => translations.uk[msg] || msg), // Початкова локаль - українська
+    $i18n: {
+      locale: 'uk',
+      // Виклик зміни локалі
+      changeLocale: jest.fn(function (newLocale) {
+        this.locale = newLocale; // Оновлюємо локаль
+        // Оновлення функції $t для роботи з новою локаллю
+        globalConfig.mocks.$t.mockImplementation((msg) => translations[newLocale][msg] || msg);
+      }),
+    },
   },
   stubs: {
     'router-link': {
       props: ['to'],
-      template: '<a :href="to"><slot /></a>',
+      template: '<a :href="to"><slot /></a>', // Простий шаблон для посилань
     },
-    'SearchResults': {
+    SearchResults: {
       props: ['query'],
-      template: '<div class="search-results">{{ query }}</div>',
+      template: '<div class="search-results">{{ query }}</div>', // Простий шаблон для результатів пошуку
+    },
+    'dropdown-component': {
+      props: ['items', 'value'],
+      template: '<div class="dropdown">{{ value }}</div>', // Заглушка для dropdown
     },
   },
+  provide: {
+    translations, // Надаємо переклади для тестів
+  },
 };
+
 
 describe('HeaderComponent.vue', () => {
   let wrapper;
@@ -278,82 +307,92 @@ describe('HeaderComponent.vue', () => {
   // Перевірка атрибутів значка кошика
   expect(cartIcon.attributes('src')).toBeDefined(); // Перевіряємо, що атрибут src існує
   expect(cartIcon.attributes('alt')).toBe('Cart Icon'); // Перевіряємо alt-атрибут
-});
+  });
 
-it('відображає бейдж із кількістю товарів у кошику, якщо cartCount > 0', async () => {
-  // Встановлюємо кількість товарів у кошику
-  await wrapper.setData({ cartCount: 5 });
+  it('відображає бейдж із кількістю товарів у кошику, якщо cartCount > 0', async () => {
+    // Встановлюємо кількість товарів у кошику
+    await wrapper.setData({ cartCount: 5 });
 
-  // Знаходимо бейдж кошика
-  const cartBadge = wrapper.find('.cart-badge');
+    // Знаходимо бейдж кошика
+    const cartBadge = wrapper.find('.cart-badge');
 
-  // Перевіряємо, чи бейдж існує
-  expect(cartBadge.exists()).toBe(true);
+    // Перевіряємо, чи бейдж існує
+    expect(cartBadge.exists()).toBe(true);
 
-  // Перевіряємо текст бейджа
-  expect(cartBadge.text()).toBe('5');
-});
+    // Перевіряємо текст бейджа
+    expect(cartBadge.text()).toBe('5');
+  });
 
-it('не відображає бейдж, якщо cartCount === 0', async () => {
-  // Встановлюємо кількість товарів у кошику
-  await wrapper.setData({ cartCount: 0 });
+  it('не відображає бейдж, якщо cartCount === 0', async () => {
+    // Встановлюємо кількість товарів у кошику
+    await wrapper.setData({ cartCount: 0 });
 
-  // Знаходимо бейдж кошика
-  const cartBadge = wrapper.find('.cart-badge');
+    // Знаходимо бейдж кошика
+    const cartBadge = wrapper.find('.cart-badge');
 
-  // Перевіряємо, що бейдж не відображається
-  expect(cartBadge.exists()).toBe(false);
-});
+    // Перевіряємо, що бейдж не відображається
+    expect(cartBadge.exists()).toBe(false);
+  });
 
-it('змінює значення isLanguageDropdownOpen при кліку на випадаюче меню мови', async () => {
-  // Мокаємо console.log
-  const consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
+  it('змінює значення isLanguageDropdownOpen при кліку на випадаюче меню мови', async () => {
+    // Мокаємо console.log
+    const consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-  // Початковий стан
-  expect(wrapper.vm.isLanguageDropdownOpen).toBe(false);
+    // Початковий стан
+    expect(wrapper.vm.isLanguageDropdownOpen).toBe(false);
 
-  // Знаходимо контейнер випадаючого меню мови
-  const languageDropdown = wrapper.find('.language .dropdown-container');
+    // Знаходимо контейнер випадаючого меню мови
+    const languageDropdown = wrapper.find('.language .dropdown-container');
 
-  // Імітуємо клік на контейнер
-  await languageDropdown.trigger('click');
+    // Імітуємо клік на контейнер
+    await languageDropdown.trigger('click');
 
-  // Перевіряємо, що isLanguageDropdownOpen змінився на true
-  expect(wrapper.vm.isLanguageDropdownOpen).toBe(true);
+    // Перевіряємо, що isLanguageDropdownOpen змінився на true
+    expect(wrapper.vm.isLanguageDropdownOpen).toBe(true);
 
-  // Імітуємо повторний клік на контейнер
-  await languageDropdown.trigger('click');
+    // Імітуємо повторний клік на контейнер
+    await languageDropdown.trigger('click');
 
-  // Перевіряємо, що isLanguageDropdownOpen змінився на false
-  expect(wrapper.vm.isLanguageDropdownOpen).toBe(false);
+    // Перевіряємо, що isLanguageDropdownOpen змінився на false
+    expect(wrapper.vm.isLanguageDropdownOpen).toBe(false);
 
-  // Відновлюємо оригінальний console.log
-  consoleLogMock.mockRestore();
-});
+    // Відновлюємо оригінальний console.log
+    consoleLogMock.mockRestore();
+  });
 
-it('змінює значення isCurrencyDropdownOpen при кліку на випадаюче меню валюти', async () => {
-  // Мокаємо console.log
-  const consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
+  it('змінює значення isCurrencyDropdownOpen при кліку на випадаюче меню валюти', async () => {
+    // Мокаємо console.log
+    const consoleLogMock = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-  // Початковий стан
-  expect(wrapper.vm.isCurrencyDropdownOpen).toBe(false);
+    // Початковий стан
+    expect(wrapper.vm.isCurrencyDropdownOpen).toBe(false);
 
-  // Знаходимо контейнер випадаючого меню валюти
-  const currencyDropdown = wrapper.find('.currency .dropdown-container');
+    // Знаходимо контейнер випадаючого меню валюти
+    const currencyDropdown = wrapper.find('.currency .dropdown-container');
 
-  // Імітуємо клік на контейнер
-  await currencyDropdown.trigger('click');
+    // Імітуємо клік на контейнер
+    await currencyDropdown.trigger('click');
 
-  // Перевіряємо, що isCurrencyDropdownOpen змінився на true
-  expect(wrapper.vm.isCurrencyDropdownOpen).toBe(true);
+    // Перевіряємо, що isCurrencyDropdownOpen змінився на true
+    expect(wrapper.vm.isCurrencyDropdownOpen).toBe(true);
 
-  // Імітуємо повторний клік на контейнер
-  await currencyDropdown.trigger('click');
+    // Імітуємо повторний клік на контейнер
+    await currencyDropdown.trigger('click');
 
-  // Перевіряємо, що isCurrencyDropdownOpen змінився на false
-  expect(wrapper.vm.isCurrencyDropdownOpen).toBe(false);
+    // Перевіряємо, що isCurrencyDropdownOpen змінився на false
+    expect(wrapper.vm.isCurrencyDropdownOpen).toBe(false);
 
-  // Відновлюємо оригінальний console.log
-  consoleLogMock.mockRestore();
-});
+    // Відновлюємо оригінальний console.log
+    consoleLogMock.mockRestore();
+  });
+
+  it('рендери з початковим українським текстом', () => {
+    // Перевіряємо початковий рендер
+    expect(wrapper.html()).toContain('Про нас');
+    expect(wrapper.html()).toContain('Доставка');
+    expect(wrapper.html()).toContain('Список бажань');
+    expect(wrapper.find('input').attributes('placeholder')).toBe('Пошук...');
+    expect(wrapper.find('.logo h1').text()).toBe('Коштовня');
+  });
+
 });
