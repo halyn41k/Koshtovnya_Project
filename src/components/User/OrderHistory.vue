@@ -1,39 +1,78 @@
 <template>
   <div class="order-history">
     <h2 class="order-history-title">Історія замовлень</h2>
-    <div v-if="orders.length === 0" class="no-orders">
+    <div v-if="loading" class="loading">Завантаження...</div>
+    <div v-else-if="orders.length === 0" class="no-orders">
       Ви не розмістили жодного замовлення :(
     </div>
     <div v-else>
-      <div v-for="(order, index) in orders" :key="index" class="order-item">
-        <span class="item-number">{{ index + 1 }}.</span>
-        <div class="item-content">
-          <img :src="order.imageSrc" alt="Product Image" class="item-image" />
-          <div class="item-details">
-            <div class="item-header">
-              <span class="item-title">{{ order.title }}</span>
-              <span class="item-price">{{ order.price }}₴</span>
+      <div class="order-item" v-for="(order, index) in orders" :key="index">
+        <div class="order-header">
+          <span class="order-number">Замовлення №{{ order.id }}</span>
+          <span class="order-status">Статус: {{ order.status }}</span>
+        </div>
+        <div class="order-details">
+          <div v-for="(item, i) in order.items" :key="i" class="order-product">
+            <img :src="item.image_url" alt="Product Image" class="order-product-image" />
+            <div class="order-product-info">
+              <h3>{{ item.title }}</h3>
+              <p>Кількість: {{ item.quantity }}</p>
+              <p>Ціна: {{ item.price }}₴</p>
             </div>
-            <p class="item-quantity">Кількість: {{ order.quantity }}</p>
           </div>
         </div>
       </div>
     </div>
-    <p class="order-status">Статус: {{ orders.length > 0 ? orders[0].status : 'В очікуванні' }}</p>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'OrderHistory',
   data() {
     return {
-      orders: [
-        { title: 'Товар 1', price: '750₴', quantity: 2, imageSrc: 'path_to_image', status: 'В очікуванні' },
-        { title: 'Товар 2', price: '150₴', quantity: 1, imageSrc: 'path_to_image', status: 'Доставлено' },
-      ]
+      orders: [],
+      loading: false,
     };
-  }
+  },
+  methods: {
+    async fetchOrders() {
+      this.loading = true;
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Будь ласка, увійдіть у свій обліковий запис.');
+        this.$router.push('/login');
+        return;
+      }
+      try {
+        const response = await axios.get('http://26.235.139.202:8080/api/orders', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Перетворення даних для відображення
+        this.orders = response.data.orders.map((order) => ({
+          id: order.id,
+          status: order.status,
+          items: order.items.map((item) => ({
+            title: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image_url: item.image_url || 'default_image_path',
+          })),
+        }));
+      } catch (error) {
+        console.error('Помилка завантаження замовлень:', error);
+        alert('Не вдалося завантажити ваші замовлення.');
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
+  mounted() {
+    this.fetchOrders();
+  },
 };
 </script>
 

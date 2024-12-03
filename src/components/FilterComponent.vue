@@ -1,209 +1,222 @@
 <template>
-    <div class="filter-container"> 
+  <div class="filter-container">
+    <section class="filter">
+      <h2 class="section-title">Доступність</h2>
+      <hr class="divider" />
+      <div class="availability-options">
+        <div class="option" v-for="item in availabilityOptions" :key="item.name">
+          <input
+            type="checkbox"
+            :id="item.name"
+            :value="item.name"
+            v-model="selectedAvailability"
+          />
+          <label :for="item.name">{{ item.name }} ({{ item.count }})</label>
+        </div>
       </div>
-      <section class="filter">
-        <h2 class="section-title">Доступність</h2>
-        <hr class="divider" />
-        <div class="availability-options">
-          <div class="option">
-            <input type="checkbox" id="outOfStock" v-model="availabilityFilters.outOfStock" />
-            <label for="outOfStock">Немає в наявності</label>
-          </div>
-          <div class="option">
-            <input type="checkbox" id="inStock" v-model="availabilityFilters.inStock" />
-            <label for="inStock">В наявності</label>
-          </div>
-        </div>
-  
-        <h3 class="subsection-title">Розмір</h3>
-        <hr class="divider" />
-        <div class="dropdown-menu">
-          <select v-model="selectedSize" class="dropdown" @change="applyFilters">
-            <option value="">(без фільтра)</option>
-            <option value="16">16 см</option>
-            <option value="17">17 см</option>
-            <option value="18">18 см</option>
-            <option value="19">19 см</option>
-            <option value="20">20 см</option>
-            <option value="25">25 см</option>
-          </select>
-        </div>
-  
-        <h3 class="subsection-title">Колір</h3>
-        <hr class="divider" />
-        <div class="dropdown-menu">
-          <select v-model="selectedColors" class="dropdown" @change="applyFilters">
-            <option value="">(без фільтра)</option>
-            <option value="Червоний">Червоний</option>
-            <option value="Зелений">Зелений</option>
-            <option value="Синій">Синій</option>
-            <option value="Жовтий">Жовтий</option>
-            <option value="Чорний">Чорний</option>
-          </select>
-        </div>
-  
+
+      <h3 class="subsection-title">Розмір</h3>
+      <hr class="divider" />
+      <div class="dropdown-menu">
+        <select v-model="selectedSize" class="dropdown">
+          <option value="">(без фільтра)</option>
+          <option v-for="size in sizeOptions" :key="size" :value="size">
+            {{ size }} см
+          </option>
+        </select>
+      </div>
+
+      <h3 class="subsection-title">Колір</h3>
+      <hr class="divider" />
+      <div class="dropdown-menu">
+        <select v-model="selectedColor" class="dropdown">
+          <option value="">(без фільтра)</option>
+          <option v-for="color in colorOptions" :key="color" :value="color">
+            {{ color }}
+          </option>
+        </select>
+      </div>
+
       <h3 class="subsection-title">Тип бісеру</h3>
       <hr class="divider" />
       <div class="bead-type-options">
-        <div class="option">
-          <input type="checkbox" id="matte" @change="applyFilters" />
-          <label for="matte">Матовий</label>
-        </div>
-        <div class="option">
-          <input type="checkbox" id="transparent" @change="applyFilters" />
-          <label for="transparent">Прозорий</label>
+        <div class="option" v-for="item in beadTypeOptions" :key="item.name">
+          <input
+            type="checkbox"
+            :id="item.name"
+            :value="item.name"
+            v-model="selectedBeadTypes"
+          />
+          <label :for="item.name">{{ item.name }} ({{ item.count }})</label>
         </div>
       </div>
-  
+
       <h3 class="subsection-title">Виробник бісеру</h3>
-      <hr class="divider" /> 
+      <hr class="divider" />
       <div class="manufacturer-options">
-        <div class="option">
-          <input type="checkbox" id="china" @change="applyFilters" />
-          <label for="china">Китай</label>
-        </div>
-        <div class="option">
-          <input type="checkbox" id="czech" @change="applyFilters" />
-          <label for="czech">Чехія</label>
-        </div>
-        <div class="option">
-          <input type="checkbox" id="japan" @change="applyFilters" />
-          <label for="japan">Японія</label>
+        <div class="option" v-for="item in beadProducerOptions" :key="item.origin_country">
+          <input
+            type="checkbox"
+            :id="item.origin_country"
+            :value="item.origin_country"
+            v-model="selectedProducers"
+          />
+          <label :for="item.origin_country">{{ item.origin_country }} ({{ item.count }})</label>
         </div>
       </div>
-  
-  <h3 class="subsection-title">Вага</h3>
-  <hr class="divider" />
-  <div class="input-box">
-    <div class="min-box">
-      <input type="number" v-model="weightRange[0]" :min="0" :max="3000" step="1" @input="handleNumberInput('weightRange', 0, $event)" />
-    </div>
-    <div class="input-divider"></div>
-    <div class="max-box">
-      <input type="number" v-model="weightRange[1]" :min="0" :max="3000" step="1" @input="handleNumberInput('weightRange', 1, $event)" />
-    </div>
-  </div>
-  <div class="range-slider" @click="moveClosestThumb($event, 'weightRange', 3000)">
-    <input type="range" v-model="weightRange[0]" :min="0" :max="3000" class="slider" step="1" @input="applyFilters" />
-    <input type="range" v-model="weightRange[1]" :min="0" :max="3000" class="slider" step="1" @input="applyFilters" />
-    <div class="slider-track" :style="trackStyle(weightRange[0], weightRange[1], 3000)"></div>
-  </div>
-  
-  <h3 class="range-title">Ціна</h3>
-  <hr class="divider" />
-  <div class="input-box">
-    <div class="min-box">
-      <input type="number" v-model="priceRange[0]" :min="0" :max="10000" step="1" @input="handleNumberInput('priceRange', 0, $event)" />
-    </div>
-    <div class="input-divider"></div>
-    <div class="max-box">
-      <input type="number" v-model="priceRange[1]" :min="0" :max="10000" step="1" @input="handleNumberInput('priceRange', 1, $event)" />
-    </div>
-  </div>
-  <div class="range-slider" @click="moveClosestThumb($event, 'priceRange', 10000)">
-    <input type="range" v-model="priceRange[0]" :min="0" :max="10000" class="slider" step="1" @input="applyFilters" />
-    <input type="range" v-model="priceRange[1]" :min="0" :max="10000" class="slider" step="1" @input="applyFilters" />
-    <div class="slider-track" :style="trackStyle(priceRange[0], priceRange[1], 10000)"></div>
-  </div>
-  <div class="pattern-background"></div>
-  
+
+      <h3 class="subsection-title">Вага</h3>
+      <hr class="divider" />
+      <div class="input-box">
+        <div class="min-box">
+          <input type="number" v-model="weightRange[0]" :min="weightOptions.min" :max="weightOptions.max" step="1" />
+        </div>
+        <div class="input-divider"></div>
+        <div class="max-box">
+          <input type="number" v-model="weightRange[1]" :min="weightOptions.min" :max="weightOptions.max" step="1" />
+        </div>
+      </div>
+      <div class="range-slider">
+        <input type="range" v-model="weightRange[0]" :min="weightOptions.min" :max="weightOptions.max" class="slider" step="1" />
+        <input type="range" v-model="weightRange[1]" :min="weightOptions.min" :max="weightOptions.max" class="slider" step="1" />
+        <div class="slider-track" :style="trackStyle(weightRange[0], weightRange[1], weightOptions.max)"></div>
+      </div>
+
+      <h3 class="subsection-title">Ціна</h3>
+      <hr class="divider" />
+      <div class="input-box">
+        <div class="min-box">
+          <input type="number" v-model="priceRange[0]" :min="priceOptions.min" :max="priceOptions.max" step="1" />
+        </div>
+        <div class="input-divider"></div>
+        <div class="max-box">
+          <input type="number" v-model="priceRange[1]" :min="priceOptions.min" :max="priceOptions.max" step="1" />
+        </div>
+      </div>
+      <div class="range-slider">
+        <input type="range" v-model="priceRange[0]" :min="priceOptions.min" :max="priceOptions.max" class="slider" step="1" />
+        <input type="range" v-model="priceRange[1]" :min="priceOptions.min" :max="priceOptions.max" class="slider" step="1" />
+        <div class="slider-track" :style="trackStyle(priceRange[0], priceRange[1], priceOptions.max)"></div>
+      </div>
+
+
+      <div class="apply-filters">
+        <button @click="applyFilters" class="results-button">Результати</button>
+      </div>
+
+      <div class="pattern-background"></div>
     </section>
-  </template>
-  
-  <script>
-  export default {
-    name: 'FilterComponent',
-    data() {
+  </div>
+</template>
+
+
+<script>
+import axios from "axios";
+
+export default {
+  name: "FilterComponent",
+  props: {
+    fetchProducts: {
+      type: Function,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      availabilityOptions: [],
+      sizeOptions: [],
+      colorOptions: [],
+      beadTypeOptions: [],
+      beadProducerOptions: [],
+      weightOptions: { min: 0, max: 1000 },
+      priceOptions: { min: 0, max: 10000 },
+      selectedAvailability: [],
+      selectedSize: "",
+      selectedColor: "",
+      selectedBeadTypes: [],
+      selectedProducers: [],
+      weightRange: [0, 1000],
+      priceRange: [0, 10000],
+    };
+  },
+  created() {
+    this.loadFilters();
+  },
+  methods: {
+    async loadFilters() {
+      try {
+        const response = await axios.get("http://26.235.139.202:8080/api/filter");
+        const data = response.data;
+
+        this.availabilityOptions = data["Доступність"] || [];
+        this.sizeOptions = data["Розмір"] || [];
+        this.colorOptions = data["Колір"] || [];
+        this.beadTypeOptions = data["Тип бісеру"] || [];
+        this.beadProducerOptions = data["Виробник бісеру"] || [];
+        this.weightOptions = data["Вага"] || { min: 0, max: 1000 };
+        this.priceOptions = data["Ціна"] || { min: 0, max: 10000 };
+        this.weightRange = [this.weightOptions.min, this.weightOptions.max];
+        this.priceRange = [this.priceOptions.min, this.priceOptions.max];
+      } catch (error) {
+        console.error("Помилка завантаження фільтрів:", error);
+      }
+    },
+    trackStyle(min, max, maxRange) {
+      const minPercent = (min / maxRange) * 100;
+      const maxPercent = (max / maxRange) * 100;
       return {
-        // Фільтри для доступності товарів
-        availabilityFilters: {
-          outOfStock: false, // Товари, яких немає в наявності
-          inStock: false, // Товари, які є в наявності
-        },
-        selectedSize: '', // Обраний розмір
-        selectedColors: '', // Обрані кольори
-        weightRange: [0, 3000], // Діапазон ваги у грамах
-        priceRange: [0, 10000], // Діапазон ціни у гривнях
+        left: `${minPercent}%`,
+        right: `${100 - maxPercent}%`,
+        background: "linear-gradient(to right, #ccc, #6B1F1F, #ccc)",
       };
     },
-    methods: {
-      /**
-       * Застосовує фільтри до даних.
-       * Наразі лише виводить інформацію про вибрані фільтри у консоль.
-       */
-      applyFilters() {
-        console.log('Застосовані фільтри:', {
-          availability: this.availabilityFilters,
-          size: this.selectedSize,
-          colors: this.selectedColors,
-          priceRange: this.priceRange,
-          weightRange: this.weightRange,
-        });
-      },
+    applyFilters() {
+  const filters = {};
 
-      /**
-       * Розраховує стиль для треку діапазону (смуга між двома ползунками).
-       * @param {number} min - Мінімальне значення
-       * @param {number} max - Максимальне значення
-       * @param {number} maxRange - Загальний діапазон
-       * @returns {Object} Об'єкт стилю CSS
-       */
-      trackStyle(min, max, maxRange) {
-        const minPercent = (min / maxRange) * 100; // Мінімальний відсоток
-        const maxPercent = (max / maxRange) * 100; // Максимальний відсоток
-        return {
-          left: `${minPercent}%`,
-          right: `${100 - maxPercent}%`,
-          backgroundColor: '#6B1F1F', // Колір заповненої частини
-        };
-      },
+  // Перевірка наявності вибору доступності
+  if (this.selectedAvailability.length > 0) {
+    // Перетворюємо значення на '1' або '0', залежно від обраного варіанту
+    filters.is_available = this.selectedAvailability.map((availability) => 
+      availability === 'В наявності' ? '1' : '0'
+    );
+  }
 
-      /**
-       * Визначає, який ползунок (лівий чи правий) слід перемістити залежно від кліку.
-       * @param {MouseEvent} event - Подія кліку
-       * @param {string} rangeName - Назва діапазону (наприклад, 'priceRange' або 'weightRange')
-       * @param {number} maxRange - Максимальне значення діапазону
-       */
-      moveClosestThumb(event, rangeName, maxRange) {
-        const rect = event.target.getBoundingClientRect(); // Розміри і позиція треку
-        const clickPosition = ((event.clientX - rect.left) / rect.width) * maxRange; // Позиція кліку у діапазоні
-        const [minValue, maxValue] = this[rangeName]; // Поточні значення діапазону
+  // Додавання інших фільтрів
+  if (this.selectedSize) {
+    filters.size = parseFloat(this.selectedSize);
+  }
 
-        // Визначає, до якої точки ближче клік
-        const distToMin = Math.abs(minValue - clickPosition);
-        const distToMax = Math.abs(maxValue - clickPosition);
+  if (this.selectedColor) {
+    filters.color = this.selectedColor;
+  }
 
-        if (distToMin < distToMax) {
-          // Переміщує ліву точку
-          this[rangeName][0] = Math.max(0, Math.min(Math.round(clickPosition), this[rangeName][1] - 1));
-        } else {
-          // Переміщує праву точку
-          this[rangeName][1] = Math.min(maxRange, Math.max(Math.round(clickPosition), this[rangeName][0] + 1));
-        }
-      },
+  if (this.selectedBeadTypes.length > 0) {
+    filters.type_of_bead = this.selectedBeadTypes;
+  }
 
-      /**
-       * Обробляє зміну значення в полях введення діапазонів.
-       * @param {string} range - Назва діапазону (наприклад, 'priceRange' або 'weightRange')
-       * @param {number} index - Індекс змінюваної точки (0 - ліва, 1 - права)
-       * @param {Event} event - Подія вводу
-       */
-      handleNumberInput(range, index, event) {
-        let value = Math.max(0, Math.floor(event.target.value)); // Гарантує, що значення буде цілим числом >= 0
+  if (this.selectedProducers.length > 0) {
+    filters.bead_producer = this.selectedProducers;
+  }
 
-        if (index === 0) {
-          // Змінює мінімальне значення, не дозволяючи йому перетнути максимальне
-          this[range][0] = Math.min(value, this[range][1] - 1);
-        } else {
-          // Змінює максимальне значення, не дозволяючи йому перетнути мінімальне
-          this[range][1] = Math.max(value, this[range][0] + 1);
-        }
+  if (this.weightRange[0] !== this.weightOptions.min || this.weightRange[1] !== this.weightOptions.max) {
+    filters.weight_from = parseFloat(this.weightRange[0]);
+    filters.weight_to = parseFloat(this.weightRange[1]);
+  }
 
-        this.applyFilters(); // Застосовує фільтри після зміни значень
-      },
+  if (this.priceRange[0] !== this.priceOptions.min || this.priceRange[1] !== this.priceOptions.max) {
+    filters.price_from = parseFloat(this.priceRange[0]);
+    filters.price_to = parseFloat(this.priceRange[1]);
+  }
+
+  // Викликаємо fetchProducts з усіма фільтрами
+  this.fetchProducts(1, filters);
+  console.log('Вибрані фільтри:', filters);
+
     },
-  };
+  },
+};
 </script>
+
 
   
   <style scoped>
@@ -243,7 +256,7 @@
 }
 
 
-  .divider {
+.divider {
     width: 30px;
     height: 1px;
     background-color: #8F8A8A;
@@ -287,12 +300,14 @@
   }
   
   input[type="range"].slider {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 5px;
-    background: transparent;
-    position: absolute;
-  }
+  -webkit-appearance: none; 
+  appearance: none; 
+  width: 100%;
+  height: 5px;
+  background: transparent;
+  position: absolute;
+}
+
   
   input[type="range"].slider::-webkit-slider-runnable-track {
     height: 5px;
@@ -314,27 +329,8 @@
     margin-bottom: 4rem;
     text-align: center; 
   }
+
   
-  .range-slider {
-    position: relative;
-    width: 100%;
-    height: 5px;
-    margin: 30px 0;
-    background-color: #8a8a8a;
-  }
-  
-  .slider-track {
-    height: 100%;
-    position: absolute;
-    background-color: #6B1F1F;
-  }
-  
-  .slider-track {
-    height: 100%;
-    position: absolute;
-    background-color: #6B1F1F;
-  }
-    
   .range-slider {
     position: relative;
     width: calc(100% - 30px); 
@@ -448,6 +444,43 @@
     border-radius: 5px;
     border: 1px solid #ccc;
   }
+
+  .results-button {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  padding: 12px 20px;
+  font-weight: 700;
+  border-radius: 8px;
+  background-color: #6b1f1f; 
+  color: white; /* Текст білий */
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Плавний перехід для змін */
+  width: 230px;
+}
+
+
+.results-button:hover {
+  background-color: #a01212; /* Темніший відтінок при наведенні */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Додаємо тінь при наведенні */
+}
+я
+.results-button:focus {
+  outline: none; /* Видаляємо стандартне обведення фокусу */
+  box-shadow: 0 0 0 3px rgba(153, 102, 102, 0.6); /* Тінь для фокусу */
+}
+
+.results-button:active {
+  background-color: #a01212; /* Тіні темніший відтінок при натисканні */
+  transform: translateY(2px); /* Зробити кнопку натискною */
+}
+
+.apply-filters{
+  display: flex;
+  justify-content: center; /* Центрує кнопку по горизонталі */
+  width: 100%; /* Забезпечує, що контейнер займає всю ширину */
+  margin-top: 20px; /* Відступ від інших елементів */
+}
+
   
   </style>
-  
