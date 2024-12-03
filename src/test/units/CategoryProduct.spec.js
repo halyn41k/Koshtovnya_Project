@@ -439,14 +439,5 @@ describe('CategoryProduct.vue', () => {
       }
     });
   });
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
 });

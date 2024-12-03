@@ -20,19 +20,6 @@ const translations = {
     earrings: 'Сережки',
     belts: 'Пояси',
   },
-  en: {
-    aboutUs: 'About Us',
-    aboutDelivery: 'About Delivery',
-    wishlist: 'Wishlist',
-    searchPlaceholder: 'Search...',
-    logo: 'My Shop',
-    bracelets: 'Bracelets',
-    herdany: 'Herdany',
-    dukats: 'Dukats',
-    sylyanky: 'Sylyanky',
-    earrings: 'Earrings',
-    belts: 'Belts',
-  },
 };
 
 const globalConfig = {
@@ -42,8 +29,7 @@ const globalConfig = {
       locale: 'uk',
       // Виклик зміни локалі
       changeLocale: jest.fn(function (newLocale) {
-        this.locale = newLocale; // Оновлюємо локаль
-        // Оновлення функції $t для роботи з новою локаллю
+        this.locale = newLocale;
         globalConfig.mocks.$t.mockImplementation((msg) => translations[newLocale][msg] || msg);
       }),
     },
@@ -51,35 +37,35 @@ const globalConfig = {
   stubs: {
     'router-link': {
       props: ['to'],
-      template: '<a :href="to"><slot /></a>', // Простий шаблон для посилань
+      template: '<a :href="to" :class="{ active: to === currentPath }"><slot /></a>',
+      data() {
+        return { currentPath: '/aboutus' }; // Імітуємо активний маршрут
+      },
     },
     SearchResults: {
       props: ['query'],
-      template: '<div class="search-results">{{ query }}</div>', // Простий шаблон для результатів пошуку
+      template: '<div class="search-results">{{ query }}</div>',
     },
     'dropdown-component': {
       props: ['items', 'value'],
-      template: '<div class="dropdown">{{ value }}</div>', // Заглушка для dropdown
+      template: '<div class="dropdown">{{ value }}</div>',
     },
   },
   provide: {
-    translations, // Надаємо переклади для тестів
+    translations,
   },
 };
-
 
 describe('HeaderComponent.vue', () => {
   let wrapper;
 
   beforeEach(() => {
-    // Ініціалізуємо компонент перед кожним тестом
     wrapper = mount(HeaderComponent, {
       global: globalConfig,
     });
   });
 
   afterEach(() => {
-    // Звільнення ресурсів після кожного тесту
     wrapper.unmount();
   });
 
@@ -395,4 +381,32 @@ describe('HeaderComponent.vue', () => {
     expect(wrapper.find('.logo h1').text()).toBe('Коштовня');
   });
 
+  // Тести для CSS-класів
+  it('перевіряє, що активне посилання має клас active', () => {
+    const activeLink = wrapper.find('a.active'); // Знаходимо посилання з класом active
+    expect(activeLink.exists()).toBe(true);
+    expect(activeLink.attributes('href')).toBe('/aboutus'); // Перевіряємо маршрут
+  });
+
+  it('перевіряє, що інші посилання не мають класу active', () => {
+    const inactiveLinks = wrapper.findAll('a').filter((link) => !link.classes('active'));
+    inactiveLinks.forEach((link) => {
+      expect(link.classes('active')).toBe(false); // Перевірка відсутності класу
+    });
+  });
+
+  it('перевіряє, що активне посилання має коректний клас', () => {
+    const activeLink = wrapper.find('a.active'); // Знаходимо активне посилання
+    expect(activeLink.exists()).toBe(true); // Перевіряємо, що воно існує
+    expect(activeLink.classes()).toContain('active'); // Перевіряємо клас active
+  });
+  
+  it('перевіряє, що неактивні посилання не мають класу active', () => {
+    const links = wrapper.findAll('a');
+    links.forEach((link) => {
+      if (!link.classes().includes('active')) {
+        expect(link.classes()).not.toContain('active'); // Всі інші не повинні мати клас active
+      }
+    });
+  });
 });
