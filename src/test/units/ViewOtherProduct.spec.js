@@ -298,4 +298,106 @@ describe('ViewOtherProduct.vue - Тестування іконки сердеч�
     global.fetch.mockRestore();
   });
 
+  it('Перевіряє, чи надсилається правильний токен у заголовку при запиті до /api/wishlist', async () => {
+    // Мокаємо axios.get
+    const axiosMock = require('axios');
+    const token = 'test-token';
+  
+    jest.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+      if (key === 'token') return token; // Симулюємо наявність токена
+      return null;
+    });
+  
+    axiosMock.get.mockResolvedValueOnce({
+      data: {
+        products: [
+          { id: 1, name: 'Product 1' },
+          { id: 2, name: 'Product 2' },
+        ],
+      },
+    });
+  
+    await wrapper.vm.fetchWishlist();
+  
+    // Перевіряємо, що запит виконувався з правильними заголовками
+    expect(axiosMock.get).toHaveBeenCalledWith('http://26.235.139.202:8080/api/wishlist', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  
+    // Очищуємо моки
+    jest.restoreAllMocks();
+  });
+
+  it('Перевіряє, чи синхронізується wishlist зі списком продуктів', async () => {
+    // Мокаємо axios.get
+    const axiosMock = require('axios');
+  
+    jest.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+      if (key === 'token') return 'test-token'; // Симулюємо наявність токена
+      return null;
+    });
+  
+    // Мокаємо список бажаного
+    axiosMock.get.mockResolvedValueOnce({
+      data: {
+        products: [
+          { id: 1, name: 'Product 1' }, // Продукт із wishlist
+        ],
+      },
+    });
+  
+    // Мокаємо продукти
+    wrapper.setData({
+      products: [
+        { id: 1, name: 'Product 1', is_in_wishlist: false }, // Має бути в wishlist
+        { id: 2, name: 'Product 2', is_in_wishlist: false }, // Не має бути в wishlist
+      ],
+    });
+  
+    await wrapper.vm.fetchWishlist();
+  
+    // Перевіряємо синхронізацію стану wishlist
+    expect(wrapper.vm.wishlist).toEqual([1]); // ID продукту у wishlist
+    expect(wrapper.vm.products[0].is_in_wishlist).toBe(true); // Продукт 1 має бути позначений у wishlist
+    expect(wrapper.vm.products[1].is_in_wishlist).toBe(false); // Продукт 2 не має бути позначений у wishlist
+  
+    // Очищуємо моки
+    jest.restoreAllMocks();
+  });
+
+  it('Перевіряє, чи правильно передається product_id у запиті POST до /api/wishlist', async () => {
+    // Мокаємо axios.post
+    const axiosMock = require('axios');
+    axiosMock.post = jest.fn().mockResolvedValueOnce({}); // Успішна відповідь на POST
+  
+    // Мокаємо localStorage
+    const token = 'test-token';
+    jest.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
+      if (key === 'token') return token;
+      return null;
+    });
+  
+    // Додаємо продукт до wishlist
+    const product = { id: 1, name: 'Product 1', is_in_wishlist: false };
+    await wrapper.vm.toggleWishlist(product);
+  
+    // Перевіряємо, чи був викликаний POST із правильними параметрами
+    expect(axiosMock.post).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/wishlist',
+      { product_id: 1 }, // product_id має бути переданий
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Заголовок з токеном
+        },
+      }
+    );
+  
+    // Перевіряємо, що продукт оновлений як доданий до wishlist
+    expect(product.is_in_wishlist).toBe(true);
+  
+    // Очищуємо моки
+    jest.restoreAllMocks();
+  });  
 });
