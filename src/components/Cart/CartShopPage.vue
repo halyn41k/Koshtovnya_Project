@@ -47,6 +47,7 @@ export default {
     };
   },
   methods: {
+
     async fetchCartItems() {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -73,7 +74,7 @@ export default {
         this.loading = false;
       }
     },
-
+    
     async updateQuantity({ id, quantity, operation }) {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -100,9 +101,6 @@ export default {
     alert(error.response?.data?.message || "Не вдалося оновити кількість товару.");
   }
 },
-
-
-
 
     async removeItem(id) {
       const token = localStorage.getItem("token");
