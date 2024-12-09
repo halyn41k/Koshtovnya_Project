@@ -97,6 +97,7 @@ export default {
   padding: 50px;
   background-color: #F4E7E5;
   font-family: 'Merriweather', serif;
+  z-index: 1000;
 }
 
 .footer-content {

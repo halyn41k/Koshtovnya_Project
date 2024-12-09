@@ -7,7 +7,9 @@
     </header>
     <div class="cart-content">
       <section class="cart-items">
-        <div v-if="loading" class="loading">Завантаження...</div>
+        <div v-if="loading" class="loading">
+          <Loader />
+        </div>
         <div v-else-if="cartItems.length === 0" class="empty-cart">
           Ваш кошик порожній.
         </div>
@@ -33,12 +35,15 @@
 import axios from "axios";
 import CartItem from './CartItem.vue';
 import Summary from './Summary.vue';
+import Loader from '../Loader.vue';  
+
 
 export default {
   name: "CartShopPage",
   components: {
     CartItem,
     Summary,
+    Loader,  // Register the Loader component
   },
   data() {
     return {
@@ -47,7 +52,6 @@ export default {
     };
   },
   methods: {
-
     async fetchCartItems() {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -60,13 +64,27 @@ export default {
         const response = await axios.get("http://26.235.139.202:8080/api/cart", {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        // Update cartItems to include is_available
         this.cartItems = response.data.products.map(item => ({
           id: item.id,
           image: item.image_url,
           title: item.name,
           price: item.price,
           quantity: item.quantity,
+          isAvailable: item.is_available,
         }));
+
+        // Handle errors if some products are unavailable
+        if (response.data.errors && response.data.errors.length > 0) {
+          response.data.errors.forEach(error => {
+            const itemIndex = this.cartItems.findIndex(item => item.title === error.product_name);
+            if (itemIndex !== -1) {
+              this.cartItems[itemIndex].isAvailable = false;
+              this.cartItems[itemIndex].errorMessage = error.message;
+            }
+          });
+        }
       } catch (error) {
         console.error("Помилка завантаження кошика:", error);
         alert("Не вдалося завантажити кошик.");
@@ -74,33 +92,31 @@ export default {
         this.loading = false;
       }
     },
-    
-    async updateQuantity({ id, quantity, operation }) {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Будь ласка, увійдіть у свій обліковий запис.");
-    this.$router.push("/login");
-    return;
-  }
-  try {
-    // Передаємо операцію (increase/decrease) та кількість
-    const data = { operation, quantity };
-    const response = await axios.patch(
-      `http://26.235.139.202:8080/api/cart/${id}`,
-      data,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
 
-    // Оновлюємо кількість у локальному масиві
-    const itemIndex = this.cartItems.findIndex(item => item.id === id);
-    if (itemIndex !== -1) {
-      this.cartItems[itemIndex].quantity = quantity;
-    }
-  } catch (error) {
-    console.error("Помилка оновлення кількості товару:", error.response?.data || error.message);
-    alert(error.response?.data?.message || "Не вдалося оновити кількість товару.");
-  }
-},
+    async updateQuantity({ id, quantity, operation }) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+      try {
+        const data = { operation, quantity };
+        const response = await axios.patch(
+          `http://26.235.139.202:8080/api/cart/${id}`,
+          data,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const itemIndex = this.cartItems.findIndex(item => item.id === id);
+        if (itemIndex !== -1) {
+          this.cartItems[itemIndex].quantity = quantity;
+        }
+      } catch (error) {
+        console.error("Помилка оновлення кількості товару:", error.response?.data || error.message);
+        alert(error.response?.data?.message || "Не вдалося оновити кількість товару.");
+      }
+    },
 
     async removeItem(id) {
       const token = localStorage.getItem("token");
@@ -125,7 +141,6 @@ export default {
   }
 };
 </script>
-
 
 <style scoped>
 @font-face {

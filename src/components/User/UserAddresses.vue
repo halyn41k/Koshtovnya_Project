@@ -1,11 +1,15 @@
 <template>
   <div class="address-container">
-    <div v-if="!addressAvailable" class="no-address">
+    <Loader v-if="loading" />
+
+    <!-- Show "Create new address" button if no address is available -->
+    <div v-if="!addressAvailable && !loading" class="no-address">
       <button class="add-address-button" @click="showForm = true">
         <span class="plus-icon">+</span> Створити нову адресу
       </button>
     </div>
 
+    <!-- Show the address form if `showForm` is true -->
     <div v-if="showForm" class="address-form">
       <h2>{{ addressAvailable ? 'Оновити адресу' : 'Додати нову адресу' }}</h2>
       <form @submit.prevent="submitAddress">
@@ -39,7 +43,8 @@
       </form>
     </div>
 
-    <div v-else-if="addressAvailable" class="address-card">
+    <!-- Show address card if `addressAvailable` is true -->
+    <div v-else-if="addressAvailable && !loading" class="address-card">
       <h2 class="card-title">Ваша адреса доставки</h2>
       <p><strong>Ім’я:</strong> {{ firstName }}</p>
       <p><strong>Прізвище:</strong> {{ lastName }}</p>
@@ -60,67 +65,158 @@
 </template>
 
 <script>
+import Loader from '../Loader.vue'; // Import the loader component
+
 export default {
-  name: 'UserAddresses', // Назва компонента
+  name: 'UserAddresses',
+  components: {
+    Loader, // Register the loader component
+  },
   data() {
     return {
-      addressAvailable: false, // Статус наявності адреси
-      showForm: false, // Показати форму
-      firstName: '', // Ім’я
-      lastName: '', // Прізвище
-      phoneNumber: '', // Номер телефону
-      city: '', // Місто
-      postalOffice: '', // Поштове відділення
-      errors: {}, // Об’єкт для зберігання помилок валідації
+      addressAvailable: false,
+      showForm: false,
+      firstName: '',
+      lastName: '',
+      phoneNumber: '',
+      city: '',
+      postalOffice: '',
+      errors: {},
+      loading: true, // Flag to show loader while checking address
     };
   },
+  created() {
+    this.fetchUserAddress();
+  },
   methods: {
-    // Валідація полів форми
+    // Fetch user address from API
+    async fetchUserAddress() {
+      try {
+        const response = await fetch('http://26.235.139.202:8080/api/user-address');
+        if (!response.ok) {
+          throw new Error('Помилка при отриманні адреси');
+        }
+        const data = await response.json();
+        const address = data.data.address;
+
+        if (address) {
+          this.firstName = address.user.split(' ')[0]; // First name
+          this.lastName = address.user.split(' ')[1]; // Last name
+          this.phoneNumber = address.phone_number;
+          this.city = address.city;
+          this.postalOffice = address.delivery_address;
+          this.addressAvailable = true;
+        }
+      } catch (error) {
+        console.error('Error fetching address:', error);
+      } finally {
+        this.loading = false; // Hide loader when done
+      }
+    },
+
+    // Validate the form fields
     validateFields() {
-      this.errors = {}; // Очищаємо попередні помилки
+      this.errors = {}; // Reset errors
       if (!this.firstName) this.errors.firstName = 'Введіть ім’я';
       if (!this.lastName) this.errors.lastName = 'Введіть прізвище';
       if (!this.phoneNumber) this.errors.phoneNumber = 'Введіть телефон';
       if (!this.city) this.errors.city = 'Введіть місто';
       if (!this.postalOffice) this.errors.postalOffice = 'Введіть відділення пошти';
-      return Object.keys(this.errors).length === 0; // Якщо помилок немає, повертаємо true
+      return Object.keys(this.errors).length === 0; // Return true if no errors
     },
 
-    // Підтвердження адреси
+    // Submit the address form (create or update)
     submitAddress() {
       if (this.validateFields()) {
-        this.addressAvailable = true; // Адресу можна використовувати
-        this.showForm = false; // Приховуємо форму
+        // Logic to save the new address or update the existing one
+        this.addressAvailable = true;
+        this.showForm = false;
       }
     },
 
-    // Редагування адреси
+    // Edit the address (show the form)
     editAddress() {
-      this.showForm = true; // Відкриваємо форму для редагування
+      this.showForm = true;
     },
 
-    // Видалення адреси
+    // Delete the address
     deleteAddress() {
-      this.addressAvailable = false; // Видаляємо адресу
-      this.showForm = false; // Приховуємо форму
-      this.firstName = ''; // Очищаємо форму
+      this.addressAvailable = false; // Remove the address
+      this.showForm = false; // Hide the form
+      this.firstName = ''; // Reset the form
       this.lastName = '';
       this.phoneNumber = '';
       this.city = '';
       this.postalOffice = '';
-      this.errors = {}; // Очищаємо помилки
+      this.errors = {}; // Clear errors
     },
 
-    // Скасування редагування
+    // Cancel editing the address
     cancelEdit() {
-      this.showForm = false; // Закриваємо форму
+      this.showForm = false; // Hide the form
     },
   },
 };
 </script>
 
-
 <style scoped>
+.address-container {
+  padding: 20px;
+}
+
+.no-address {
+  margin-bottom: 20px;
+}
+
+.add-address-button {
+  background-color: #6b1f1f;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.address-form,
+.address-card {
+  margin-top: 20px;
+}
+
+
+.address-container {
+  padding: 20px;
+}
+
+.no-address {
+  margin-bottom: 20px;
+}
+
+.add-address-button {
+  background-color: #6b1f1f;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.address-form,
+.address-card {
+  margin-top: 20px;
+}
+
+.loader {
+  /* Loader styling here */
+  width: 100px;
+  height: 100px;
+  background-color: #6b1f1f;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
 .address-container {
   max-width: 800px;
   margin: 0 auto;

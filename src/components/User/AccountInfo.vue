@@ -66,6 +66,7 @@ export default {
       activeTab: 0,
       first_name: '', // Поля мають бути порожніми за замовчуванням
       last_name: '',
+      second_name: '',
       email: '',
       menuItems: [
         { title: 'Інформація', icon: require('@/assets/user.png') },
@@ -123,12 +124,13 @@ export default {
           }
         }
 
-        const { user } = await response.json(); // Передбачено, що об'єкт користувача знаходиться всередині "user"
+        const { user } = await response.json();
         this.first_name = user.first_name || 'Невідоме ім’я';
         this.last_name = user.last_name || 'Невідоме прізвище';
+        this.second_name = user.second_name || 'Невідоме по батькові'; // Отримуємо поле по батькові
         this.email = user.email || 'Невідомий email';
       } catch (error) {
-        this.setMessage('Сталася помилка. Спробуйте пізніше.', 'error');
+        this.setMessage('Сталася помилка.', 'error');
       }
     },
     async selectTab(index) {

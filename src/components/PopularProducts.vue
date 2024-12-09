@@ -1,4 +1,4 @@
-<template>
+<template> 
   <section class="popular-goods">
     <h2 class="section-title">{{ $t('popularGoods') }}</h2>
     <div class="arrow-container">
@@ -14,7 +14,8 @@
           :key="product.id"
           class="product-card"
         >
-          <router-link :to="`/productpage/${product.id}`" class="product-card-link">
+          <div v-if="isLoading" class="card--skeleton"></div>
+          <router-link v-else :to="`/productpage/${product.id}`" class="product-card-link">
             <div class="image-container">
               <img :src="product.image_url" :alt="product.name" class="product-image" />
             </div>
@@ -27,26 +28,25 @@
             <span class="product-material">{{ product.bead_producer_name }}</span>
             <span class="wishlist-icon" @click.stop="toggleWishlist(product)">
               <svg
-                  v-if="product.is_in_wishlist"
-                  class="filled-heart"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                <svg
-                  v-else
-                  class="empty-heart"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-                </svg>
-
+                v-if="product.is_in_wishlist"
+                class="filled-heart"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+              <svg
+                v-else
+                class="empty-heart"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+              </svg>
             </span>
           </p>
           <button class="buy-button">
@@ -83,7 +83,8 @@ export default {
       currentPage: 0,
       productsPerPage: 3,
       totalPages: 0,
-      wishlist: [], // Store IDs of products in the wishlist
+      wishlist: [],
+      isLoading: true,  // Додаємо змінну для управління станом загрузки
     };
   },
   methods: {
@@ -95,6 +96,7 @@ export default {
         this.products = data.data;
         this.updateVisibleProducts();
         this.totalPages = Math.ceil(this.products.length / this.productsPerPage);
+        this.isLoading = false;  // Завантаження завершено
 
         // Fetch the wishlist after products are fetched
         await this.fetchWishlist();
@@ -193,9 +195,33 @@ export default {
 };
 </script>
 
+<style scoped>
+.card--skeleton {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
+  width: 50%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  animation: loading 1.5s infinite linear;
+}
+
+@keyframes loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: 200px 0;
+  }
+}
+
+.product-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
 
 
-  <style scoped>
   .product-card-link {
   text-decoration: none;
   color: inherit;

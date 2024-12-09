@@ -1,10 +1,16 @@
 <template>
   <div class="order-history">
     <h2 class="order-history-title">Історія замовлень</h2>
-    <div v-if="loading" class="loading">Завантаження...</div>
+
+    <!-- Show Loader while loading orders -->
+    <Loader v-if="loading" />
+
+    <!-- Show message if no orders found -->
     <div v-else-if="orders.length === 0" class="no-orders">
       Ви не розмістили жодного замовлення :(
     </div>
+
+    <!-- Show order details if there are orders -->
     <div v-else>
       <div class="order-item" v-for="(order, index) in orders" :key="index">
         <div class="order-header">
@@ -28,30 +34,34 @@
 
 <script>
 import axios from 'axios';
+import Loader from '@/components/Loader.vue'; // Import the loader component
 
 export default {
   name: 'OrderHistory',
+  components: {
+    Loader, // Register the loader component
+  },
   data() {
     return {
       orders: [],
-      loading: false,
+      loading: true, // Initially loading is true
     };
   },
   methods: {
     async fetchOrders() {
-      this.loading = true;
       const token = localStorage.getItem('token');
       if (!token) {
         alert('Будь ласка, увійдіть у свій обліковий запис.');
         this.$router.push('/login');
         return;
       }
+
       try {
         const response = await axios.get('http://26.235.139.202:8080/api/orders', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Перетворення даних для відображення
+        // Transform the response data to match the desired structure
         this.orders = response.data.orders.map((order) => ({
           id: order.id,
           status: order.status,
@@ -66,15 +76,17 @@ export default {
         console.error('Помилка завантаження замовлень:', error);
         alert('Не вдалося завантажити ваші замовлення.');
       } finally {
-        this.loading = false;
+        this.loading = false; // Hide the loader after fetching is complete
       }
     },
   },
   mounted() {
+    document.title = 'Історія замовлень';
     this.fetchOrders();
   },
 };
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Merriweather:wght@400;700&family=Montserrat:wght@600&display=swap');

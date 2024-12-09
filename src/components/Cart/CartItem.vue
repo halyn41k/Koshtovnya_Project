@@ -14,17 +14,20 @@
         <div class="item-controls">
           <p class="item-quantity">Кількість: {{ quantity }}</p>
           <div class="quantity-controls">
-            <!-- Приклад кнопок для зміни кількості -->
+            <!-- Increase and Decrease buttons are disabled if the item is unavailable -->
             <button 
-  class="quantity-button increase" 
-  @click="increaseQuantity">+</button>
-<button 
-  class="quantity-button decrease" 
-  @click="decreaseQuantity">-</button>
-
-
+              class="quantity-button increase" 
+              @click="increaseQuantity" 
+              :disabled="!isAvailable">+</button>
+            <button 
+              class="quantity-button decrease" 
+              @click="decreaseQuantity" 
+              :disabled="!isAvailable">-</button>
           </div>
           <p class="item-total">Загальна: {{ totalPrice }}₴</p>
+          
+          <!-- Error message if the product is unavailable -->
+          <p v-if="!isAvailable" class="error-message">{{ errorMessage }}</p>
         </div>
       </div>
     </div>
@@ -41,6 +44,8 @@ export default {
     title: { type: String, required: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
+    isAvailable: { type: Boolean, default: true }, // Added isAvailable prop
+    errorMessage: { type: String, default: '' }, // Added errorMessage prop
   },
   computed: {
     totalPrice() {
@@ -49,16 +54,18 @@ export default {
   },
   methods: {
     increaseQuantity() {
-    this.$emit('change-quantity', { id: this.id, quantity: this.quantity + 1, operation: 'increase' });
-  },
-  decreaseQuantity() {
-    if (this.quantity > 1) {
-      this.$emit('change-quantity', { id: this.id, quantity: this.quantity - 1, operation: 'decrease' });
+      if (this.isAvailable) {
+        this.$emit('change-quantity', { id: this.id, quantity: this.quantity + 1, operation: 'increase' });
+      }
+    },
+    decreaseQuantity() {
+      if (this.isAvailable && this.quantity > 1) {
+        this.$emit('change-quantity', { id: this.id, quantity: this.quantity - 1, operation: 'decrease' });
+      }
+    },
+    removeItem() {
+      this.$emit('remove-item', this.id);
     }
-  },
-  removeItem() {
-    this.$emit('remove-item', this.id);
-  }
   }
 };
 </script>

@@ -14,42 +14,65 @@
         <div class="form-group">
           <div class="form-labels">
             <label for="email" class="form-label">Email:</label>
+          </div>
+          <div class="form-inputs">
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              v-model="email"
+              @input="validateEmail"
+              aria-label="Email"
+              placeholder="Введіть ваш email"
+              required
+            />
+            <span v-if="emailError" class="error-message email-error">{{ emailError }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-labels">
             <label for="password" class="form-label">Пароль:</label>
           </div>
           <div class="form-inputs">
-            <input 
-              type="email" 
-              id="email" 
-              class="form-input" 
-              v-model="email" 
-              aria-label="Email" 
-              placeholder="Введіть ваш email" 
-              required
-            />
             <div class="password-input-container">
-              <input 
-                :type="showPassword ? 'text' : 'password'" 
-                id="password" 
-                class="form-input" 
-                v-model="password" 
-                aria-label="Пароль" 
-                placeholder="Введіть пароль" 
+              <input
+                :type="showPassword ? 'text' : 'password'"
+                id="password"
+                class="form-input"
+                v-model="password"
+                @input="validatePassword"
+                aria-label="Пароль"
+                placeholder="Введіть пароль"
                 required
               />
-              <button type="button" @click="togglePasswordVisibility" class="toggle-password-button">
-                <span v-if="showPassword" v-html="eyeOpenIcon"></span>
-                <span v-else v-html="eyeClosedIcon"></span>
+              <span v-if="passwordError" class="error-message password-error">{{ passwordError }}</span>
+              <button
+                type="button"
+                @click="togglePasswordVisibility"
+                class="toggle-password-button"
+              >
+                <img :src="showPassword ? eyeOpenIcon : eyeClosedIcon" alt="Toggle Password Visibility" />
               </button>
             </div>
           </div>
         </div>
+
         <p class="signup-prompt">
           Немає облікового запису?
           <router-link to="/registration" class="signup-link">Створіть його тут</router-link>
         </p>
-        <button type="submit" class="login-button">
+        <button
+          type="submit"
+          class="login-button"
+          :disabled="emailError || passwordError"
+        >
           <span>Увійти</span>
-          <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="login-icon" />
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
+            alt=""
+            class="login-icon"
+          />
         </button>
       </form>
     </main>
@@ -57,56 +80,69 @@
 </template>
 
 <script>
+import eyeOpenIcon from "@/assets/eye-hide-svgrepo-com.svg";
+import eyeClosedIcon from "@/assets/eye-1-svgrepo-com.svg";
+
 export default {
   data() {
     return {
       email: "",
       password: "",
+      emailError: "",
+      passwordError: "",
       showPassword: false,
-      eyeOpenIcon: `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5z" stroke="#555" stroke-width="2"/>
-          <circle cx="12" cy="12" r="3" fill="#555"/>
-        </svg>`,
-      eyeClosedIcon: `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3m5.87-2.8c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5m0 0l6.57 6.57M16.87 16.87c1.9-1.02 3.37-2.77 4.13-4.87-1.73-4.39-6-7.5-11-7.5-1.08 0-2.13.14-3.13.4" stroke="#555" stroke-width="2"/>
-        </svg>`,
+      eyeOpenIcon,
+      eyeClosedIcon,
     };
   },
   methods: {
+    validateEmail() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.emailError = emailRegex.test(this.email)
+        ? ""
+        : "Введіть дійсний email.";
+    },
+    validatePassword() {
+      const hasSpaces = /\s/.test(this.password);
+      this.passwordError =
+        this.password.length < 8
+          ? "Пароль повинен містити мінімум 8 символів."
+          : hasSpaces
+          ? "Пароль не повинен містити пробілів."
+          : "";
+    },
     async submitLogin() {
-  try {
-    const response = await fetch("http://26.235.139.202:8080/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: this.email,
-        password: this.password,
-      }),
-    });
+      try {
+        if (this.emailError || this.passwordError) {
+          alert("Виправте помилки у формі.");
+          return;
+        }
 
-    if (!response.ok) throw new Error("Помилка входу. Перевірте дані.");
+        const response = await fetch("http://26.235.139.202:8080/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: this.email,
+            password: this.password,
+          }),
+        });
 
-    const data = await response.json();
-    console.log("Успішний вхід:", data);
+        if (!response.ok) throw new Error("Помилка входу. Перевірте дані.");
 
-    // Збереження токена
-    localStorage.setItem("token", data.token);
+        const data = await response.json();
+        console.log("Успішний вхід:", data);
 
-    // Перевірка чи токен збережений
-    if (localStorage.getItem("token")) {
-      this.$router.push({ name: "AccountInfo" });
-    } else {
-      alert("Не вдалося зберегти токен.");
-    }
-  } catch (error) {
-    console.error("Помилка входу:", error.message);
-    alert("Не вдалося увійти. Перевірте ваші дані.");
-  }
+        // Збереження токена
+        localStorage.setItem("token", data.token);
 
+        // Перехід до облікового запису
+        this.$router.push({ name: "AccountInfo" });
+      } catch (error) {
+        console.error("Помилка входу:", error.message);
+        alert("Не вдалося увійти. Перевірте ваші дані.");
+      }
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
@@ -115,12 +151,34 @@ export default {
 };
 </script>
 
+<style scoped>
+.error-message {
+  color: red;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  transform: translateY(5px); /* Додаємо невеликий відступ від поля */
+  width: 100%; /* Робимо ширину рівною ширині поля вводу */
+  box-sizing: border-box; /* Враховуємо padding */
+}
 
+.form-inputs {
+  position: relative; /* Додаємо relative позицію до контейнера для коректного розташування повідомлень */
+}
 
+.error-field input {
+  border-color: red;
+}
 
+.signup-prompt {
+  color: var(--Schemes-On-Error-Container, #852221);
+  margin-top: -20px; /* Встановлюємо невеликий відступ для коректного розташування */
+}
 
-  
-  <style scoped>
+.error-field input {
+  border-color: red;
+}
   .login-container {
   display: flex;
   flex-direction: column;
@@ -262,16 +320,30 @@ export default {
   position: relative;
   width: 100%; 
 }
-  .toggle-password-button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
+
+.toggle-password-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Ширина кнопки */
+  height: 30px; /* Висота кнопки */
+}
+
+.toggle-password-button img {
+  width: 20px; /* Ширина іконки */
+  height: 20px; /* Висота іконки */
+  object-fit: contain; /* Запобігає спотворенню зображення */
+}
+
+
   .signup-prompt {
     color: var(--Schemes-On-Error-Container, #852221);
     margin-top: -10px;

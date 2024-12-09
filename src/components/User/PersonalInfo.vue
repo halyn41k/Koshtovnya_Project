@@ -4,6 +4,7 @@
     <div class="info-details">
       <p><strong>Ім’я:</strong> {{ first_name }}</p>
       <p><strong>Прізвище:</strong> {{ last_name }}</p>
+      <p><strong>По батькові:</strong> {{ second_name }}</p> 
       <p><strong>Email:</strong> {{ email }}</p>
     </div>
     <button class="change-password-button" @click="changePassword">Змінити пароль</button>
@@ -20,6 +21,10 @@ export default {
     last_name: {
       type: String,
       default: 'Прізвище',
+    },
+    second_name: {
+      type: String,
+      default: 'По батькові', 
     },
     email: {
       type: String,

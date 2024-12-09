@@ -97,7 +97,7 @@ const routes = [
   {
     path: '/payment',
     name: 'PaymentComponent',
-    component: () => import('@/components/PaymentComponent.vue'),
+    component: () => import('@/components/Payment/PaymentComponent.vue'),
   },
   {
     path: '/admin',

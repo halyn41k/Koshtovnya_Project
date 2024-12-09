@@ -1,10 +1,16 @@
 <template>
   <div class="wishlist">
     <h2 class="wishlist-title">Список бажань</h2>
-    <div v-if="loading" class="loading">Завантаження...</div>
+
+    <!-- Show Loader while loading wishlist -->
+    <Loader v-if="loading" />
+
+    <!-- Show message if no items in wishlist -->
     <div v-else-if="items.length === 0" class="no-items">
       Ваш список бажань порожній :(
     </div>
+
+    <!-- Show wishlist items if they are present -->
     <div v-else>
       <div class="wishlist-items">
         <div v-for="(item, index) in items" :key="index" class="wishlist-item">
@@ -40,9 +46,13 @@
 
 <script>
 import axios from "axios";
+import Loader from '../Loader.vue'; // Import the loader component
 
 export default {
   name: "UserWishlist",
+  components: {
+    Loader, // Register the loader component
+  },
   data() {
     return {
       items: [],
@@ -76,69 +86,60 @@ export default {
       }
     },
     async addToCart(item) {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    alert('Будь ласка, увійдіть у свій обліковий запис.');
-    this.$router.push('/login');
-    return;
-  }
-
-  try {
-    // Додавання товару до кошика без передачі quantity
-    const cartData = { product_id: item.id };
-    const response = await axios.post(
-      'http://26.235.139.202:8080/api/cart',
-      cartData,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    console.log('Відповідь після додавання товару:', response.data);  // Логування відповіді
-
-    // Перевірка, чи додавання успішне
-    if (response.data && response.data.message === 'Product added to cart') {
-      alert('Товар успішно додано до кошика.');
-
-      // Оновлення або повторне завантаження даних кошика, якщо потрібно
-    } else {
-      console.error('Товари не були додані.');
-      alert('Не вдалося додати товар до кошика.');
-    }
-
-  } catch (error) {
-    console.error('Помилка додавання товару до кошика:', error);
-    alert('Не вдалося додати товар до кошика.');
-  }
-},
-async removeItem(index) {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Будь ласка, увійдіть у свій обліковий запис.");
-      this.$router.push("/login");
-      return;
-    }
-
-    try {
-      const itemId = this.items[index].id; // ID товару, який треба видалити
-      const response = await axios.delete(`http://26.235.139.202:8080/api/wishlist/${itemId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.status === 200) {
-        // Видаляємо товар з локального списку
-        this.items.splice(index, 1); // Видаляємо товар за індексом
-        alert("Товар видалено з бажаного.");
-      } else {
-        alert("Не вдалося видалити товар.");
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Будь ласка, увійдіть у свій обліковий запис.');
+        this.$router.push('/login');
+        return;
       }
 
-    } catch (error) {
-      console.error("Помилка при видаленні товару:", error);
-      alert("Не вдалося видалити товар з бажаного.");
-    }
-  },
+      try {
+        const cartData = { product_id: item.id };
+        const response = await axios.post(
+          'http://26.235.139.202:8080/api/cart',
+          cartData,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-  },
+        console.log('Відповідь після додавання товару:', response.data);
 
+        if (response.data && response.data.message === 'Product added to cart') {
+          alert('Товар успішно додано до кошика.');
+        } else {
+          console.error('Товари не були додані.');
+          alert('Не вдалося додати товар до кошика.');
+        }
+      } catch (error) {
+        console.error('Помилка додавання товару до кошика:', error);
+        alert('Не вдалося додати товар до кошика.');
+      }
+    },
+    async removeItem(index) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+
+      try {
+        const itemId = this.items[index].id; 
+        const response = await axios.delete(`http://26.235.139.202:8080/api/wishlist/${itemId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.status === 200) {
+          this.items.splice(index, 1); // Remove item from the list
+          alert("Товар видалено з бажаного.");
+        } else {
+          alert("Не вдалося видалити товар.");
+        }
+      } catch (error) {
+        console.error("Помилка при видаленні товару:", error);
+        alert("Не вдалося видалити товар з бажаного.");
+      }
+    },
+  },
 
   mounted() {
     this.fetchWishlist();

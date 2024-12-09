@@ -1,144 +1,233 @@
 <template>
-    <div class="registration-container">
-      <header class="registration-header">
-        <div class="header-line"></div>
-      </header>
-      <h1 class="registration-title-container">
-        <div class="line"></div>
-        <span class="registration-title">Реєстрація</span>
-        <div class="line"></div>
-      </h1>
-  
-      <main class="registration-main">
-        <div class="registration-background-image"></div>
-        <form class="registration-form" @submit.prevent="submitRegistration">
-          <div class="form-group">
-            <div class="form-labels">
-              <label for="first_name" class="form-label">Ім'я:</label>
-              <label for="last_name" class="form-label">Прізвище:</label>
-              <label for="email" class="form-label">Email:</label>
-              <label for="password" class="form-label">Пароль:</label>
+  <div class="registration-container">
+    <header class="registration-header">
+      <div class="header-line"></div>
+    </header>
+    <h1 class="registration-title-container">
+      <div class="line"></div>
+      <span class="registration-title">Реєстрація</span>
+      <div class="line"></div>
+    </h1>
+
+    <main class="registration-main">
+      <div class="registration-background-image"></div>
+      <form class="registration-form" @submit.prevent="submitRegistration">
+        <div class="form-group">
+          <div class="form-labels">
+            <label for="first_name" class="form-label">Ім'я:</label>
+            <label for="last_name" class="form-label">Прізвище:</label>
+            <label for="middle_name" class="form-label">По батькові:</label> <!-- Додано по батькові -->
+            <label for="email" class="form-label">Email:</label>
+            <label for="password" class="form-label">Пароль:</label>
+          </div>
+          <div class="form-inputs">
+            <!-- Ім'я -->
+            <div class="form-input-container">
+              <input
+                type="text"
+                id="first_name"
+                class="form-input"
+                v-model="first_name"
+                @input="validateName"
+                placeholder="Введіть ваше ім'я"
+                required
+              />
+              <transition name="fade">
+                <small v-if="nameError" class="error-message">{{ nameError }}</small>
+              </transition>
             </div>
-            <div class="form-inputs">
-              <input 
-                type="text" 
-                id="first_name" 
-                class="form-input" 
-                v-model="first_name" 
-                aria-label="Ім'я" 
-                placeholder="Введіть ваше ім'я" 
+
+            <!-- Прізвище -->
+            <div class="form-input-container">
+              <input
+                type="text"
+                id="last_name"
+                class="form-input"
+                v-model="last_name"
+                @input="validateLastName"
+                placeholder="Введіть ваше прізвище"
                 required
               />
-              <input 
-                type="text" 
-                id="last_name" 
-                class="form-input" 
-                v-model="last_name" 
-                aria-label="Прізвище" 
-                placeholder="Введіть ваше прізвище" 
+              <transition name="fade">
+                <small v-if="lastNameError" class="error-message">{{ lastNameError }}</small>
+              </transition>
+            </div>
+
+            <!-- По батькові -->
+            <div class="form-input-container">
+              <input
+                type="text"
+                id="middle_name"
+                class="form-input"
+                v-model="middle_name"
+                @input="validateMiddleName"
+                placeholder="Введіть ваше по батькові"
                 required
               />
-              <input 
-                type="email" 
-                id="email" 
-                class="form-input" 
-                v-model="email" 
-                aria-label="Email" 
-                placeholder="Введіть ваш email" 
+              <transition name="fade">
+                <small v-if="middleNameError" class="error-message">{{ middleNameError }}</small>
+              </transition>
+            </div>
+
+            <!-- Email -->
+            <div class="form-input-container">
+              <input
+                type="email"
+                id="email"
+                class="form-input"
+                v-model="email"
+                @input="validateEmail"
+                placeholder="Введіть ваш email"
                 required
               />
+              <transition name="fade">
+                <small v-if="emailError" class="error-message">{{ emailError }}</small>
+              </transition>
+            </div>
+
+            <!-- Пароль -->
+            <div class="form-input-container">
               <div class="password-input-container">
-                          <input 
-                          :type="showPassword ? 'text' : 'password'" 
-                          id="password" 
-                          class="form-input" 
-                          v-model="password" 
-                          aria-label="Пароль" 
-                          placeholder="Введіть пароль" 
-                          required
-                        />
-                        <button 
-                          type="button" 
-                          @click="togglePasswordVisibility" 
-                          class="toggle-password-button"
-                        >
-                          <span v-html="showPassword ? eyeOpenIcon : eyeClosedIcon"></span>
-                        </button>
-                      </div>
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  id="password"
+                  class="form-input"
+                  v-model="password"
+                  @input="validatePassword"
+                  placeholder="Введіть пароль"
+                  required
+                />
+                <button
+                  type="button"
+                  @click="togglePasswordVisibility"
+                  class="toggle-password-button"
+                >
+                  <img :src="showPassword ? eyeOpenIcon : eyeClosedIcon" alt="toggle password visibility" />
+                </button>
+              </div>
+              <transition name="fade">
+                <small v-if="passwordError" class="error-message">{{ passwordError }}</small>
+              </transition>
             </div>
           </div>
-          <p class="login-prompt">
-    Вже маєте обліковий запис?
-    <router-link to="/login" class="login-link">Увійти</router-link>
-  </p>
-  
-          <button type="submit" class="registration-button">
-            <span>Зареєструватися</span>
-            <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="" class="registration-icon" />
-          </button>
-        </form>
-      </main>
-    </div>
-  </template>
-  
-  
-  <script>
-  export default {
-    data() {
-      return {
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        showPassword: false,
-        eyeOpenIcon: `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5z" stroke="#555" stroke-width="2"/>
-            <circle cx="12" cy="12" r="3" fill="#555"/>
-          </svg>`,
-        eyeClosedIcon: `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3m5.87-2.8c-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5m0 0l6.57 6.57M16.87 16.87c1.9-1.02 3.37-2.77 4.13-4.87-1.73-4.39-6-7.5-11-7.5-1.08 0-2.13.14-3.13.4" stroke="#555" stroke-width="2"/>
-          </svg>`
-      };
+        </div>
+
+        <p class="login-prompt">
+          Вже маєте обліковий запис?
+          <router-link to="/login" class="login-link">Увійти</router-link>
+        </p>
+
+        <button
+          type="submit"
+          class="registration-button"
+          :disabled="nameError || lastNameError || middleNameError || emailError || passwordError"
+        >
+          <span>Зареєструватися</span>
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
+            alt=""
+            class="registration-icon"
+          />
+        </button>
+      </form>
+    </main>
+  </div>
+</template>
+
+<script>
+import eyeOpenIcon from "@/assets/eye-hide-svgrepo-com.svg";
+import eyeClosedIcon from "@/assets/eye-1-svgrepo-com.svg";
+
+export default {
+  data() {
+    return {
+      first_name: "",
+      last_name: "",
+      middle_name: "", // Додано змінну для по батькові
+      email: "",
+      password: "",
+      nameError: "",
+      lastNameError: "",
+      middleNameError: "", // Додано помилку для по батькові
+      emailError: "",
+      passwordError: "",
+      showPassword: false,
+      eyeOpenIcon,
+      eyeClosedIcon,
+    };
+  },
+  methods: {
+    validateName() {
+      this.nameError = this.first_name.trim()
+        ? ""
+        : "Ім'я не може бути порожнім.";
     },
-    methods: {
-      async submitRegistration() {
-  if (!this.first_name || !this.last_name || !this.email || !this.password) {
-    alert('Будь ласка, заповніть усі поля.');
-    return;
-  }
-  try {
-    const response = await fetch('http://26.235.139.202:8080/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',  // added Accept header
-      },
-      body: JSON.stringify({
-        first_name: this.first_name,
-        last_name: this.last_name,
-        email: this.email,
-        password: this.password,
-      }),
-    });
+    validateLastName() {
+      this.lastNameError = this.last_name.trim()
+        ? ""
+        : "Прізвище не може бути порожнім.";
+    },
+    validateMiddleName() {
+      this.middleNameError = this.middle_name.trim()
+        ? ""
+        : "По батькові не може бути порожнім."; // Валідація по батькові
+    },
+    validateEmail() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.emailError = emailRegex.test(this.email)
+        ? ""
+        : "Введіть дійсний email.";
+    },
+    validatePassword() {
+      const hasSpaces = /\s/.test(this.password);
+      this.passwordError =
+        this.password.length < 8
+          ? "Пароль повинен містити щонайменше 8 символів."
+          : hasSpaces
+          ? "Пароль не повинен містити пробілів."
+          : "";
+    },
+    async submitRegistration() {
+      this.validateName();
+      this.validateLastName();
+      this.validateMiddleName(); // Додано перевірку по батькові
+      this.validateEmail();
+      this.validatePassword();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Помилка з беку:', errorData);
-      throw new Error(errorData.message || 'Не вдалося зареєструватися.');
-    }
+      if (
+        this.nameError ||
+        this.lastNameError ||
+        this.middleNameError || // Перевірка помилки по батькові
+        this.emailError ||
+        this.passwordError
+      ) {
+        alert("Будь ласка, виправте помилки.");
+        return;
+      }
 
-    const data = await response.json();
-    alert(`Реєстрація успішна! Ласкаво просимо, ${data.first_name}!`);
-    this.$router.push({ name: 'Login' });
+      try {
+        const response = await fetch("http://26.235.139.202:8080/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            first_name: this.first_name,
+            last_name: this.last_name,
+            middle_name: this.middle_name, // Додано передавання по батькові
+            email: this.email,
+            password: this.password,
+          }),
+        });
 
-  } catch (error) {
-    console.error('Помилка реєстрації:', error.message);
-    alert(`Помилка реєстрації: ${error.message}`);
-  }
+        if (!response.ok) throw new Error("Помилка реєстрації.");
 
-
+        const data = await response.json();
+        alert(`Реєстрація успішна! Вітаємо, ${data.first_name}!`);
+        this.$router.push({ name: "Login" });
+      } catch (error) {
+        alert(`Помилка реєстрації: ${error.message}`);
+      }
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
@@ -146,8 +235,51 @@
   },
 };
 </script>
-  
-  <style scoped>
+
+
+<style scoped>
+.form-input-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+.error-message {
+  color: red;
+  font-size: 0.8rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+.error-field input {
+  border-color: red;
+}
+
+.form-item {
+  margin-bottom: 1.5rem;
+}
+.error-field input {
+  border: 1px solid red;
+  animation: shake 0.3s ease-in-out;
+}
+.error-message {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
   .registration-container {
   display: flex;
   flex-direction: column;
@@ -198,9 +330,9 @@
     text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
     letter-spacing: -2px;
     text-align: center;
-    margin-top: 150px;
+    margin-top: 120px;
     font-size: 30px;
-    margin-bottom: 40px;
+    margin-bottom: 0px;
   }
   
   .registration-main {
@@ -272,19 +404,27 @@
     width: 900px;
   }
   
-  .toggle-password-button {
+.toggle-password-button {
   position: absolute;
-  right: 110px; 
+  right: 100px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
-  width: 24px; 
-  height: 24px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; /* Ширина кнопки */
+  height: 30px; /* Висота кнопки */
 }
-  
+
+.toggle-password-button img {
+  width: 20px; /* Ширина іконки */
+  height: 20px; /* Висота іконки */
+  object-fit: contain; /* Запобігає спотворенню зображення */
+}
   .login-prompt {
     color: var(--Schemes-On-Error-Container, #852221);
     margin-top: -10px;
