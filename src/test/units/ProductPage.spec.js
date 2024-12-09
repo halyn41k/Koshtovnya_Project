@@ -4,6 +4,8 @@ import axios from 'axios';
 
 jest.mock('axios', () => ({
   get: jest.fn(),
+  post: jest.fn(),
+  delete: jest.fn(),
 }));
 
 describe('ProductPage Component', () => {
@@ -25,6 +27,7 @@ describe('ProductPage Component', () => {
   };
 
   beforeEach(() => {
+    jest.spyOn(window, 'alert').mockImplementation(() => {}); // Мокаємо alert
     // Мокаємо fetch
     global.fetch = jest.fn(() =>
       Promise.resolve({
@@ -51,6 +54,7 @@ describe('ProductPage Component', () => {
       global: {
         mocks: {
           $route: mockRoute,
+          $router: { push: jest.fn() }, // Додаємо мок для роутера
         },
         stubs: {
           ProductReviews: true, // Замоканий компонент
@@ -450,4 +454,230 @@ describe('ProductPage Component', () => {
     expect(wrapper.find('.filled-heart').exists()).toBe(false); // Заповнене серце не відображається
     expect(wrapper.find('.empty-heart').exists()).toBe(true); // Порожнє серце відображається
   });  
+
+  it('Перевіряє виклик fetchWishlist при створенні компонента', () => {
+    expect(ProductPage.methods.fetchWishlist).toHaveBeenCalled();
+  });
+  
+  it('Перевірка відповідності ключів і значень у `localizedCharacteristics`', async () => {
+    // Задаємо товар із характеристиками
+    wrapper.setData({
+      product: {
+        id: 1,
+        name: 'Тестовий товар',
+        price: 1500,
+        image_url: 'https://example.com/image.jpg',
+        sizes: [10, 20, 30],
+        is_available: true,
+        material: 'Бавовна',
+        weight: '500 г',
+        colors: ['червоний', 'зелений'],
+        country_of_manufacture: 'Україна',
+      },
+    });
+  
+    await wrapper.vm.$nextTick();
+  
+    // Очікувані локалізовані характеристики
+    const expectedCharacteristics = {
+      Матеріал: 'Бавовна',
+      Вага: '500 г',
+      Кольори: 'червоний, зелений',
+      'Країна виробник товару': 'Україна',
+    };
+  
+    // Отримуємо локалізовані характеристики з компонента
+    const localizedCharacteristics = wrapper.vm.localizedCharacteristics;
+  
+    // Перевіряємо, чи всі ключі присутні
+    expect(Object.keys(localizedCharacteristics)).toEqual(Object.keys(expectedCharacteristics));
+  
+    // Перевіряємо, чи всі значення збігаються
+    for (const [key, value] of Object.entries(expectedCharacteristics)) {
+      if (Array.isArray(localizedCharacteristics[key])) {
+        // Якщо значення є масивом, об'єднуємо його в рядок
+        expect(localizedCharacteristics[key].join(', ')).toBe(value);
+      } else {
+        expect(localizedCharacteristics[key]).toBe(value);
+      }
+    }
+  });
+  
+  it('Перевірка правильної локалізації ключа "Кольори" (відображення як списку)', async () => {
+    // Задаємо товар із характеристиками, включаючи "Кольори"
+    wrapper.setData({
+      product: {
+        id: 1,
+        name: 'Тестовий товар',
+        price: 1500,
+        image_url: 'https://example.com/image.jpg',
+        sizes: [10, 20, 30],
+        is_available: true,
+        colors: ['червоний', 'зелений', 'синій'], // Масив кольорів
+      },
+    });
+  
+    await wrapper.vm.$nextTick();
+  
+    // Перевіряємо, чи список характеристик рендериться
+    const specificationsList = wrapper.find('.specifications-list');
+    expect(specificationsList.exists()).toBe(true);
+  
+    // Знаходимо елемент із локалізованим ключем "Кольори"
+    const colorItem = specificationsList.findAll('.spec-item').filter(item => {
+      const term = item.find('.spec-term');
+      return term.exists() && term.text() === 'Кольори'; // Локалізований ключ
+    }).at(0);
+  
+    expect(colorItem).not.toBeUndefined(); // Елемент повинен існувати
+  
+    // Перевіряємо значення
+    const colorDescription = colorItem.find('.spec-description');
+    expect(colorDescription.exists()).toBe(true);
+    expect(colorDescription.text()).toBe('червоний, зелений, синій'); // Очікуване форматування
+  });
+
+  it('Перевірка, чи коректно обробляється порожній масив `product.sizes`', async () => {
+    // Задаємо товар із порожнім масивом розмірів
+    wrapper.setData({
+      product: {
+        id: 1,
+        name: 'Тестовий товар',
+        price: 1500,
+        image_url: 'https://example.com/image.jpg',
+        sizes: [], // Порожній масив розмірів
+        is_available: true,
+      },
+    });
+  
+    await wrapper.vm.$nextTick();
+  
+    // Перевіряємо, чи випадаючий список існує
+    const sizeDropdown = wrapper.find('select.size-dropdown');
+    expect(sizeDropdown.exists()).toBe(true);
+  
+    // Перевіряємо, чи випадаючий список не має варіантів
+    const options = sizeDropdown.findAll('option');
+    expect(options.length).toBe(0); // Випадаючий список повинен бути порожнім
+  });
+  
+  it('Перевіряє поведінку при спробі додати товар до списку бажаного без авторизації', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue(null);
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    await wrapper.vm.toggleWishlist(mockProduct);
+
+    expect(alertSpy).toHaveBeenCalledWith('Будь ласка, увійдіть у свій обліковий запис.');
+    expect(wrapper.vm.$router.push).toHaveBeenCalledWith('/login');
+
+    alertSpy.mockRestore();
+  });
+
+  it('Перевіряє поведінку при спробі додати товар до списку бажаного з авторизацією', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
+    axios.post.mockResolvedValue();
+
+    wrapper.setData({ wishlist: [] });
+
+    await wrapper.vm.toggleWishlist(mockProduct);
+
+    expect(wrapper.vm.wishlist).toContain(mockProduct.id);
+    expect(axios.post).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/wishlist',
+      { product_id: mockProduct.id },
+      { headers: { Authorization: 'Bearer mock-token' } }
+    );
+  });
+
+  it('Перевіряє поведінку при спробі видалити товар зі списку бажаного з авторизацією', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
+    axios.delete.mockResolvedValue();
+
+    wrapper.setData({ wishlist: [mockProduct.id] });
+
+    await wrapper.vm.toggleWishlist(mockProduct);
+
+    expect(wrapper.vm.wishlist).not.toContain(mockProduct.id);
+    expect(axios.delete).toHaveBeenCalledWith(
+      `http://26.235.139.202:8080/api/wishlist/${mockProduct.id}`,
+      { headers: { Authorization: 'Bearer mock-token' } }
+    );
+  });
+
+  it('Перевіряє поведінку при спробі отримати повідомлення про доступність без авторизації', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue(null);
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+    await wrapper.vm.notifyWhenAvailable();
+
+    expect(alertSpy).toHaveBeenCalledWith('Будь ласка, увійдіть у свій обліковий запис.');
+    expect(wrapper.vm.$router.push).toHaveBeenCalledWith('/login');
+
+    alertSpy.mockRestore();
+  });
+
+  it('Перевіряє поведінку при спробі отримати повідомлення про доступність з авторизацією', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
+    axios.post.mockResolvedValue();
+
+    await wrapper.vm.notifyWhenAvailable();
+
+    expect(axios.post).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/notification',
+      { product_id: mockProduct.id },
+      { headers: { Authorization: 'Bearer mock-token' } }
+    );
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+    expect(alertSpy).toHaveBeenCalledWith(`Ви будете повідомлені, коли ${mockProduct.name} з'явиться в наявності!`);
+    alertSpy.mockRestore();
+  });
+
+  it('Перевірка успішного додавання товару до списку бажаного', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
+    axios.post.mockResolvedValue();
+
+    wrapper.setData({ wishlist: [] });
+
+    await wrapper.vm.toggleWishlist(mockProduct);
+
+    expect(axios.post).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/wishlist',
+      { product_id: mockProduct.id },
+      { headers: { Authorization: 'Bearer mock-token' } }
+    );
+    expect(wrapper.vm.wishlist).toContain(mockProduct.id);
+    expect(window.alert).toHaveBeenCalledWith(`${mockProduct.name} додано до списку бажаного!`);
+  });
+
+  it('Перевірка успішного видалення товару зі списку бажаного', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
+    axios.delete.mockResolvedValue();
+
+    wrapper.setData({ wishlist: [mockProduct.id] });
+
+    await wrapper.vm.toggleWishlist(mockProduct);
+
+    expect(axios.delete).toHaveBeenCalledWith(
+      `http://26.235.139.202:8080/api/wishlist/${mockProduct.id}`,
+      { headers: { Authorization: 'Bearer mock-token' } }
+    );
+    expect(wrapper.vm.wishlist).not.toContain(mockProduct.id);
+    expect(window.alert).toHaveBeenCalledWith(`${mockProduct.name} видалено зі списку бажаного!`);
+  });
+
+  it('Перевірка успішного створення запиту на сповіщення про наявність товару', async () => {
+    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
+    axios.post.mockResolvedValue();
+
+    wrapper.setData({ product: mockProduct });
+
+    await wrapper.vm.notifyWhenAvailable();
+
+    expect(axios.post).toHaveBeenCalledWith(
+      'http://26.235.139.202:8080/api/notification',
+      { product_id: mockProduct.id },
+      { headers: { Authorization: 'Bearer mock-token' } }
+    );
+    expect(window.alert).toHaveBeenCalledWith(`Ви будете повідомлені, коли ${mockProduct.name} з'явиться в наявності!`);
+  });
 });
