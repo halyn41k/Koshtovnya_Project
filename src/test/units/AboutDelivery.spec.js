@@ -14,6 +14,13 @@ describe('AboutDelivery.vue', () => {
 
   beforeEach(() => {
     wrapper = shallowMount(AboutDelivery);
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: jest.fn().mockImplementation(() => ({
+        fontSize: '34px',
+        color: 'rgb(0, 0, 0)',
+        textAlign: 'center',
+      })),
+    });
   });
 
   afterEach(() => {
@@ -85,4 +92,14 @@ describe('AboutDelivery.vue', () => {
     expect(thankYouMessage.exists()).toBe(true);
     expect(thankYouMessage.text()).toBe('Дякуємо, що обрали наш магазин!');
   });
+
+  it('повинен мати правильний стиль для заголовка', () => {
+    const titleElement = wrapper.find('.main-title').element;
+    const computedStyles = window.getComputedStyle(titleElement);
+  
+    expect(computedStyles.fontSize).toBe('34px');
+    expect(computedStyles.color).toBe('rgb(0, 0, 0)');
+    expect(computedStyles.textAlign).toBe('center');
+  });
+  
 });
