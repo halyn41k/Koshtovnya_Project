@@ -65,7 +65,7 @@
         <button
           type="submit"
           class="login-button"
-          :disabled="emailError || passwordError"
+    
         >
           <span>Увійти</span>
           <img

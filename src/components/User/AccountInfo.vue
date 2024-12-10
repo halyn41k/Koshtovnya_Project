@@ -33,11 +33,12 @@
 
       <div class="account-details">
         <component
-          :is="activeTabContent"
-          :first_name="first_name"
-          :last_name="last_name"
-          :email="email"
-        />
+  :is="activeTabContent"
+  :first_name="first_name"
+  :last_name="last_name"
+  :email="email"
+  :second_name="second_name" 
+/>
       </div>
     </section>
 
@@ -201,14 +202,13 @@ export default {
   
   .account-header {
     text-align: center;
-    margin-bottom: 20px;
   }
   
   .account-title-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 80px;
+    margin-top: 30px;
   }
   
   .line {
@@ -216,7 +216,7 @@ export default {
     height: 2px;
     background-color: grey;
     margin: 0 10px;
-    margin-top: 120px;
+    margin-top: 150px;
   }
   
   .account-title {
@@ -227,8 +227,8 @@ export default {
     letter-spacing: -2px;
     text-align: center;
     font-size: 30px;
-    margin-bottom: 40px;
-    margin-top: 150px;
+    margin-bottom: 30px;
+    margin-top: 170px;
   }
   
   .account-page {

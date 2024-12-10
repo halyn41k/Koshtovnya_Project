@@ -1,4 +1,4 @@
-<template>
+<template> 
   <div class="registration-container">
     <header class="registration-header">
       <div class="header-line"></div>
@@ -16,12 +16,11 @@
           <div class="form-labels">
             <label for="first_name" class="form-label">Ім'я:</label>
             <label for="last_name" class="form-label">Прізвище:</label>
-            <label for="middle_name" class="form-label">По батькові:</label> <!-- Додано по батькові -->
+            <label for="second_name" class="form-label">По батькові:</label>
             <label for="email" class="form-label">Email:</label>
             <label for="password" class="form-label">Пароль:</label>
           </div>
           <div class="form-inputs">
-            <!-- Ім'я -->
             <div class="form-input-container">
               <input
                 type="text"
@@ -36,8 +35,6 @@
                 <small v-if="nameError" class="error-message">{{ nameError }}</small>
               </transition>
             </div>
-
-            <!-- Прізвище -->
             <div class="form-input-container">
               <input
                 type="text"
@@ -52,24 +49,20 @@
                 <small v-if="lastNameError" class="error-message">{{ lastNameError }}</small>
               </transition>
             </div>
-
-            <!-- По батькові -->
             <div class="form-input-container">
               <input
                 type="text"
-                id="middle_name"
+                id="second_name"
                 class="form-input"
-                v-model="middle_name"
-                @input="validateMiddleName"
+                v-model="second_name"
+                @input="validateSecondName"
                 placeholder="Введіть ваше по батькові"
                 required
               />
               <transition name="fade">
-                <small v-if="middleNameError" class="error-message">{{ middleNameError }}</small>
+                <small v-if="secondNameError" class="error-message">{{ secondNameError }}</small>
               </transition>
             </div>
-
-            <!-- Email -->
             <div class="form-input-container">
               <input
                 type="email"
@@ -84,8 +77,6 @@
                 <small v-if="emailError" class="error-message">{{ emailError }}</small>
               </transition>
             </div>
-
-            <!-- Пароль -->
             <div class="form-input-container">
               <div class="password-input-container">
                 <input
@@ -117,17 +108,9 @@
           <router-link to="/login" class="login-link">Увійти</router-link>
         </p>
 
-        <button
-          type="submit"
-          class="registration-button"
-          :disabled="nameError || lastNameError || middleNameError || emailError || passwordError"
-        >
+        <button type="submit" class="registration-button">
+
           <span>Зареєструватися</span>
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-            alt=""
-            class="registration-icon"
-          />
         </button>
       </form>
     </main>
@@ -143,12 +126,12 @@ export default {
     return {
       first_name: "",
       last_name: "",
-      middle_name: "", // Додано змінну для по батькові
+      second_name: "",
       email: "",
       password: "",
       nameError: "",
       lastNameError: "",
-      middleNameError: "", // Додано помилку для по батькові
+      secondNameError: "",
       emailError: "",
       passwordError: "",
       showPassword: false,
@@ -167,10 +150,10 @@ export default {
         ? ""
         : "Прізвище не може бути порожнім.";
     },
-    validateMiddleName() {
-      this.middleNameError = this.middle_name.trim()
+    validateSecondName() {
+      this.secondNameError = this.second_name.trim()
         ? ""
-        : "По батькові не може бути порожнім."; // Валідація по батькові
+        : "По батькові не може бути порожнім.";
     },
     validateEmail() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -188,24 +171,27 @@ export default {
           : "";
     },
     async submitRegistration() {
+      console.log("Виклик submitRegistration");
       this.validateName();
       this.validateLastName();
-      this.validateMiddleName(); // Додано перевірку по батькові
+      this.validateSecondName();
       this.validateEmail();
       this.validatePassword();
 
       if (
         this.nameError ||
         this.lastNameError ||
-        this.middleNameError || // Перевірка помилки по батькові
+        this.secondNameError ||
         this.emailError ||
         this.passwordError
       ) {
+        console.log("Є помилки валідації.");
         alert("Будь ласка, виправте помилки.");
         return;
       }
 
       try {
+        console.log("Відправка запиту на сервер...");
         const response = await fetch("http://26.235.139.202:8080/api/register", {
           method: "POST",
           headers: {
@@ -214,27 +200,36 @@ export default {
           body: JSON.stringify({
             first_name: this.first_name,
             last_name: this.last_name,
-            middle_name: this.middle_name, // Додано передавання по батькові
+            second_name: this.second_name,
             email: this.email,
             password: this.password,
           }),
         });
 
-        if (!response.ok) throw new Error("Помилка реєстрації.");
-
         const data = await response.json();
+        console.log("Відповідь API:", data);
+
+        if (!response.ok) {
+          throw new Error(data.message || "Помилка реєстрації.");
+        }
+
         alert(`Реєстрація успішна! Вітаємо, ${data.first_name}!`);
         this.$router.push({ name: "Login" });
       } catch (error) {
+        console.error("Помилка реєстрації:", error);
         alert(`Помилка реєстрації: ${error.message}`);
       }
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
+    testClick() {
+      console.log("Тестова кнопка працює!");
+    },
   },
 };
 </script>
+
 
 
 <style scoped>

@@ -638,85 +638,9 @@
  
   <style scoped>
 
-.city-suggestions {
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  margin-top: 5px;
-}
-
-.city-suggestions ul {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.city-suggestions li {
-  padding: 5px;
-  cursor: pointer;
-}
-
-.city-suggestions li:hover {
-  background-color: #f0f0f0;
-}
-  .payment-header {
-    margin-top: 200px;
-    display: flex;
-    align-items: center;
-    gap: 26.67px;
-    font: 840 26.67px/1.3 'KyivType Titling', -apple-system, Roboto, Helvetica, sans-serif;
-    letter-spacing: -1.33px;
-  }
-  
-  
-  .header-line {
-    flex: 1;
-    height: 2px;
-    background-color: grey;
-    margin: 0 10px;
-  }
-  
-  .main-title {
-    font-family: 'KyivType Titling', sans-serif;
-    font-size: 34px;
-    font-weight: 900;
-    letter-spacing: -1.2px;
-    text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
-    text-align: center;
-  }
-  
-  .payment-content {
-  background-image: url('@/assets/paymentpattern.png'); 
-  background-attachment: fixed;
-  background-size: cover;
-  padding: 0 46.67px;
-  margin-top: 28px;
-}
-  
-  .payment-notice {
-    font: 700 16.67px/22px Merriweather, sans-serif;
-    margin: 148.67px 0 0 18.67px;
-
-  }
-  
-  .order-details {
-    gap: 13px;
-    margin: 10px 0 0 18.67px;
-    max-width: 1108px;
-  }
-
   
   @media (max-width: 991px) {
-    .payment-header {
-      white-space: initial;
-    }
-  
-    .payment-content {
-      max-width: 100%;
-      margin-top: 40px;
-      padding: 0 20px;
-    }
-  
+
     .payment-columns {
       flex-direction: column;
     }
@@ -824,20 +748,7 @@
   
     
     @media (max-width: 991px) {
-      .payment-header {
-        white-space: initial;
-      }
-    
-      .payment-content {
-        max-width: 100%;
-        margin-top: 40px;
-        padding: 0 20px;
-      }
-    
-      .payment-columns {
-        flex-direction: column;
-      }
-    
+
       .payment-steps,
       .payment-summary,
       .order-items,
@@ -846,15 +757,6 @@
       }
   
   
-      .payment-notice {
-        max-width: 100%;
-        margin-top: 40px;
-      }
-    
-      .order-details {
-        flex-direction: column;
-        max-width: 100%;
-      }
     }
     .delivery-steps {
     font: 700 20px/1.3 Merriweather, sans-serif;
