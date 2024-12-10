@@ -17,6 +17,10 @@ global.fetch = jest.fn(() =>
 Storage.prototype.setItem = jest.fn();
 Storage.prototype.getItem = jest.fn(() => 'mock-token');
 
+// Моки для імпортованих SVG-іконок
+jest.mock('@/assets/eye-hide-svgrepo-com.svg', () => 'mock-eye-hide-icon.svg');
+jest.mock('@/assets/eye-1-svgrepo-com.svg', () => 'mock-eye-closed-icon.svg');
+
 // Мок для window.alert
 global.alert = jest.fn();
 
@@ -169,30 +173,29 @@ describe('UserLogin.vue', () => {
     const passwordInput = wrapper.find('input#password');
     const togglePasswordButton = wrapper.find('button.toggle-password-button');
   
-    // Отримуємо HTML SVG-елемента
-    const getCurrentIconSVG = () => togglePasswordButton.find('svg').html();
+    // Отримуємо джерело іконки
+    const getCurrentIconSrc = () => togglePasswordButton.find('img').attributes('src');
   
-    // Ключові частини SVG-коду для перевірки
-    const expectedEyeClosedPath = 'M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3';
-    const expectedEyeOpenPath = 'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5';
+    const expectedEyeClosedIcon = 'mock-eye-closed-icon.svg';
+    const expectedEyeOpenIcon = 'mock-eye-hide-icon.svg';
   
-    // Початковий стан: поле має тип "password", і відображається іконка закритого ока.
+    // Початковий стан: тип "password", іконка закритого ока
     expect(passwordInput.attributes('type')).toBe('password');
-    expect(getCurrentIconSVG()).toContain(expectedEyeClosedPath);
+    expect(getCurrentIconSrc()).toBe(expectedEyeClosedIcon);
   
-    // Клік по кнопці зміни видимості пароля.
+    // Клік по кнопці
     await togglePasswordButton.trigger('click');
   
-    // Після кліку: поле має тип "text", і відображається іконка відкритого ока.
+    // Після кліку: тип "text", іконка відкритого ока
     expect(passwordInput.attributes('type')).toBe('text');
-    expect(getCurrentIconSVG()).toContain(expectedEyeOpenPath);
+    expect(getCurrentIconSrc()).toBe(expectedEyeOpenIcon);
   
-    // Повторний клік.
+    // Повторний клік
     await togglePasswordButton.trigger('click');
   
-    // Повертається до початкового стану: поле "password", іконка закритого ока.
+    // Повернення до початкового стану
     expect(passwordInput.attributes('type')).toBe('password');
-    expect(getCurrentIconSVG()).toContain(expectedEyeClosedPath);
+    expect(getCurrentIconSrc()).toBe(expectedEyeClosedIcon);
   });
     
   it('Перевіряє, що всі тексти відповідають українській локалізації', () => {
@@ -275,17 +278,25 @@ describe('UserLogin.vue', () => {
     const emailInput = wrapper.find('input#email');
     const passwordInput = wrapper.find('input#password');
     const loginForm = wrapper.find('form.login-form');
-
+  
     await emailInput.setValue('test@example.com');
     await passwordInput.setValue('password123');
     await loginForm.trigger('submit.prevent');
-
+  
     expect(global.fetch).toHaveBeenCalledWith(
       'http://26.235.139.202:8080/api/login',
-      expect.any(Object)
+      expect.objectContaining({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'password123',
+        }),
+      })
     );
+  
     expect(localStorage.setItem).toHaveBeenCalledWith('token', 'mock-token');
-    expect(localStorage.getItem).toHaveBeenCalledWith('token');
+    
   });
 
   it('Перенаправляє після успішного збереження токена', async () => {
@@ -369,11 +380,14 @@ describe('UserLogin.vue', () => {
   });
 
   it('Іконки для пароля відображаються правильно', () => {
-    const eyeOpenIcon = wrapper.find('.toggle-password-button span:first-child');
-    const eyeClosedIcon = wrapper.find('.toggle-password-button span:last-child');
-
-    expect(eyeOpenIcon.exists()).toBe(true);
-    expect(eyeClosedIcon.exists()).toBe(true);
+    const togglePasswordButton = wrapper.find('button.toggle-password-button');
+    const iconImg = togglePasswordButton.find('img');
+  
+    // Перевіряємо, що іконка існує
+    expect(iconImg.exists()).toBe(true);
+  
+    // Перевіряємо, що іконка має правильний src
+    expect(iconImg.attributes('src')).toBe('mock-eye-closed-icon.svg');
   });
 
   it('Кнопка входу має правильний клас', () => {

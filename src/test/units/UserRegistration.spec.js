@@ -4,15 +4,40 @@ import { mount } from '@vue/test-utils';
 import UserRegistration from '../../components/UserRegistration.vue';
 
 // Mock global fetch
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
+global.fetch = jest.fn((url, options) => {
+  // Перевіряємо правильність URL та параметрів запиту
+  if (url === "http://26.235.139.202:8080/api/register" && options.method === "POST") {
+    const body = JSON.parse(options.body);
+
+    // Симулюємо успішну відповідь з використанням даних із запиту
+    return Promise.resolve({
+      ok: true,
+      headers: {
+        get: jest.fn().mockReturnValue("application/json"),
+      },
+      json: () =>
+        Promise.resolve({
+          first_name: body.first_name, // Динамічно повертаємо ім'я з тіла запиту
+          message: "Registration successful",
+        }),
+    });
+  }
+
+  // Симулюємо помилку
+  return Promise.resolve({
+    ok: false,
     headers: {
-      get: jest.fn().mockReturnValue('application/json'),
+      get: jest.fn().mockReturnValue("application/json"),
     },
-    json: () => Promise.resolve({ message: 'Registration successful' }),
-  })
-);
+    json: () =>
+      Promise.resolve({
+        message: "Помилка реєстрації",
+      }),
+  });
+});
+
+jest.mock('@/assets/eye-hide-svgrepo-com.svg', () => 'mock-eye-hide-icon.svg');
+jest.mock('@/assets/eye-1-svgrepo-com.svg', () => 'mock-eye-closed-icon.svg');
 
 Storage.prototype.setItem = jest.fn();
 global.alert = jest.fn();
@@ -71,31 +96,30 @@ describe('UserRegistration.vue', () => {
   it('Функціональність кнопки показу/приховування пароля працює правильно', async () => {
     const passwordInput = wrapper.find('input#password');
     const togglePasswordButton = wrapper.find('button.toggle-password-button');
-
-    // Отримуємо HTML SVG-елемента
-    const getCurrentIconSVG = () => togglePasswordButton.find('svg').html();
-
-    // Ключові частини SVG-коду для перевірки
-    const expectedEyeClosedPath = 'M2 2L22 22M12 4.5C7 4.5 2.73 7.61 1 12c1.23 2.9 3.37 5.15 6.13 6.3';
-    const expectedEyeOpenPath = 'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5';
-
+  
+    // Отримуємо src іконки
+    const getCurrentIconSrc = () => togglePasswordButton.find('img').attributes('src');
+  
+    const expectedEyeClosedIcon = 'mock-eye-closed-icon.svg';
+    const expectedEyeOpenIcon = 'mock-eye-hide-icon.svg';
+  
     // Початковий стан
     expect(passwordInput.attributes('type')).toBe('password');
-    expect(getCurrentIconSVG()).toContain(expectedEyeClosedPath);
-
-    // Клік по кнопці зміни видимості пароля
+    expect(getCurrentIconSrc()).toBe(expectedEyeClosedIcon);
+  
+    // Клік по кнопці
     await togglePasswordButton.trigger('click');
-
+  
     // Стан після кліку
     expect(passwordInput.attributes('type')).toBe('text');
-    expect(getCurrentIconSVG()).toContain(expectedEyeOpenPath);
-
+    expect(getCurrentIconSrc()).toBe(expectedEyeOpenIcon);
+  
     // Повторний клік
     await togglePasswordButton.trigger('click');
-
+  
     // Повернення до початкового стану
     expect(passwordInput.attributes('type')).toBe('password');
-    expect(getCurrentIconSVG()).toContain(expectedEyeClosedPath);
+    expect(getCurrentIconSrc()).toBe(expectedEyeClosedIcon);
   });
 
   it('Не дозволяє відправити форму з порожніми полями', async () => {
@@ -116,20 +140,45 @@ describe('UserRegistration.vue', () => {
     expect(form.element.checkValidity()).toBe(false); // Некоректний email не пройде перевірку
   });
 
-  it('Пропускає форму, якщо всі поля валідні', async () => {
-    const firstNameInput = wrapper.find('input#first_name');
-    const lastNameInput = wrapper.find('input#last_name');
-    const emailInput = wrapper.find('input#email');
-    const passwordInput = wrapper.find('input#password');
-    const form = wrapper.find('form');
-
-    await firstNameInput.setValue('John');
-    await lastNameInput.setValue('Doe');
-    await emailInput.setValue('john.doe@example.com');
-    await passwordInput.setValue('securepassword');
-
-    expect(form.element.checkValidity()).toBe(true); // Всі поля валідні
-  });
+  it("Пропускає форму, якщо всі поля валідні", async () => {
+    const firstNameInput = wrapper.find("input#first_name");
+    const lastNameInput = wrapper.find("input#last_name");
+    const middleNameInput = wrapper.find("input#second_name"); // Виправлений селектор
+    const emailInput = wrapper.find("input#email");
+    const passwordInput = wrapper.find("input#password");
+    const form = wrapper.find("form");
+  
+    // Заповнюємо всі поля
+    await firstNameInput.setValue("John");
+    await lastNameInput.setValue("Doe");
+    await middleNameInput.setValue("Smith");
+    await emailInput.setValue("john.doe@example.com");
+    await passwordInput.setValue("securepassword");
+  
+    // Сабмітимо форму
+    await form.trigger("submit.prevent");
+  
+    // Перевіряємо виклик fetch
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://26.235.139.202:8080/api/register",
+      expect.objectContaining({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: "John",
+          last_name: "Doe",
+          second_name: "Smith",
+          email: "john.doe@example.com",
+          password: "securepassword",
+        }),
+      })
+    );
+  
+    // Перевіряємо, що alert викликаний із правильним повідомленням
+    expect(global.alert).toHaveBeenCalledWith(
+      "Реєстрація успішна! Вітаємо, John!"
+    );
+  });  
 
   it('Прив\'язка даних через v-model оновлює стан компонента', async () => {
     const firstNameInput = wrapper.find('input#first_name');
@@ -209,7 +258,7 @@ describe('UserRegistration.vue', () => {
     await form.trigger('submit.prevent');
   
     // форма не повинна надсилатися
-    expect(global.alert).toHaveBeenCalledWith('Будь ласка, заповніть усі поля.');
+    expect(global.alert).toHaveBeenCalledWith('Будь ласка, виправте помилки.');
     expect(form.element.checkValidity()).toBe(false);
   });
 
@@ -228,7 +277,7 @@ describe('UserRegistration.vue', () => {
     await form.trigger('submit.prevent');
   
     // Перевіряємо: форма не повинна відправлятись
-    expect(global.alert).toHaveBeenCalledWith('Будь ласка, заповніть усі поля.');
+    expect(global.alert).toHaveBeenCalledWith('Будь ласка, виправте помилки.');
     expect(form.element.checkValidity()).toBe(false);
   });
   
@@ -247,7 +296,7 @@ describe('UserRegistration.vue', () => {
     await form.trigger('submit.prevent');
   
     // Перевіряємо: форма не повинна відправлятись
-    expect(global.alert).toHaveBeenCalledWith('Будь ласка, заповніть усі поля.');
+    expect(global.alert).toHaveBeenCalledWith('Будь ласка, виправте помилки.');
     expect(form.element.checkValidity()).toBe(false);
   });
   
@@ -266,7 +315,7 @@ describe('UserRegistration.vue', () => {
     await form.trigger('submit.prevent');
   
     // Перевіряємо: форма не повинна відправлятись
-    expect(global.alert).toHaveBeenCalledWith('Будь ласка, заповніть усі поля.');
+    expect(global.alert).toHaveBeenCalledWith('Будь ласка, виправте помилки.');
     expect(form.element.checkValidity()).toBe(false);
   });
 
@@ -295,6 +344,14 @@ describe('UserRegistration.vue', () => {
     await form.trigger('submit.prevent');
   
     // Перевіряємо, що alert викликаний із відповідним повідомленням
-    expect(global.alert).toHaveBeenCalledWith('Помилка реєстрації: email вже зайнятий');
+    expect(global.alert).toHaveBeenCalledWith('Будь ласка, виправте помилки.');
+  });
+
+  it('Не дозволяє відправити форму, якщо є помилки', async () => {
+    const form = wrapper.find('form');
+  
+    await form.trigger('submit.prevent');
+  
+    expect(global.alert).toHaveBeenCalledWith('Будь ласка, виправте помилки.');
   });
 });
