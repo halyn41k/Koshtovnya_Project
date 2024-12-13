@@ -97,25 +97,27 @@
                   </span>
     
                   <!-- City Input -->
-                  <input
-                    v-if="formData.deliveryType && formData.deliveryType !== 'Самовивіз з наших магазинів'"
-                    class="input-field"
-                    v-model="formData.city"
-                    placeholder="Введіть місто"
-                    @input="handleCityInput"
-                  />
-                  <div v-if="cities.length > 0" class="city-suggestions">
-                    <ul>
-                      <li
-                        v-for="city in cities"
-                        :key="city.Ref"
-                        @click="selectCity(city)"
-                      >
-                        {{ city.city }}
-                      </li>
-                    </ul>
-                  </div>
-                  <span v-if="errors.city" class="error">{{ errors.city }}</span>
+                  <div v-if="formData.deliveryType && formData.deliveryType !== 'Самовивіз з наших магазинів'">
+  <input
+    class="input-field"
+    v-model="formData.city"
+    placeholder="Введіть місто"
+    @input="handleCityInput"
+  />
+  <div v-if="cities.length > 0" class="city-suggestions">
+    <ul>
+      <li
+        v-for="city in cities"
+        :key="city.Ref"
+        @click="selectCity(city)"
+      >
+        {{ city.city }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+
     
                   <!-- Street Input for Courier Delivery -->
                   <div v-if="formData.city && formData.deliveryType && formData.deliveryType.includes('Кур\'єр')">
@@ -145,15 +147,17 @@
                     <span v-if="errors.street" class="error">{{ errors.street }}</span>
                   </div>
     
-                  <!-- House Number Input -->
                   <div v-if="formData.street">
-                    <input
-                      class="input-field"
-                      v-model="formData.houseNumber"
-                      placeholder="Введіть номер будинку"
-                    />
-                    <span v-if="errors.houseNumber" class="error">{{ errors.houseNumber }}</span>
-                  </div>
+    <input
+      class="input-field"
+      v-model="formData.houseNumber"
+      placeholder="Введіть номер будинку"
+    />
+    <span v-if="errors.houseNumber" class="error">{{ errors.houseNumber }}</span>
+  </div>
+
+
+
     
                   <!-- Store Pickup -->
                   <div v-if="formData.deliveryType === 'Самовивіз з наших магазинів'">
@@ -164,67 +168,75 @@
                   </div>
     
                   <!-- Поштомати -->
-                  <div 
-                    v-if="formData.deliveryType === 'Самовивіз з поштоматів Нової Пошти'"
-                  >
-                    <select 
-                      v-model="formData.warehouse" 
-                      class="input-field"
-                      @change="fetchWarehouses"
-                    >
-                      <option disabled value="">Оберіть поштомат</option>
-                      <option 
-                        v-for="postomat in postomats" 
-                        :key="postomat.id" 
-                        :value="postomat.id"
-                      >
-                        {{ postomat.name }}
-                      </option>
-                    </select>
-                  </div>
+                 <!-- Поштомати -->
+<div 
+  v-if="formData.deliveryType === 'Самовивіз з поштоматів Нової Пошти'"
+>
+  <select 
+    v-model="formData.warehouse" 
+    class="input-field"
+  >
+    <option disabled value="">Оберіть поштомат</option>
+    <option 
+      v-for="warehouse in warehouses" 
+      :key="warehouse.id" 
+      :value="warehouse.id"
+    >
+      {{ warehouse.name }}
+    </option>
+  </select>
+</div>
+
     
                   <!-- Відділення -->
-                  <div 
-                    v-else-if="['Самовивіз з Нової Пошти', 'Самовивіз з УКРПОШТИ'].includes(formData.deliveryType)"
-                  >
-                    <select 
-                      v-model="formData.warehouse" 
-                      class="input-field"
-                    >
-                      <option disabled value="">Оберіть відділення</option>
-                      <option 
-                        v-for="warehouse in warehouses" 
-                        :key="warehouse.id" 
-                        :value="warehouse.id"
-                      >
-                        {{ warehouse.name }}
-                      </option>
-                    </select>
-                  </div>
+                  <div v-if="formData.deliveryType === 'Самовивіз з Нової Пошти' || formData.deliveryType === 'Самовивіз з УКРПОШТИ'">
+  <select v-model="formData.warehouse" class="input-field">
+    <option disabled value="">Оберіть відділення</option>
+    <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.name">
+      {{ warehouse.name }}
+    </option>
+  </select>
+</div>
+
+
+
                 </div>
               </template>
     
-              <!-- Payment Step -->
               <template v-else-if="step.title === 'Оплата'">
-                <div class="payment-options">
-                  <div 
-                    v-for="(option, idx) in paymentOptions" 
-                    :key="idx" 
-                    class="payment-option"
-                  >
-                    <input
-                      type="radio"
-                      :id="option"
-                      :value="option"
-                      v-model="selectedPaymentOption"
-                      class="radio-input"
-                    />
-                    <label :for="option" class="payment-label">{{ option }}</label>
-                  </div>
-                  <span v-if="errors.paymentOption" class="error">{{ errors.paymentOption }}</span>
-                </div>
-              </template>
-    
+  <div class="payment-options">
+    <!-- Вибір типу оплати -->
+    <div 
+      v-for="(option, idx) in paymentOptions" 
+      :key="idx" 
+      class="payment-option"
+    >
+      <input
+        type="radio"
+        :id="`payment-${idx}`"
+        :value="option"
+        v-model="selectedPaymentOption"
+        class="radio-input"
+      />
+      <label :for="`payment-${idx}`" class="payment-label">{{ option }}</label>
+    </div>
+
+    <!-- Відображення помилки -->
+    <span v-if="errors.paymentOption" class="error">{{ errors.paymentOption }}</span>
+  </div>
+
+  <!-- Кнопка Далі -->
+  <button 
+    :disabled="!selectedPaymentOption" 
+    @click="validateAndProceed" 
+    class="next-button"
+  >
+    Далі
+  </button>
+</template>
+
+
+
               <!-- Next Step Button -->
               <button 
                 v-if="canProceedToNextStep" 
@@ -251,8 +263,12 @@
         { title: "Поштове відділення", completed: false, isExpanded: false },
         { title: "Оплата", completed: false, isExpanded: false },
       ],
+      paymentOptions: ["Післяоплата", "Оплата картою", "Передоплата"], // Опції оплати
+
       currentStep: 0,
       formData: {
+        selectedPaymentOption: "", // Вибраний варіант оплати
+
         firstName: "",
         lastName: "",
         secondName: "",
@@ -267,6 +283,8 @@
         warehouse: "",
         postomats: "",
       },
+      paymentOption: null, // Для валідації
+
     postomats: [],
     warehouseType: null, // Додаткове поле для розрізнення типів
       cities: [],
@@ -338,18 +356,20 @@
     },
 
     handleCityInput() {
-      clearTimeout(this.citySearchTimeout);
-      this.citySearchTimeout = setTimeout(() => {
-        this.fetchCities();
-      }, 300);
-    },
+  console.log("Введене місто:", this.formData.city);
+  if (this.formData.city.length >= 3) {
+    this.fetchCities();
+  }
+},
 
-    selectCity(city) {
-      this.formData.city = city.city; 
-      this.formData.cityRef = city.Ref; 
-      this.cities = []; 
-      console.log("Вибране місто:", { city: this.formData.city, Ref: this.formData.cityRef });
-    },
+
+selectCity(city) {
+  this.formData.city = city.city;   // Встановлюємо місто
+  this.formData.cityRef = city.Ref;  // Встановлюємо Ref міста
+  this.cities = [];  // Очищаємо список міст
+  console.log("Вибране місто:", { city: this.formData.city, Ref: this.formData.cityRef });
+  this.fetchWarehouses();  // Запит на відділення після вибору міста
+},
 
     handleStreetSearch() {
       clearTimeout(this.streetSearchTimeout);
@@ -367,37 +387,42 @@
     },
 
     async fetchCities() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Ви не авторизовані. Будь ласка, увійдіть у свій обліковий запис.");
-        this.$router.push("/login");
-        return;
-      }
+  const token = localStorage.getItem("token"); // Define token here
+  console.log("Fetching cities with:", {
+    city: this.formData.city,
+    delivery_type: this.formData.deliveryType,
+  });
 
-      if (this.formData.city.length >= 3) {
-        try {
-          const response = await axios.get(
-            "http://26.235.139.202:8080/api/nova-poshta/cities",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              params: {
-                city: this.formData.city,
-                delivery_type: this.formData.deliveryType,
-              },
-            }
-          );
-
-          if (response.data.success && Array.isArray(response.data.data)) {
-            this.cities = response.data.data;
-          } else {
-            console.error("Неправильний формат даних:", response.data);
-            this.cities = [];
-          }
-        } catch (error) {
-          this.handleApiError(error);
-        }
+  try {
+    const response = await axios.get(
+      "http://26.235.139.202:8080/api/nova-poshta/cities",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          city: this.formData.city,
+          delivery_type: this.formData.deliveryType,
+        },
       }
-    },
+    );
+    console.log("Cities API Response:", response.data);
+
+    if (response.data.success && Array.isArray(response.data.data)) {
+      this.cities = response.data.data;
+    } else {
+      console.error("Incorrect response format:", response.data);
+      this.cities = [];
+    }
+  } catch (error) {
+    console.error("Error fetching cities:", error.response?.data || error.message);
+  }
+},
+selectDeliveryType(type) {
+  this.formData.deliveryType = type;  // Встановлюємо тип доставки
+  console.log("Тип доставки обрано:", this.formData.deliveryType);
+  this.fetchWarehouses();  // Оновлюємо відділення після вибору типу доставки
+},
+
+
 
     async fetchStreets() {
       const token = localStorage.getItem("token");
@@ -432,56 +457,45 @@
       }
     },
     async fetchWarehouses() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Ви не авторизовані. Будь ласка, увійдіть у свій обліковий запис.");
-    this.$router.push("/login");
-    return;
-  }
+  this.warehouses = []; // Очистити старі дані
+  console.log("Fetching warehouses for city:", this.formData.city, "Ref:", this.formData.cityRef);
 
-  if (this.formData.city && this.formData.deliveryType) {
-    try {
-      const params = {
-        city: this.formData.city,
-        delivery_type: this.formData.deliveryType,
-      };
-
-      if (this.formData.deliveryType === "Самовивіз з поштоматів Нової Пошти") {
-        this.warehouseType = "postomats";
-        params.type = "postomats";
-      } else if (
-        ["Самовивіз з Нової Пошти", "Самовивіз з УКРПОШТИ"].includes(
-          this.formData.deliveryType
-        )
-      ) {
-        this.warehouseType = "warehouses";
-        params.type = "warehouses";
+  try {
+    const response = await axios.get(
+      "http://26.235.139.202:8080/api/nova-poshta/ware-houses",
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        params: {
+          city: this.formData.city,
+          Ref: this.formData.cityRef,
+          delivery_type: this.formData.deliveryType,
+        },
       }
+    );
 
-      const response = await axios.get(
-        "http://26.235.139.202:8080/api/nova-poshta/ware-houses",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          params,
-        }
-      );
+    console.log("Warehouses response:", response.data);
 
-      if (response.status === 200 && response.data) {
-        if (this.warehouseType === "postomats") {
-          this.postomats = response.data?.data || [];
-        } else {
-          this.warehouses = response.data?.data || [];
-        }
-      } else {
-        console.error("Unexpected API response:", response);
-        alert("Не вдалося отримати дані про відділення.");
-      }
-    } catch (error) {
-      console.error("API error:", error.response?.data || error.message);
-      this.handleApiError(error);
+    if (response.status === 200 && Array.isArray(response.data?.data)) {
+      // Форматування даних
+      this.warehouses = response.data.data.map((item, index) => ({
+        id: index + 1, // Унікальний ID
+        name: item.warehouse, // Назва поштомату
+      }));
+      console.log("Processed warehouses:", this.warehouses);
+    } else {
+      console.error("No data returned or invalid format");
     }
+  } catch (error) {
+    console.error("Error fetching warehouses:", error.response?.data || error.message);
   }
 },
+
+
+
+
+
+
+
 
 
     handleApiError(error) {
@@ -538,23 +552,32 @@
     },
 
     validateAndProceed() {
-      let isValid = false;
+  let isValid = false;
 
-      if (this.currentStep === 0) {
-        isValid = this.validatePersonalInfo();
-      } else if (this.currentStep === 1) {
-        isValid = this.validatePostalInfo();
-      } else if (this.currentStep === 2) {
-        isValid = !!this.selectedPaymentOption;
-        if (!isValid) {
-          this.errors.paymentOption = "Оберіть спосіб оплати";
-        }
-      }
+  if (this.currentStep === 0) {
+    isValid = this.validatePersonalInfo();
+  } else if (this.currentStep === 1) {
+    isValid = this.validatePostalInfo();
+    // Додайте перевірку полів адреси
+    if (!this.formData.city || !this.formData.street || !this.formData.houseNumber || !this.formData.deliveryType) {
+      this.errors.city = !this.formData.city ? "Введіть місто" : "";
+      this.errors.street = !this.formData.street ? "Виберіть вулицю" : "";
+      this.errors.houseNumber = !this.formData.houseNumber ? "Введіть номер будинку" : "";
+      this.errors.deliveryType = !this.formData.deliveryType ? "Оберіть тип доставки" : "";
+      isValid = false;
+    }
+  } else if (this.currentStep === 2) {
+    isValid = !!this.selectedPaymentOption;
+    if (!isValid) {
+      this.errors.paymentOption = "Оберіть спосіб оплати";
+    }
+  }
 
-      if (isValid) {
-        this.completeStep();
-      }
-    },
+  if (isValid) {
+    this.completeStep();
+  }
+},
+
 
     validatePersonalInfo() {
       this.errors = {};
@@ -835,14 +858,15 @@
     width: 12px;
     height: 12px;
     margin-right: 10px;
-    border: 2px solid #9D9292;
-    border-radius: 50%;
+    border: 5px solid #9D9292;
+    border-radius: 30%;
     background-color: transparent;
   }
   
   /* Стиль обраного радіо-доту */
   .radio-input:checked + .payment-label::before {
     background-color: #6B1F1F;
+    border: 4.5px solid #9D9292;
   }
   
   .next-button {
@@ -1163,4 +1187,25 @@
 .street-suggestions li:hover {
   background-color: #f0f0f0;
 }
+
+.radio-input {
+    display: none;
+  }
+  
+  .radio-input + .payment-label::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    border: 2px solid #9D9292;
+    border-radius: 50%;
+    background-color: transparent;
+  }
+  
+  /* Стиль обраного радіо-доту */
+  .radio-input:checked + .payment-label::before {
+    background-color: #6B1F1F;
+  }
+
 </style>

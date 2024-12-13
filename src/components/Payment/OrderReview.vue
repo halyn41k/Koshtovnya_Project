@@ -22,7 +22,7 @@
     <PaymentSummary
       :cartItems="localCartItems"
       :deliveryCost="deliveryCost"
-      :totalAmount="totalAmount"
+      :totalAmount="calculatedTotalAmount"
       :cityRef="formData.city"
       :deliveryType="formData.deliveryType"
       @submit-payment="submitOrder"
@@ -30,16 +30,19 @@
   </div>
 </template>
 
-
 <script>
-import axios from "axios"; // Підключаємо axios
+import axios from "axios";
+import PaymentSummary from "./PaymentSummary.vue";
 
 export default {
   name: "OrderReview",
-
+  components: {
+    PaymentSummary,
+  },
   data() {
     return {
       localCartItems: [], // Локальна копія товарів
+      deliveryCost: 0,
       loading: false,
       steps: [
         { title: "Особиста інформація", completed: false, isExpanded: true },
@@ -96,9 +99,7 @@ export default {
     submitOrder() {
       alert("Ваше замовлення успішно оформлено!");
     },
-  
     validateAndProceed() {
-      // Перевірка перед переходом до наступного кроку
       const errors = {};
       if (this.currentStep === 0) {
         if (!this.formData.firstName) errors.firstName = "Ім'я є обов'язковим";
@@ -122,10 +123,12 @@ export default {
     },
   },
   computed: {
-    totalAmount() {
-      return this.localCartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
+    calculatedTotalAmount() {
+      return (
+        this.localCartItems.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ) + this.deliveryCost
       );
     },
   },
@@ -134,6 +137,7 @@ export default {
   },
 };
 </script>
+
 
 
 <style scoped>
