@@ -27,56 +27,73 @@
                 <p class="product-price">{{ product.price }}₴</p>
                 <div
                   class="availability-badge"
-                  :class="{ 'available': product.is_available, 'unavailable': !product.is_available }"
+                  :class="{ 'available': isAvailable, 'unavailable': !isAvailable }"
                 >
-                  <span>{{ product.is_available ? 'В наявності' : 'Немає в наявності' }}</span>
+                  <span>{{ isAvailable ? 'В наявності' : 'Немає в наявності' }}</span>
                 </div>
                 <p class="delivery-time">Приблизний час доставки: 1-7 днів</p>
               </div>
               <hr class="thin-divider" />
+              <!-- Розмір -->
               <label for="size-select" class="size-label">Розмір</label>
               <div class="size-selector">
-                <select id="size-select" class="size-dropdown">
+                <select
+                  id="size-select"
+                  class="size-dropdown"
+                  v-model="selectedSize"
+                >
                   <option
-                    v-for="size in product.sizes"
-                    :key="size"
-                    :value="size"
+                    v-for="variant in product.variants"
+                    :key="variant.size"
+                    :value="variant.size"
+                    :disabled="!variant.is_available"
                   >
-                    {{ size }} см
+                    {{ variant.size }} см
+                    <span v-if="!variant.is_available"> (Немає в наявності)</span>
                   </option>
                 </select>
               </div>
+
               <div class="purchase-controls">
                 <div class="quantity-wrapper">
                   <div class="quantity-display">
                     {{ quantity }}
                   </div>
                   <div class="quantity-buttons">
-                    <button class="quantity-arrow up-arrow" @click="increaseQuantity">
+                    <button
+                      class="quantity-arrow up-arrow"
+                      @click="increaseQuantity"
+                      :disabled="!selectedVariant || quantity >= selectedVariant.quantity"
+                    >
                       ▲
                     </button>
-                    <button class="quantity-arrow down-arrow" @click="decreaseQuantity">
+                    <button
+                      class="quantity-arrow down-arrow"
+                      @click="decreaseQuantity"
+                      :disabled="quantity <= 1"
+                    >
                       ▼
                     </button>
                   </div>
                 </div>
 
-                <button 
-                  v-if="product.is_available" 
+                <button
+                  v-if="isAvailable"
                   class="buy-button"
+                  :disabled="!selectedVariant"
                 >
                   <span class="buy-text">Купити</span>
                 </button>
 
-                <button 
-                  v-else 
-                  class="notify-button" 
+                <button
+                  v-else
+                  class="notify-button"
                   @click="notifyWhenAvailable"
                 >
                   <span class="notify-text">Повідомити про наявність</span>
                 </button>
 
-                <!-- Сердечко (вибір у список бажаного) -->
+                <!-- Сердечко -->
                 <div class="wishlist-wrapper">
                   <div class="wishlist-square" @click="toggleWishlist(product)">
                     <svg
@@ -103,8 +120,6 @@
                     </svg>
                   </div>
                 </div>
-
-            
               </div>
               <hr class="thin-divider" />
             </section>
@@ -113,35 +128,31 @@
       </div>
     </section>
 
+    <!-- Характеристики -->
     <h2 class="specifications-title">Характеристики</h2>
     <section class="specifications-list">
-  <dl class="spec-grid" v-if="localizedCharacteristics">
-    <div
-      class="spec-item"
-      v-for="(value, key) in localizedCharacteristics"
-      :key="key"
-    >
-      <dt class="spec-term">{{ key }}</dt>
-      <dd class="spec-description">
-        <!-- Додати перевірку на 'colors' -->
-        <template v-if="key === 'Кольори' && Array.isArray(value)">
-          {{ value.join(', ') }}
-        </template>
-        <template v-else>
-          {{ value }}
-        </template>
-      </dd>
-      <hr class="spec-divider" />
-    </div>
-  </dl>
-</section>
+      <dl class="spec-grid" v-if="formattedCharacteristics">
+        <div
+          class="spec-item"
+          v-for="(value, key) in formattedCharacteristics"
+          :key="key"
+        >
+          <dt class="spec-term">{{ key }}</dt>
+          <dd class="spec-description">{{ value }}</dd>
+          <hr class="spec-divider" />
+        </div>
+      </dl>
+    </section>
 
-
+    <!-- Відгуки -->
     <ProductReviews v-if="productId" :productId="productId" />
+
+    <!-- Схожі товари -->
     <section>
       <ViewOtherProduct />
     </section>
 
+    <!-- Модальне вікно -->
     <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <img
@@ -153,7 +164,6 @@
     </div>
   </main>
 </template>
-
 <script>
 import ViewOtherProduct from "./ViewOtherProduct.vue";
 import ProductReviews from "./ProductReviews.vue";
@@ -167,9 +177,14 @@ export default {
   data() {
     return {
       isModalOpen: false,
-      product: {}, // Інформація про товар
-      quantity: 1, // Кількість товару
-      wishlist: [], // Список бажаного
+      product: {
+        variants: [],
+        colors: [],
+      },
+      quantity: 1,
+      wishlist: [],
+      selectedSize: null,
+      productId: null,
       translations: {
         country_of_manufacture: "Країна виробник товару",
         material: "Матеріал",
@@ -178,36 +193,48 @@ export default {
         weight: "Вага",
         colors: "Кольори",
         bead_producer_name: "Виробник бісеру",
+        size: "Розміри",
       },
-      productId: null, // Ідентифікатор продукту
     };
   },
   computed: {
-    // Фільтруємо характеристики продукту для виведення
-    productCharacteristics() {
+    isAvailable() {
+      return Array.isArray(this.product.variants) && this.product.variants.some((variant) => variant.is_available);
+    },
+    selectedVariant() {
+      return Array.isArray(this.product.variants)
+        ? this.product.variants.find((variant) => variant.size === this.selectedSize)
+        : null;
+    },
+    formattedCharacteristics() {
       const excludeKeys = [
         "id",
         "name",
         "price",
         "image_url",
-        "sizes",
         "is_available",
         "quantity",
+        "is_in_wishlist",
+        "is_in_cart",
+        "notify_when_available",
       ];
-      return Object.keys(this.product)
-        .filter((key) => !excludeKeys.includes(key))
-        .reduce((obj, key) => {
-          obj[key] = this.product[key];
-          return obj;
-        }, {});
-    },
-    // Локалізовані характеристики
-    localizedCharacteristics() {
-      return Object.entries(this.productCharacteristics).reduce((acc, [key, value]) => {
-        const translatedKey = this.translations[key] || key;
-        acc[translatedKey] = value === null ? "Немає" : value;
-        return acc;
-      }, {});
+
+      const result = {};
+      Object.entries(this.product)
+        .filter(([key]) => !excludeKeys.includes(key))
+        .forEach(([key, value]) => {
+          const translatedKey = this.translations[key] || key;
+
+          if (key === "colors" && Array.isArray(value)) {
+            result[translatedKey] = value.join(", ");
+          } else if (key === "variants") {
+            result[this.translations.size] = value.map((v) => v.size).join(", ");
+          } else {
+            result[translatedKey] = value || "Немає";
+          }
+        });
+
+      return result;
     },
   },
   methods: {
@@ -217,182 +244,105 @@ export default {
         console.error("Користувач не авторизований");
         return;
       }
+
       try {
-        const wishlistResponse = await axios.get("http://26.235.139.202:8080/api/wishlist", {
+        const response = await axios.get("http://26.235.139.202:8080/api/wishlist", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        const wishlistItems = Array.isArray(wishlistResponse.data.products)
-          ? wishlistResponse.data.products
-          : [];
-        this.wishlist = wishlistItems.map((item) => item.id); // Оновлюємо список бажаного
+        const wishlistItems = response.data.products || [];
+        this.wishlist = wishlistItems.map((item) => item.id);
       } catch (error) {
         console.error("Помилка завантаження списку бажаного:", error);
       }
     },
-    // Відкриття модального вікна
-    openModal() {
-      this.isModalOpen = true;
-    },
-    // Закриття модального вікна
-    closeModal() {
-      this.isModalOpen = false;
-    },
-    // Перевірка, чи товар є в списку бажаного
-    isInWishlist(productId) {
-      return this.wishlist.includes(productId);
-    },
-    // Додавання або видалення товару зі списку бажаного
     async toggleWishlist(product) {
-      const profile = await this.checkAuthAndFetchProfile();
-      if (!profile) {
+      const token = localStorage.getItem("token");
+      if (!token) {
         alert("Будь ласка, увійдіть у свій обліковий запис.");
         this.$router.push("/login");
         return;
       }
-      if (this.isInWishlist(product.id)) {
-        // Видалити товар зі списку бажаного
-        try {
-          const token = localStorage.getItem("token");
-          await axios.delete(
-            `http://26.235.139.202:8080/api/wishlist/${product.id}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          this.wishlist = this.wishlist.filter((id) => id !== product.id); // Оновлюємо список бажаного
-          alert(`${product.name} видалено зі списку бажаного!`);
-        } catch (error) {
-          console.error("Помилка при видаленні з бажаного:", error);
-          alert("Не вдалося видалити товар зі списку бажаного.");
+
+      try {
+        if (this.isInWishlist(product.id)) {
+          await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          this.wishlist = this.wishlist.filter((id) => id !== product.id);
+          alert(`${product.name} видалено зі списку бажаного.`);
+        } else {
+          await axios.post("http://26.235.139.202:8080/api/wishlist", { product_id: product.id }, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          this.wishlist.push(product.id);
+          alert(`${product.name} додано до списку бажаного.`);
         }
-      } else {
-        // Додати до списку бажаного
-        try {
-          const token = localStorage.getItem("token");
-          await axios.post(
-            "http://26.235.139.202:8080/api/wishlist",
-            { product_id: product.id },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          this.wishlist.push(product.id); // Оновлюємо список бажаного
-          alert(`${product.name} додано до списку бажаного!`);
-        } catch (error) {
-          console.error("Помилка при додаванні до списку бажаного:", error);
-          alert("Не вдалося додати товар до списку бажаного.");
-        }
+      } catch (error) {
+        console.error("Помилка роботи зі списком бажаного:", error);
+        alert("Не вдалося оновити список бажаного.");
       }
     },
-    // Перевірка автентифікації та отримання профілю користувача
-    async checkAuthAndFetchProfile() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        return null; // Користувач не авторизований
-      }
-      try {
-        const response = await axios.get("http://26.235.139.202:8080/api/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        return response.data; // Повертаємо дані профілю
-      } catch (error) {
-        console.error("Помилка авторизації:", error);
-        return null; // Помилка при перевірці
-      }
+    isInWishlist(productId) {
+      return this.wishlist.includes(productId);
+    },
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
     },
     async notifyWhenAvailable() {
-    const profile = await this.checkAuthAndFetchProfile();
-    if (!profile) {
-      alert("Будь ласка, увійдіть у свій обліковий запис.");
-      this.$router.push("/login");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Будь ласка, увійдіть у свій обліковий запис.");
-      this.$router.push("/login");
-      return;
-    }
-
-    try {
-      await axios.post(
-        "http://26.235.139.202:8080/api/notification", 
-        { 
-          product_id: this.productId 
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      alert(`Ви будете повідомлені, коли ${this.product.name} з'явиться в наявності!`);
-    } catch (error) {
-      console.error("Помилка при реєстрації сповіщення:", error);
-      
-      // More specific error handling
-      if (error.response) {
-        if (error.response.status === 422) {
-          alert("Ви вже підписані на сповіщення про цей товар.");
-        } else {
-          alert("Не вдалося підписатися на сповіщення. Спробуйте пізніше.");
-        }
-      } else {
-        alert("Помилка мережі. Перевірте підключення.");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
       }
-    }
-  },
-    // Збільшення кількості товару
+
+      try {
+        await axios.post(
+          "http://26.235.139.202:8080/api/notification",
+          { product_id: this.productId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        alert(`Ви будете повідомлені, коли ${this.product.name} з'явиться в наявності.`);
+      } catch (error) {
+        console.error("Помилка реєстрації на сповіщення:", error);
+        alert("Не вдалося підписатися на сповіщення. Спробуйте пізніше.");
+      }
+    },
     increaseQuantity() {
-      if (this.quantity < this.product.quantity) {
+      if (this.selectedVariant && this.quantity < this.selectedVariant.quantity) {
         this.quantity++;
       }
     },
-    // Зменшення кількості товару
     decreaseQuantity() {
       if (this.quantity > 1) {
         this.quantity--;
       }
-    },
-    // Зміна розміру зображення
-    resizeImage() {
-      alert("Змінено розмір зображення!");
     },
   },
   created() {
     const productIdFromRoute = this.$route.params.id;
     if (productIdFromRoute) {
       this.productId = productIdFromRoute;
-      // Завантаження даних про товар
-      fetch(`http://26.235.139.202:8080/api/products/${this.productId}`)
+      axios
+        .get(`http://26.235.139.202:8080/api/products/${this.productId}`)
         .then((response) => {
-          if (!response.ok) {
-            throw new Error("Помилка завантаження продукту");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.product = data.data || {};
+          this.product = response.data.data || {};
         })
         .catch((error) => {
-          console.error("Помилка при завантаженні даних:", error);
+          console.error("Помилка при завантаженні продукту:", error);
         });
+
+      this.fetchWishlist();
     }
-    // Завантаження списку бажаного
-    this.fetchWishlist();
-  }
+  },
 };
 </script>
+
 
 
 

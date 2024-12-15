@@ -144,23 +144,41 @@ export default {
   },
   methods: {
     async loadFilters() {
-      try {
-        const response = await axios.get("http://26.235.139.202:8080/api/filter");
-        const data = response.data;
-
-        this.availabilityOptions = data["Доступність"] || [];
-        this.sizeOptions = data["Розмір"] || [];
-        this.colorOptions = data["Колір"] || [];
-        this.beadTypeOptions = data["Тип бісеру"] || [];
-        this.beadProducerOptions = data["Виробник бісеру"] || [];
-        this.weightOptions = data["Вага"] || { min: 0, max: 1000 };
-        this.priceOptions = data["Ціна"] || { min: 0, max: 10000 };
-        this.weightRange = [this.weightOptions.min, this.weightOptions.max];
-        this.priceRange = [this.priceOptions.min, this.priceOptions.max];
-      } catch (error) {
-        console.error("Помилка завантаження фільтрів:", error);
+    try {
+      // Перевірка наявності кешованих даних
+      const cachedFilters = localStorage.getItem('filterCache');
+      if (cachedFilters) {
+        const parsedFilters = JSON.parse(cachedFilters);
+        this.updateFilterOptions(parsedFilters);
+        console.log('Фільтри завантажені з кешу');
+        return;
       }
-    },
+
+      // Якщо немає кешу, завантажуємо з сервера
+      const response = await axios.get("http://26.235.139.202:8080/api/filter");
+      const data = response.data;
+
+      // Оновлення даних у компоненті
+      this.updateFilterOptions(data);
+
+      // Збереження даних у кеш
+      localStorage.setItem('filterCache', JSON.stringify(data));
+      console.log('Фільтри завантажені з сервера та збережені в кеш');
+    } catch (error) {
+      console.error("Помилка завантаження фільтрів:", error);
+    }
+  },
+  updateFilterOptions(data) {
+    this.availabilityOptions = data["Доступність"] || [];
+    this.sizeOptions = data["Розмір"] || [];
+    this.colorOptions = data["Колір"] || [];
+    this.beadTypeOptions = data["Тип бісеру"] || [];
+    this.beadProducerOptions = data["Виробник бісеру"] || [];
+    this.weightOptions = data["Вага"] || { min: 0, max: 1000 };
+    this.priceOptions = data["Ціна"] || { min: 0, max: 10000 };
+    this.weightRange = [this.weightOptions.min, this.weightOptions.max];
+    this.priceRange = [this.priceOptions.min, this.priceOptions.max];
+  },
     trackStyle(min, max, maxRange) {
       const minPercent = (min / maxRange) * 100;
       const maxPercent = (max / maxRange) * 100;

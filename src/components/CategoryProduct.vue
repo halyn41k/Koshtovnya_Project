@@ -83,51 +83,50 @@ export default {
   methods: {
     // Метод для отримання категорій із API
     async fetchCategories() {
-      try {
-        const response = await fetch("http://26.235.139.202:8080/api/categories");
+  try {
+    // Перевіряємо, чи є дані в localStorage
+    const cachedCategories = localStorage.getItem("categories");
+    if (cachedCategories) {
+      this.categories = JSON.parse(cachedCategories);
+      return;
+    }
 
-        // Перевірка, чи успішна відповідь
-        if (!response.ok) {
-          throw new Error(`HTTP помилка: ${response.status}`);
-        }
+    // Якщо кеша немає, робимо запит до API
+    const response = await fetch("http://26.235.139.202:8080/api/categories");
 
-        // Перевірка типу контенту, щоб переконатися, що сервер повернув JSON
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Сервер не повернув JSON");
-        }
+    if (!response.ok) {
+      throw new Error(`HTTP помилка: ${response.status}`);
+    }
 
-        // Парсинг JSON-відповіді
-        const data = await response.json();
+    const data = await response.json();
+    if (!Array.isArray(data.data)) {
+      throw new Error("Очікував масив категорій з API");
+    }
 
-        // Перевірка структури даних API (очікується масив категорій)
-        if (!Array.isArray(data.data)) {
-          throw new Error("Очікував масив категорій з API");
-        }
+    const fixedUrls = [
+      '/bracelets',
+      '/herdany',
+      '/sylyanky',
+      '/dukats',
+      '/earrings',
+      '/belts',
+    ];
 
-        // Призначаємо фіксовані URL до кожної категорії
-        const fixedUrls = [
-          '/bracelets',
-          '/herdany',
-          '/sylyanky',
-          '/dukats',
-          '/earrings',
-          '/belts',
-        ];
+    // Форматуємо дані
+    this.categories = data.data.map((category, index) => ({
+      id: category.id,
+      name: category.name,
+      image_url: category.image_url,
+      url: fixedUrls[index] || '#',
+    }));
 
-        // Форматуємо дані, додаючи фіксовані URL
-        this.categories = data.data.map((category, index) => ({
-          id: category.id,
-          name: category.name,
-          image_url: category.image_url,
-          url: fixedUrls[index] || '#', // Призначаємо URL або залишаємо '#'
-        }));
-      } catch (error) {
-        // У разі помилки використовуємо запасний масив
-        console.error("Помилка при отриманні категорій:", error.message);
-        this.categories = this.fallbackCategories;
-      }
-    },
+    // Зберігаємо дані в localStorage
+    localStorage.setItem("categories", JSON.stringify(this.categories));
+  } catch (error) {
+    console.error("Помилка при отриманні категорій:", error.message);
+    this.categories = this.fallbackCategories;
+  }
+},
   },
   // Викликаємо fetchCategories одразу після монтуння компонента
   mounted() {

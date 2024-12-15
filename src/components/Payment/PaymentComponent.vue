@@ -6,21 +6,21 @@
       <div class="header-line"></div>
     </header>
     <main class="payment-content" :style="{ backgroundImage: `url(${require('@/assets/paymentpattern.png')})` }">
-      <PaymentSteps :currentStep="currentStep" />
-      <OrderReview :cartItems="cartItems" />
-      <DeliveryAddress :formData="formData" />
-      
-      <payment-summary
-  :cart-items="cartItems"
-  :delivery-cost="deliveryCost"
-  :total-amount="totalAmount"
-  :city-ref="selectedCityRef"
-  :delivery-type="selectedDeliveryType"
-  :customer-details="customerDetails"
-  :delivery-details="deliveryDetails"
-  :payment-method="selectedPaymentMethod" 
-  :type-of-card="typeOfCard"
-/>
+      <PaymentStepsParent :currentStep="currentStep" />
+      <OrderReview v-if="currentStep === 1" :cartItems="cartItems" />
+      <DeliveryAddress v-if="currentStep === 2" :formData="formData" />
+      <PaymentSummary 
+        v-if="currentStep === 3"
+        :cart-items="cartItems"
+        :delivery-cost="deliveryCost"
+        :total-amount="totalAmount"
+        :city-ref="selectedCityRef"
+        :delivery-type="selectedDeliveryType"
+        :customer-details="customerDetails"
+        :delivery-details="deliveryDetails"
+        :payment-method="selectedPaymentMethod" 
+        :type-of-card="typeOfCard"
+      />
     </main>
   </section>
 </template>
@@ -29,7 +29,7 @@
 import OrderReview from "./OrderReview.vue";
 import DeliveryAddress from "./DeliveryAddress.vue";
 import PaymentSummary from "./PaymentSummary.vue";
-import PaymentSteps from "./PaymentSteps.vue";
+import PaymentStepsParent from "./PaymentStepsParent.vue";
 
 export default {
   name: "PaymentComponent",
@@ -37,13 +37,13 @@ export default {
     OrderReview,
     DeliveryAddress,
     PaymentSummary,
-    PaymentSteps,
+    PaymentStepsParent,
   },
   data() {
     return {
-      cartItems: [], // Додайте реальні дані
+      cartItems: [],
       formData: {
-        cityRef: null, // Переконайтеся, що значення визначене
+        cityRef: null,
         deliveryType: null,
       },
       deliveryCost: 0,
@@ -53,8 +53,6 @@ export default {
   },
 };
 </script>
-
-
 
   <style scoped>
 

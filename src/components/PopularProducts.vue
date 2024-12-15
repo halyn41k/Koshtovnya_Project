@@ -1,4 +1,4 @@
-<template> 
+<template>
   <section class="popular-goods">
     <h2 class="section-title">{{ $t('popularGoods') }}</h2>
     <div class="arrow-container">
@@ -14,8 +14,7 @@
           :key="product.id"
           class="product-card"
         >
-          <div v-if="isLoading" class="card--skeleton"></div>
-          <router-link v-else :to="`/productpage/${product.id}`" class="product-card-link">
+          <router-link :to="`/productpage/${product.id}`" class="product-card-link">
             <div class="image-container">
               <img :src="product.image_url" :alt="product.name" class="product-image" />
             </div>
@@ -28,25 +27,25 @@
             <span class="product-material">{{ product.bead_producer_name }}</span>
             <span class="wishlist-icon" @click.stop="toggleWishlist(product)">
               <svg
-                v-if="product.is_in_wishlist"
-                class="filled-heart"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-              <svg
-                v-else
-                class="empty-heart"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
-              </svg>
+                  v-if="product.is_in_wishlist"
+                  class="filled-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                <svg
+                  v-else
+                  class="empty-heart"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
+                </svg>
             </span>
           </p>
           <button class="buy-button">
@@ -84,47 +83,68 @@ export default {
       productsPerPage: 3,
       totalPages: 0,
       wishlist: [],
-      isLoading: true,  // Додаємо змінну для управління станом загрузки
     };
   },
   methods: {
     async fetchProducts() {
       try {
-        const response = await fetch("http://26.235.139.202:8080/api/popular-products");
+        const cachedData = localStorage.getItem('popularProducts');
+        const cachedPageData = JSON.parse(localStorage.getItem('popularProductsPages')) || {};
+
+        if (cachedData && cachedPageData[1]) {
+          this.products = JSON.parse(cachedData);
+          this.totalPages = cachedPageData.totalPages;
+          this.updateVisibleProducts();
+          await this.fetchWishlist(); // Оновлюємо стан wishlist
+          this.isLoading = false;
+          console.log('Дані завантажені з кешу');
+          return;
+        }
+
+        const response = await fetch("http://26.235.139.202:8080/api/popular-products?page=1");
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+
         const data = await response.json();
         this.products = data.data;
+        this.totalPages = data.totalPages || Math.ceil(this.products.length / this.productsPerPage);
         this.updateVisibleProducts();
-        this.totalPages = Math.ceil(this.products.length / this.productsPerPage);
-        this.isLoading = false;  // Завантаження завершено
 
-        // Fetch the wishlist after products are fetched
-        await this.fetchWishlist();
+        // Кешуємо дані
+        localStorage.setItem('popularProducts', JSON.stringify(this.products));
+        localStorage.setItem('popularProductsPages', JSON.stringify({ 1: true, totalPages: this.totalPages }));
+
+        await this.fetchWishlist(); // Оновлюємо стан wishlist
+        console.log('Дані кешовано (popular products)');
       } catch (error) {
         console.error("Error fetching popular products:", error.message);
+      } finally {
+        this.isLoading = false;
       }
     },
-    
+
     async fetchWishlist() {
       const token = localStorage.getItem('token');
       if (!token) {
         console.warn('Користувач не авторизований');
         return;
       }
+
+      const cachedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      this.wishlist = cachedWishlist;
+
       try {
         const response = await axios.get('http://26.235.139.202:8080/api/wishlist', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Ensure the response contains products
         if (response.data && response.data.products) {
           this.wishlist = response.data.products.map((item) => item.id);
+          localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
         } else {
           console.warn('Некоректна структура відповіді API для списку бажаного:', response.data);
           this.wishlist = [];
         }
 
-        // Sync product states with the wishlist
         this.products.forEach((product) => {
           product.is_in_wishlist = this.isInWishlist(product.id);
         });
@@ -132,41 +152,57 @@ export default {
         console.error('Помилка завантаження списку бажаного:', error);
       }
     },
+async fetchAdditionalProducts(page) {
+  try {
+    const response = await fetch(`http://26.235.139.202:8080/api/new-arrivals?page=${page}`);
+    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    const data = await response.json();
+    this.products.push(...data.data);
+  } catch (error) {
+    console.error("Error pre-fetching additional products:", error.message);
+  }
+},
 
+   
     isInWishlist(productId) {
       return this.wishlist.includes(productId);
     },
 
-    async toggleWishlist(product) {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Будь ласка, увійдіть у свій обліковий запис.');
-        this.$router.push('/login');
-        return;
+    async toggleWishlist(product, size = null) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Будь ласка, увійдіть у свій обліковий запис.');
+    this.$router.push('/login');
+    return;
+  }
+  try {
+    if (this.isInWishlist(product.id)) {
+      // Видалення зі списку бажаного
+      await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      this.wishlist = this.wishlist.filter((id) => id !== product.id);
+    } else {
+      // Додавання до списку бажаного
+      const requestData = { product_id: product.id };
+      if (size) {
+        requestData.size = size; // Додаємо поле size, якщо воно передане
       }
-      try {
-        if (this.isInWishlist(product.id)) {
-          // Remove from wishlist
-          await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          this.wishlist = this.wishlist.filter((id) => id !== product.id);
-        } else {
-          // Add to wishlist
-          await axios.post(
-            'http://26.235.139.202:8080/api/wishlist',
-            { product_id: product.id },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          this.wishlist.push(product.id);
-        }
-        
-        // Immediately update product's wishlist state
-        product.is_in_wishlist = this.isInWishlist(product.id);
-      } catch (error) {
-        console.error('Помилка при оновленні списку бажаного:', error);
-      }
-    },
+
+      await axios.post(
+        'http://26.235.139.202:8080/api/wishlist',
+        requestData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      this.wishlist.push(product.id);
+    }
+    // Оновлюємо стан продукту напряму
+    product.is_in_wishlist = this.isInWishlist(product.id);
+  } catch (error) {
+    console.error('Помилка при оновленні списку бажаного:', error);
+  }
+},
+
 
     updateVisibleProducts() {
       const start = this.currentPage * this.productsPerPage;
@@ -196,24 +232,6 @@ export default {
 </script>
 
 <style scoped>
-.card--skeleton {
-  position: absolute;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
-  width: 50%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  animation: loading 1.5s infinite linear;
-}
-
-@keyframes loading {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: 200px 0;
-  }
-}
 
 .product-card-link {
   text-decoration: none;

@@ -37,6 +37,7 @@
 <script>
 export default {
   name: 'CartItem',
+  type: String,
   props: {
     id: { type: String, required: true },
     itemNumber: { type: Number, required: true },

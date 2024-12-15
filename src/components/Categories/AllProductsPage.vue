@@ -154,11 +154,6 @@ export default {
     },
 
 
-    
-
-
-
-
 
     async fetchWishlist() {
       const token = localStorage.getItem('token');
@@ -192,35 +187,40 @@ export default {
       return this.wishlist.includes(productId);
     },
 
-    async toggleWishlist(product) {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Будь ласка, увійдіть у свій обліковий запис.');
-        this.$router.push('/login');
-        return;
+    async toggleWishlist(product, size = null) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Будь ласка, увійдіть у свій обліковий запис.');
+    this.$router.push('/login');
+    return;
+  }
+  try {
+    if (this.isInWishlist(product.id)) {
+      // Видалення зі списку бажаного
+      await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      this.wishlist = this.wishlist.filter((id) => id !== product.id);
+    } else {
+      // Додавання до списку бажаного
+      const requestData = { product_id: product.id };
+      if (size) {
+        requestData.size = size; // Додаємо поле size, якщо воно передане
       }
-      try {
-        if (this.isInWishlist(product.id)) {
-          // Видалення зі списку бажаного
-          await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          this.wishlist = this.wishlist.filter((id) => id !== product.id);
-        } else {
-          // Додавання до списку бажаного
-          await axios.post(
-            'http://26.235.139.202:8080/api/wishlist',
-            { product_id: product.id },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          this.wishlist.push(product.id);
-        }
-        // Оновлюємо стан продукту напряму
-        product.is_in_wishlist = this.isInWishlist(product.id);
-      } catch (error) {
-        console.error('Помилка при оновленні списку бажаного:', error);
-      }
-    },
+
+      await axios.post(
+        'http://26.235.139.202:8080/api/wishlist',
+        requestData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      this.wishlist.push(product.id);
+    }
+    // Оновлюємо стан продукту напряму
+    product.is_in_wishlist = this.isInWishlist(product.id);
+  } catch (error) {
+    console.error('Помилка при оновленні списку бажаного:', error);
+  }
+},
 
     updateFilters(filters) {
   console.log('filters to update:', filters); // Для дебагу
@@ -242,7 +242,7 @@ changePage(page) {
         this.fetchProducts(page, this.filters);
       }
     },
-    async addToCart(item) {
+    async addToCart(item, size = null) {
   const token = localStorage.getItem('token');
   if (!token) {
     alert('Будь ласка, увійдіть у свій обліковий запис.');
@@ -251,11 +251,16 @@ changePage(page) {
   }
 
   try {
-    // Додаємо параметр quantity (наприклад, 1 товар)
+    // Додаємо базові параметри для запиту
     const cartData = {
       product_id: item.id,
-      quantity: 1,  // Ви можете змінити це значення, залежно від потреб
+      quantity: 1, // Ви можете змінити це значення, залежно від потреб
     };
+
+    // Додаємо size, якщо передано
+    if (size) {
+      cartData.size = size;
+    }
 
     const response = await axios.post(
       'http://26.235.139.202:8080/api/cart',
@@ -263,16 +268,15 @@ changePage(page) {
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    console.log('Відповідь після додавання товару:', response.data);  // Логування відповіді
+    console.log('Відповідь після додавання товару:', response.data); // Логування відповіді
 
     // Перевірка, чи додавання успішне
     if (response.data && response.data.message === 'Product added to cart') {
       alert('Товар успішно додано до кошика.');
     } else {
-      console.error('Товари не були додані:', response.data);
+      console.error('Товар не був доданий:', response.data);
       alert('Не вдалося додати товар до кошика.');
     }
-
   } catch (error) {
     console.error('Помилка додавання товару до кошика:', error.response || error);
     alert('Не вдалося додати товар до кошика.');

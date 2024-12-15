@@ -16,8 +16,13 @@
       </div>
     </div>
     <button class="payment-button" @click="goToPayment">
-      <span>Перейти до оплати</span>
-    </button>
+      <span>Зареєструватися</span>
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
+            alt=""
+            class="login-icon"
+          />
+        </button>
   </div>
 </template>
 
@@ -96,6 +101,8 @@ export default {
     border: none;
     cursor: pointer;
     transition: background-color 0.3s;
+    height: 40px;
+    font-size: 15px;
   }
   
   .payment-button:hover {

@@ -1,5 +1,5 @@
 <template>
-  <section class="popular-goods">
+<section class="new-arrivals">
     <h2 class="section-title">{{ $t('newArrivals') }}</h2>
     <div class="arrow-container">
       <img
@@ -46,7 +46,6 @@
                   stroke-linejoin="round">
                   <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z" />
                 </svg>
-
             </span>
           </p>
           <button class="buy-button">
@@ -83,46 +82,68 @@ export default {
       currentPage: 0,
       productsPerPage: 3,
       totalPages: 0,
-      wishlist: [], // Store IDs of products in the wishlist
+      wishlist: [],
     };
   },
   methods: {
     async fetchProducts() {
-      try {
-        const response = await fetch("http://26.235.139.202:8080/api/new-arrivals");
-        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-        const data = await response.json();
-        this.products = data.data;
-        this.updateVisibleProducts();
-        this.totalPages = Math.ceil(this.products.length / this.productsPerPage);
+  try {
+    const cachedData = localStorage.getItem('newArrivals');
+    const cachedPageData = JSON.parse(localStorage.getItem('newArrivalsPages')) || {};
 
-        // Fetch the wishlist after products are fetched
-        await this.fetchWishlist();
-      } catch (error) {
-        console.error("Error fetching popular products:", error.message);
-      }
-    },
-    
+    if (cachedData && cachedPageData[1]) {
+      this.products = JSON.parse(cachedData);
+      this.totalPages = cachedPageData.totalPages;
+      this.updateVisibleProducts();
+      await this.fetchWishlist();
+      this.isLoading = false;
+      console.log('Дані завантажені з кешу (new arrivals)');
+      return;
+    }
+
+    const response = await fetch("http://26.235.139.202:8080/api/new-arrivals?page=1");
+    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+
+    const data = await response.json();
+    this.products = data.data;
+    this.totalPages = data.totalPages || Math.ceil(this.products.length / this.productsPerPage);
+    this.updateVisibleProducts();
+
+    localStorage.setItem('newArrivals', JSON.stringify(this.products));
+    localStorage.setItem('newArrivalsPages', JSON.stringify({ 1: true, totalPages: this.totalPages }));
+
+    await this.fetchWishlist();
+    console.log('Дані кешовано (new arrivals)');
+  } catch (error) {
+    console.error("Error fetching new arrivals:", error.message);
+  } finally {
+    this.isLoading = false;
+  }
+},
+
     async fetchWishlist() {
       const token = localStorage.getItem('token');
       if (!token) {
         console.warn('Користувач не авторизований');
         return;
       }
+
+      const cachedWishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      this.wishlist = cachedWishlist;
+
       try {
         const response = await axios.get('http://26.235.139.202:8080/api/wishlist', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Ensure the response contains products
         if (response.data && response.data.products) {
           this.wishlist = response.data.products.map((item) => item.id);
+          localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
         } else {
           console.warn('Некоректна структура відповіді API для списку бажаного:', response.data);
           this.wishlist = [];
         }
 
-        // Sync product states with the wishlist
         this.products.forEach((product) => {
           product.is_in_wishlist = this.isInWishlist(product.id);
         });
@@ -130,41 +151,56 @@ export default {
         console.error('Помилка завантаження списку бажаного:', error);
       }
     },
+async fetchAdditionalProducts(page) {
+  try {
+    const response = await fetch(`http://26.235.139.202:8080/api/new-arrivals?page=${page}`);
+    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+    const data = await response.json();
+    this.products.push(...data.data);
+  } catch (error) {
+    console.error("Error pre-fetching additional products:", error.message);
+  }
+},
 
+   
     isInWishlist(productId) {
       return this.wishlist.includes(productId);
     },
 
-    async toggleWishlist(product) {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Будь ласка, увійдіть у свій обліковий запис.');
-        this.$router.push('/login');
-        return;
+    async toggleWishlist(product, size = null) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Будь ласка, увійдіть у свій обліковий запис.');
+    this.$router.push('/login');
+    return;
+  }
+  try {
+    if (this.isInWishlist(product.id)) {
+      // Видалення зі списку бажаного
+      await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      this.wishlist = this.wishlist.filter((id) => id !== product.id);
+    } else {
+      // Додавання до списку бажаного
+      const requestData = { product_id: product.id };
+      if (size) {
+        requestData.size = size; // Додаємо поле size, якщо воно передане
       }
-      try {
-        if (this.isInWishlist(product.id)) {
-          // Remove from wishlist
-          await axios.delete(`http://26.235.139.202:8080/api/wishlist/${product.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          this.wishlist = this.wishlist.filter((id) => id !== product.id);
-        } else {
-          // Add to wishlist
-          await axios.post(
-            'http://26.235.139.202:8080/api/wishlist',
-            { product_id: product.id },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          this.wishlist.push(product.id);
-        }
-        
-        // Immediately update product's wishlist state
-        product.is_in_wishlist = this.isInWishlist(product.id);
-      } catch (error) {
-        console.error('Помилка при оновленні списку бажаного:', error);
-      }
-    },
+
+      await axios.post(
+        'http://26.235.139.202:8080/api/wishlist',
+        requestData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      this.wishlist.push(product.id);
+    }
+    // Оновлюємо стан продукту напряму
+    product.is_in_wishlist = this.isInWishlist(product.id);
+  } catch (error) {
+    console.error('Помилка при оновленні списку бажаного:', error);
+  }
+},
 
     updateVisibleProducts() {
       const start = this.currentPage * this.productsPerPage;

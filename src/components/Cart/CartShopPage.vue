@@ -22,7 +22,7 @@
           :title="item.title"
           :price="item.price"
           :quantity="item.quantity"
-          @change-quantity="updateQuantity"
+          @change-quantity="updateCartItem"
           @remove-item="removeItem"
         />
       </section>
@@ -53,70 +53,89 @@ export default {
   },
   methods: {
     async fetchCartItems() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Будь ласка, увійдіть у свій обліковий запис.");
-        this.$router.push("/login");
-        return;
-      }
-      this.loading = true;
-      try {
-        const response = await axios.get("http://26.235.139.202:8080/api/cart", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Будь ласка, увійдіть у свій обліковий запис.");
+    this.$router.push("/login");
+    return;
+  }
+  this.loading = true;
+  try {
+    const response = await axios.get("http://26.235.139.202:8080/api/cart", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-        // Update cartItems to include is_available
-        this.cartItems = response.data.products.map(item => ({
-          id: item.id,
-          image: item.image_url,
-          title: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          isAvailable: item.is_available,
-        }));
+    // Оновлюємо cartItems, включаючи нові поля
+    this.cartItems = response.data.products.map(item => ({
+      id: item.id,
+      image: item.image_url,
+      title: item.name,
+      price: item.price,
+      quantity: item.quantity,
+      isAvailable: item.is_available,
+      selectedSize: item.selected_size, // Додаємо вибраний розмір
+      variants: item.variants.map(variant => ({
+        size: variant.size,
+        quantity: variant.quantity,
+        isAvailable: variant.is_available,
+      })), // Додаємо всі доступні варіанти розмірів
+    }));
 
-        // Handle errors if some products are unavailable
-        if (response.data.errors && response.data.errors.length > 0) {
-          response.data.errors.forEach(error => {
-            const itemIndex = this.cartItems.findIndex(item => item.title === error.product_name);
-            if (itemIndex !== -1) {
-              this.cartItems[itemIndex].isAvailable = false;
-              this.cartItems[itemIndex].errorMessage = error.message;
-            }
-          });
-        }
-      } catch (error) {
-        console.error("Помилка завантаження кошика:", error);
-        alert("Не вдалося завантажити кошик.");
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async updateQuantity({ id, quantity, operation }) {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Будь ласка, увійдіть у свій обліковий запис.");
-        this.$router.push("/login");
-        return;
-      }
-      try {
-        const data = { operation, quantity };
-        const response = await axios.patch(
-          `http://26.235.139.202:8080/api/cart/${id}`,
-          data,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        const itemIndex = this.cartItems.findIndex(item => item.id === id);
+    // Обробка помилок (якщо є недоступні товари)
+    if (response.data.errors && response.data.errors.length > 0) {
+      response.data.errors.forEach(error => {
+        const itemIndex = this.cartItems.findIndex(item => item.title === error.product_name);
         if (itemIndex !== -1) {
-          this.cartItems[itemIndex].quantity = quantity;
+          this.cartItems[itemIndex].isAvailable = false;
+          this.cartItems[itemIndex].errorMessage = error.message;
         }
-      } catch (error) {
-        console.error("Помилка оновлення кількості товару:", error.response?.data || error.message);
-        alert(error.response?.data?.message || "Не вдалося оновити кількість товару.");
+      });
+    }
+  } catch (error) {
+    console.error("Помилка завантаження кошика:", error);
+    alert("Не вдалося завантажити кошик.");
+  } finally {
+    this.loading = false;
+  }
+},
+async updateCartItem({ id, quantity = null, operation = null, size = null }) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("Будь ласка, увійдіть у свій обліковий запис.");
+    this.$router.push("/login");
+    return;
+  }
+
+  try {
+    // Формуємо тіло запиту залежно від дії
+    const data = size 
+      ? { size } // Якщо змінюємо розмір
+      : { operation, quantity }; // Якщо змінюємо кількість
+
+    const response = await axios.patch(
+      `http://26.235.139.202:8080/api/cart/${id}`,
+      data,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const itemIndex = this.cartItems.findIndex(item => item.id === id);
+    if (itemIndex !== -1) {
+      if (size) {
+        // Оновлюємо розмір товару в локальному стані
+        this.cartItems[itemIndex].selectedSize = size;
+      } else if (quantity !== null) {
+        // Оновлюємо кількість товару в локальному стані
+        this.cartItems[itemIndex].quantity = quantity;
       }
-    },
+    }
+
+    alert("Товар успішно оновлено.");
+  } catch (error) {
+    console.error("Помилка оновлення товару в кошику:", error.response?.data || error.message);
+    alert(error.response?.data?.message || "Не вдалося оновити товар у кошику.");
+  }
+},
+
 
     async removeItem(id) {
       const token = localStorage.getItem("token");

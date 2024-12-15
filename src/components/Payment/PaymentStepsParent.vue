@@ -1,202 +1,119 @@
 <template>
-  <div>
-    <p class="payment-notice">
-      Будь ласка, перевірте своє замовлення перед оплатою.
-    </p>
-    <section ref="orderItems" class="order-items">
-      <div v-if="localCartItems.length > 0">
-        <div v-for="item in localCartItems" :key="item.id" class="item">
-          <img :src="item.image" alt="Product Image" class="item-image" />
-          <div class="item-details">
-            <h3 class="item-title">{{ item.title }}</h3>
-            <p class="item-price">{{ item.price }}₴ / за штуку</p>
-            <p class="item-quantity">Кількість: {{ item.quantity }}</p>
-          </div>
-        </div>
+  <div class="payment-steps-container">
+    <div class="steps-navigation">
+      <div 
+        v-for="(step, index) in steps" 
+        :key="index"
+        class="step"
+        :class="{ active: currentStep === index }"
+        @click="goToStep(index)"
+      >
+        {{ step.title }}
       </div>
-      <div v-else>
-        <p>Ваш кошик порожній.</p>
-      </div>
-    </section>
+    </div>
 
-    <PaymentSummary
-      :cartItems="localCartItems"
-      :deliveryCost="deliveryCost"
-      :totalAmount="calculatedTotalAmount"
-      :cityRef="formData.city"
-      :deliveryType="formData.deliveryType"
-      @submit-payment="submitOrder"
-    />
+    <div class="step-content">
+      <PersonalInfoStep 
+        v-if="currentStep === 0"
+        @validation="handlePersonalInfoValidation"
+      />
+      
+      <PostalOfficeStep 
+        v-if="currentStep === 1"
+        @validation="handlePostalInfoValidation"
+      />
+      
+      <PaymentStep 
+        v-if="currentStep === 2"
+        @validation="handlePaymentInfoValidation"
+      />
+
+      <div class="navigation-buttons">
+        <button 
+          v-if="currentStep > 0" 
+          @click="prevStep"
+        >
+          Назад
+        </button>
+        <button 
+          @click="nextStep" 
+          :disabled="!isStepValid"
+        >
+          {{ currentStep === steps.length - 1 ? 'Підтвердити' : 'Далі' }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import PaymentSummary from "./PaymentSummary.vue";
+import PersonalInfoStep from './PersonalInfoStep.vue';
+import PostalOfficeStep from './PostalOfficeStep.vue';
+import PaymentStep from './PaymentStep.vue';
 
 export default {
-  name: "OrderReview",
+  name: 'PaymentSteps',
   components: {
-    PaymentSummary,
+    PersonalInfoStep,
+    PostalOfficeStep,
+    PaymentStep
   },
   data() {
     return {
-      localCartItems: [], // Локальна копія товарів
-      deliveryCost: 0,
-      loading: false,
       steps: [
-        { title: "Особиста інформація", completed: false, isExpanded: true },
-        { title: "Поштове відділення", completed: false, isExpanded: false },
-        { title: "Оплата", completed: false, isExpanded: false },
+        { title: 'Особиста інформація' },
+        { title: 'Поштове відділення' },
+        { title: 'Оплата' }
       ],
       currentStep: 0,
-      formData: {
-        firstName: "",
-        lastName: "",
-        secondName: "",
-        phone: "",
-        city: "",
-        deliveryType: "",
-        warehouse: "",
-        streetSearch: "",
-        houseNumber: "",
-      },
-      errors: {},
-      paymentOptions: ["Картка", "Готівка", "PayPal"],
-      selectedPaymentOption: "",
-      canProceedToNextStep: false,
-    };
+      formData: {},
+      isStepValid: false
+    }
   },
   methods: {
-    async fetchCartItems() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Будь ласка, увійдіть у свій обліковий запис.");
-        this.$router.push("/login");
-        return;
-      }
-
-      this.loading = true;
-      try {
-        const response = await axios.get("http://26.235.139.202:8080/api/cart", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        this.localCartItems = response.data.products.map((item) => ({
-          id: item.id,
-          image: item.image_url,
-          title: item.name,
-          price: item.price,
-          quantity: item.quantity,
-        }));
-      } catch (error) {
-        console.error("Помилка завантаження кошика:", error);
-        alert("Не вдалося завантажити кошик.");
-      } finally {
-        this.loading = false;
+    handlePersonalInfoValidation({ data, isValid }) {
+      this.formData = { ...this.formData, ...data };
+      this.isStepValid = isValid;
+    },
+    handlePostalInfoValidation({ data, isValid }) {
+      this.formData = { ...this.formData, ...data };
+      this.isStepValid = isValid;
+    },
+    handlePaymentInfoValidation({ data, isValid }) {
+      this.formData = { ...this.formData, ...data };
+      this.isStepValid = isValid;
+    },
+    nextStep() {
+      if (this.currentStep < this.steps.length - 1) {
+        this.currentStep++;
+        this.isStepValid = false;
+      } else {
+        this.submitOrder();
       }
     },
- 
-  },
-  computed: {
-    calculatedTotalAmount() {
-      return (
-        this.localCartItems.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        ) + this.deliveryCost
-      );
+    prevStep() {
+      if (this.currentStep > 0) {
+        this.currentStep--;
+      }
     },
-  },
-  mounted() {
-    this.fetchCartItems();
-  },
-};
+    submitOrder() {
+      console.log('Замовлення:', this.formData);
+      // Логіка відправки замовлення
+    },
+    goToStep(index) {
+      if (index < this.currentStep) {
+        this.currentStep = index;
+      }
+    }
+  }
+}
 </script>
-
-
-
-<style scoped>
-
-.city-suggestions {
-  max-height: 150px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  margin-top: 5px;
-}
-
-.city-suggestions ul {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.city-suggestions li {
-  padding: 5px;
-  cursor: pointer;
-}
-
-.city-suggestions li:hover {
-  background-color: #f0f0f0;
-}
-  .payment-header {
-    margin-top: 200px;
-    display: flex;
-    align-items: center;
-    gap: 26.67px;
-    font: 840 26.67px/1.3 'KyivType Titling', -apple-system, Roboto, Helvetica, sans-serif;
-    letter-spacing: -1.33px;
-  }
-  
-  
-  .header-line {
-    flex: 1;
-    height: 2px;
-    background-color: grey;
-    margin: 0 10px;
-  }
-  
-  .main-title {
-    font-family: 'KyivType Titling', sans-serif;
-    font-size: 34px;
-    font-weight: 900;
-    letter-spacing: -1.2px;
-    text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
-    text-align: center;
-  }
-  
-  .payment-content {
-  background-image: url('@/assets/paymentpattern.png'); 
-  background-attachment: fixed;
-  background-size: cover;
-  padding: 0 46.67px;
-  margin-top: 28px;
-}
-  
-  .payment-notice {
-    font: 700 16.67px/22px Merriweather, sans-serif;
-    margin: 148.67px 0 0 18.67px;
-
-  }
-  
-  .order-details {
-    gap: 13px;
-    margin: 10px 0 0 18.67px;
-    max-width: 1108px;
-  }
+ 
+  <style scoped>
 
   
   @media (max-width: 991px) {
-    .payment-header {
-      white-space: initial;
-    }
-  
-    .payment-content {
-      max-width: 100%;
-      margin-top: 40px;
-      padding: 0 20px;
-    }
-  
+
     .payment-columns {
       flex-direction: column;
     }
@@ -304,20 +221,7 @@ export default {
   
     
     @media (max-width: 991px) {
-      .payment-header {
-        white-space: initial;
-      }
-    
-      .payment-content {
-        max-width: 100%;
-        margin-top: 40px;
-        padding: 0 20px;
-      }
-    
-      .payment-columns {
-        flex-direction: column;
-      }
-    
+
       .payment-steps,
       .payment-summary,
       .order-items,
@@ -326,15 +230,6 @@ export default {
       }
   
   
-      .payment-notice {
-        max-width: 100%;
-        margin-top: 40px;
-      }
-    
-      .order-details {
-        flex-direction: column;
-        max-width: 100%;
-      }
     }
     .delivery-steps {
     font: 700 20px/1.3 Merriweather, sans-serif;
@@ -413,14 +308,15 @@ export default {
     width: 12px;
     height: 12px;
     margin-right: 10px;
-    border: 2px solid #9D9292;
-    border-radius: 50%;
+    border: 5px solid #9D9292;
+    border-radius: 30%;
     background-color: transparent;
   }
   
   /* Стиль обраного радіо-доту */
   .radio-input:checked + .payment-label::before {
     background-color: #6B1F1F;
+    border: 4.5px solid #9D9292;
   }
   
   .next-button {
@@ -741,4 +637,25 @@ export default {
 .street-suggestions li:hover {
   background-color: #f0f0f0;
 }
+
+.radio-input {
+    display: none;
+  }
+  
+  .radio-input + .payment-label::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+    border: 2px solid #9D9292;
+    border-radius: 50%;
+    background-color: transparent;
+  }
+  
+  /* Стиль обраного радіо-доту */
+  .radio-input:checked + .payment-label::before {
+    background-color: #6B1F1F;
+  }
+
 </style>
