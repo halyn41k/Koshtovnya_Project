@@ -1,5 +1,3 @@
-// src/test/units/UserLogin.spec.js
-
 import { mount } from '@vue/test-utils';
 import UserLogin from '../../components/UserLogin.vue';
 

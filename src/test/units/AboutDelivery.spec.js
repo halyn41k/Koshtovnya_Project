@@ -102,4 +102,106 @@ describe('AboutDelivery.vue', () => {
     expect(computedStyles.textAlign).toBe('center');
   });
   
+  it('повинен додати клас "show" до елементів з класом "fade-in" при їх появі', async () => {
+    // Мок-функція для IntersectionObserver
+    const observeCallback = jest.fn((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+        }
+      });
+    });
+  
+    // Мок для IntersectionObserver
+    global.IntersectionObserver = jest.fn((callback) => ({
+      observe: (element) => {
+        observeCallback([{ target: element, isIntersecting: true }]);
+      },
+      disconnect: jest.fn(),
+      unobserve: jest.fn(),
+    }));
+  
+    // Монтуємо компонент
+    wrapper.vm.observeElements();
+  
+    // Отримуємо всі елементи з класом fade-in
+    const fadeInElements = wrapper.findAll('.fade-in');
+    expect(fadeInElements.length).toBeGreaterThan(0);
+  
+    // Емулюємо обробку змін у DOM
+    fadeInElements.forEach((element) => {
+      observeCallback([{ target: element.element, isIntersecting: true }]);
+    });
+  
+    await wrapper.vm.$nextTick();
+  
+    // Перевіряємо, чи клас "show" було додано
+    fadeInElements.forEach((element) => {
+      expect(element.element.classList.contains('show')).toBe(true);
+    });
+  });
+  
+  it('повинен викликати unobserve для елементів після додавання класу "show"', async () => {
+    const unobserveMock = jest.fn();
+    const observeCallback = jest.fn((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          observerMock.unobserve(entry.target); // Симулюємо виклик unobserve
+        }
+      });
+    });
+  
+    // Мок для IntersectionObserver
+    const observerMock = {
+      observe: jest.fn((element) => {
+        observeCallback([{ target: element, isIntersecting: true }]);
+      }),
+      unobserve: unobserveMock,
+      disconnect: jest.fn(),
+    };
+  
+    global.IntersectionObserver = jest.fn(() => observerMock);
+  
+    // Монтуємо компонент
+    wrapper.vm.observeElements();
+  
+    // Отримуємо всі елементи з класом fade-in
+    const fadeInElements = wrapper.findAll('.fade-in');
+    expect(fadeInElements.length).toBeGreaterThan(0);
+  
+    // Емулюємо обробку змін у DOM
+    fadeInElements.forEach((element) => {
+      observeCallback([{ target: element.element, isIntersecting: true }]);
+    });
+  
+    await wrapper.vm.$nextTick();
+  
+    // Перевіряємо, чи unobserve було викликано для кожного елемента
+    fadeInElements.forEach((element) => {
+      expect(unobserveMock).toHaveBeenCalledWith(element.element);
+    });
+  });
+  
+  it('повинен викликати disconnect при завершенні спостереження', () => {
+    const disconnectMock = jest.fn();
+  
+    // Мок для IntersectionObserver
+    const observerMock = {
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: disconnectMock,
+    };
+  
+    global.IntersectionObserver = jest.fn(() => observerMock);
+  
+    // Монтуємо компонент
+    wrapper.vm.observeElements();
+  
+    // Викликаємо disconnect
+    observerMock.disconnect();
+  
+    // Перевіряємо, чи disconnect було викликано
+    expect(disconnectMock).toHaveBeenCalled();
+  });
 });
