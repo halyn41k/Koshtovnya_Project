@@ -32,6 +32,7 @@ describe('FilterComponent.vue', () => {
   beforeEach(async () => {
     // Налаштовуємо мок-дані для axios
     axios.get.mockResolvedValue({ data: mockFilterData });
+    jest.spyOn(console, 'log').mockImplementation(() => {});
   
     // Повне рендеринг компонента з потрібними пропсами
     wrapper = mount(FilterComponent, {
@@ -50,6 +51,7 @@ describe('FilterComponent.vue', () => {
   afterEach(() => {
     wrapper.unmount();
     jest.clearAllMocks();
+    jest.restoreAllMocks();
   });
 
   it('повинен дозволяти вибір та зміну значень у чекбоксах доступності', async () => {

@@ -23,6 +23,7 @@ describe('PopularProducts.vue', () => {
   let wrapper;
 
   beforeEach(() => {
+    jest.spyOn(console, 'log').mockImplementation(() => {});
     // Мок для localStorage
     jest.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
       if (key === 'token') return null; // Симулюємо відсутність токена
@@ -317,7 +318,7 @@ describe('PopularProducts.vue', () => {
     await wrapper.vm.fetchProducts();
   
     // Перевіряємо, що fetch був викликаний з правильним URL
-    expect(global.fetch).toHaveBeenCalledWith('http://26.235.139.202:8080/api/popular-products');
+    expect(global.fetch).toHaveBeenCalledWith('http://26.235.139.202:8080/api/popular-products?page=1');
   
     // Перевіряємо, чи дані API збережено у змінну products
     expect(wrapper.vm.products).toEqual([
@@ -327,9 +328,6 @@ describe('PopularProducts.vue', () => {
   
     // Перевіряємо кількість видимих продуктів після обробки
     expect(wrapper.vm.visibleProducts.length).toBe(wrapper.vm.productsPerPage);
-  
-    // Відновлюємо оригінальний fetch
-    global.fetch.mockRestore();
-  });
+  });  
   
 });

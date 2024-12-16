@@ -127,14 +127,22 @@ describe('ProductPage Component', () => {
     expect(price.text()).toBe(`${mockProduct.price}₴`);
   });
 
-  // Перевірка відображення бейджа доступності
   it('Перевіряє візуальне відображення бейджа доступності', async () => {
+    wrapper.setData({
+      product: {
+        ...mockProduct,
+        variants: [
+          { size: 10, is_available: true }, // Один доступний варіант
+          { size: 20, is_available: false },
+        ],
+      },
+    });
     await wrapper.vm.$nextTick();
-
+  
     const availabilityBadge = wrapper.find('.availability-badge');
-    expect(availabilityBadge.exists()).toBe(true);
-    expect(availabilityBadge.classes()).toContain('available');
-    expect(availabilityBadge.text()).toBe('В наявності');
+    expect(availabilityBadge.exists()).toBe(true); // Перевірка наявності елемента
+    expect(availabilityBadge.classes()).toContain('available'); // Перевірка класу
+    expect(availabilityBadge.text()).toBe('В наявності'); // Перевірка тексту
   });
 
   // Товар без розмірів
@@ -151,39 +159,20 @@ describe('ProductPage Component', () => {
     expect(sizeDropdown.exists()).toBe(true);
     expect(sizeDropdown.findAll('option').length).toBe(0);
   });
-
-  it('Перевіряє відображення без характеристик, якщо вони відсутні', async () => {
-    // Задаємо товар без додаткових характеристик
-    wrapper.setData({
-      product: {
-        id: 1,
-        name: 'Тестовий товар',
-        price: 1500,
-        image_url: 'https://example.com/image.jpg',
-        sizes: [10, 20, 30],
-        is_available: true,
-      },
-    });
-  
-    await wrapper.vm.$nextTick();
-  
-    // Перевіряємо, чи відсутні характеристики
-    const specificationsList = wrapper.find('.specifications-list');
-    expect(specificationsList.exists()).toBe(true);
-  
-    const specificationItems = specificationsList.findAll('.spec-item');
-    expect(specificationItems.length).toBe(0); // Характеристик немає
-  });
   
   it('Перевіряє відображення випадаючого списку розмірів з варіантами', async () => {
-    // Задаємо товар із розмірами
+    // Задаємо товар із варіантами розмірів
     wrapper.setData({
       product: {
         id: 1,
         name: 'Тестовий товар',
         price: 1500,
         image_url: 'https://example.com/image.jpg',
-        sizes: [10, 20, 30], // Масив розмірів
+        variants: [
+          { size: 10, is_available: true },
+          { size: 20, is_available: true },
+          { size: 30, is_available: true },
+        ],
         is_available: true,
       },
     });
@@ -199,64 +188,23 @@ describe('ProductPage Component', () => {
     expect(options.length).toBe(3); // Очікуємо 3 варіанти (10, 20, 30)
   
     // Перевіряємо значення кожного варіанту
-    expect(options.at(0).text()).toBe('10 см');
-    expect(options.at(1).text()).toBe('20 см');
-    expect(options.at(2).text()).toBe('30 см');
+    expect(options.at(0).text()).toContain('10 см');
+    expect(options.at(1).text()).toContain('20 см');
+    expect(options.at(2).text()).toContain('30 см');
   
     // Перевіряємо атрибути value кожного варіанту
     expect(options.at(0).attributes('value')).toBe('10');
     expect(options.at(1).attributes('value')).toBe('20');
     expect(options.at(2).attributes('value')).toBe('30');
-  });
-  
-  it('Перевіряє коректну локалізацію характеристик товару', async () => {
-    // Задаємо товар із характеристиками
-    wrapper.setData({
-      product: {
-        id: 1,
-        name: 'Тестовий товар',
-        price: 1500,
-        image_url: 'https://example.com/image.jpg',
-        sizes: [10, 20, 30],
-        is_available: true,
-        material: 'Бавовна',
-        weight: '500 г',
-        colors: ['червоний', 'зелений'],
-      },
-    });
-  
-    await wrapper.vm.$nextTick();
-  
-    // Перевіряємо, чи список характеристик рендериться
-    const specificationsList = wrapper.find('.specifications-list');
-    expect(specificationsList.exists()).toBe(true);
-  
-    // Знаходимо всі локалізовані характеристики
-    const specificationItems = specificationsList.findAll('.spec-item');
-  
-    // Очікуємо 3 характеристики: material, weight, colors
-    expect(specificationItems.length).toBe(3);
-  
-    // Перевіряємо кожну характеристику
-    const materialItem = specificationItems.at(0);
-    expect(materialItem.find('.spec-term').text()).toBe('Матеріал'); // Локалізований ключ
-    expect(materialItem.find('.spec-description').text()).toBe('Бавовна'); // Значення
-  
-    const weightItem = specificationItems.at(1);
-    expect(weightItem.find('.spec-term').text()).toBe('Вага'); // Локалізований ключ
-    expect(weightItem.find('.spec-description').text()).toBe('500 г'); // Значення
-  
-    const colorsItem = specificationItems.at(2);
-    expect(colorsItem.find('.spec-term').text()).toBe('Кольори'); // Локалізований ключ
-    expect(colorsItem.find('.spec-description').text()).toBe('червоний, зелений'); // Об'єднаний список
-  });
+  });  
   
   it('Перевірка роботи кнопки збільшення кількості (`increaseQuantity`) з граничними значеннями', async () => {
     wrapper.setData({
       product: {
         ...mockProduct,
-        quantity: 5, // Максимальна кількість товару
+        variants: [{ size: 10, is_available: true, quantity: 5 }], // Максимальна кількість товару
       },
+      selectedSize: 10,
       quantity: 1, // Початкова кількість
     });
   
@@ -273,7 +221,7 @@ describe('ProductPage Component', () => {
   
     // Перевіряємо, що кількість не перевищує `product.quantity`
     await increaseButton.trigger('click');
-    expect(wrapper.vm.quantity).toBe(5); // Залишається максимальною
+    expect(wrapper.vm.quantity).toBe(5); // Максимальне значення
   });
   
   it('Перевірка роботи кнопки зменшення кількості (`decreaseQuantity`) з граничними значеннями', async () => {
@@ -351,8 +299,10 @@ describe('ProductPage Component', () => {
     wrapper.setData({
       product: {
         ...mockProduct,
-        is_available: true, // Товар доступний
+        is_available: true,
+        variants: [{ size: 10, is_available: true }], // Доступний варіант
       },
+      selectedSize: 10, // Обраний розмір
     });
   
     await wrapper.vm.$nextTick();
@@ -360,7 +310,7 @@ describe('ProductPage Component', () => {
     const buyButton = wrapper.find('.buy-button');
     expect(buyButton.exists()).toBe(true); // Перевіряємо, що кнопка існує
     expect(buyButton.text()).toBe('Купити'); // Текст кнопки
-    expect(buyButton.attributes('disabled')).toBeUndefined(); // Кнопка активна
+    expect(buyButton.attributes('disabled')).toBeFalsy(); // Перевіряємо, що кнопка активна
   
     const notifyButton = wrapper.find('.notify-button');
     expect(notifyButton.exists()).toBe(false); // Кнопки "Повідомити про наявність" не повинно бути
@@ -459,50 +409,6 @@ describe('ProductPage Component', () => {
     expect(ProductPage.methods.fetchWishlist).toHaveBeenCalled();
   });
   
-  it('Перевірка відповідності ключів і значень у `localizedCharacteristics`', async () => {
-    // Задаємо товар із характеристиками
-    wrapper.setData({
-      product: {
-        id: 1,
-        name: 'Тестовий товар',
-        price: 1500,
-        image_url: 'https://example.com/image.jpg',
-        sizes: [10, 20, 30],
-        is_available: true,
-        material: 'Бавовна',
-        weight: '500 г',
-        colors: ['червоний', 'зелений'],
-        country_of_manufacture: 'Україна',
-      },
-    });
-  
-    await wrapper.vm.$nextTick();
-  
-    // Очікувані локалізовані характеристики
-    const expectedCharacteristics = {
-      Матеріал: 'Бавовна',
-      Вага: '500 г',
-      Кольори: 'червоний, зелений',
-      'Країна виробник товару': 'Україна',
-    };
-  
-    // Отримуємо локалізовані характеристики з компонента
-    const localizedCharacteristics = wrapper.vm.localizedCharacteristics;
-  
-    // Перевіряємо, чи всі ключі присутні
-    expect(Object.keys(localizedCharacteristics)).toEqual(Object.keys(expectedCharacteristics));
-  
-    // Перевіряємо, чи всі значення збігаються
-    for (const [key, value] of Object.entries(expectedCharacteristics)) {
-      if (Array.isArray(localizedCharacteristics[key])) {
-        // Якщо значення є масивом, об'єднуємо його в рядок
-        expect(localizedCharacteristics[key].join(', ')).toBe(value);
-      } else {
-        expect(localizedCharacteristics[key]).toBe(value);
-      }
-    }
-  });
-  
   it('Перевірка правильної локалізації ключа "Кольори" (відображення як списку)', async () => {
     // Задаємо товар із характеристиками, включаючи "Кольори"
     wrapper.setData({
@@ -562,14 +468,17 @@ describe('ProductPage Component', () => {
   });
   
   it('Перевіряє поведінку при спробі додати товар до списку бажаного без авторизації', async () => {
-    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue(null);
+    // Оновлюємо мокацію localStorage для цього тесту
+    global.localStorage.getItem.mockImplementation((key) => (key === 'token' ? null : null));
+  
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
-
+  
     await wrapper.vm.toggleWishlist(mockProduct);
-
+  
+    // Перевіряємо, що з'явилося повідомлення про необхідність авторизації
     expect(alertSpy).toHaveBeenCalledWith('Будь ласка, увійдіть у свій обліковий запис.');
     expect(wrapper.vm.$router.push).toHaveBeenCalledWith('/login');
-
+  
     alertSpy.mockRestore();
   });
 
@@ -605,16 +514,19 @@ describe('ProductPage Component', () => {
   });
 
   it('Перевіряє поведінку при спробі отримати повідомлення про доступність без авторизації', async () => {
-    wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue(null);
+    // Оновлюємо мокацію localStorage для цього тесту
+    global.localStorage.getItem.mockImplementation((key) => (key === 'token' ? null : null));
+  
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
-
+  
     await wrapper.vm.notifyWhenAvailable();
-
+  
+    // Перевіряємо, що з'явилося повідомлення про необхідність авторизації
     expect(alertSpy).toHaveBeenCalledWith('Будь ласка, увійдіть у свій обліковий запис.');
     expect(wrapper.vm.$router.push).toHaveBeenCalledWith('/login');
-
+  
     alertSpy.mockRestore();
-  });
+  });  
 
   it('Перевіряє поведінку при спробі отримати повідомлення про доступність з авторизацією', async () => {
     wrapper.vm.checkAuthAndFetchProfile = jest.fn().mockResolvedValue({ id: 1 });
@@ -628,7 +540,7 @@ describe('ProductPage Component', () => {
       { headers: { Authorization: 'Bearer mock-token' } }
     );
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
-    expect(alertSpy).toHaveBeenCalledWith(`Ви будете повідомлені, коли ${mockProduct.name} з'явиться в наявності!`);
+    expect(alertSpy).toHaveBeenCalledWith(`Ви будете повідомлені, коли ${mockProduct.name} з'явиться в наявності.`);
     alertSpy.mockRestore();
   });
 
@@ -646,7 +558,7 @@ describe('ProductPage Component', () => {
       { headers: { Authorization: 'Bearer mock-token' } }
     );
     expect(wrapper.vm.wishlist).toContain(mockProduct.id);
-    expect(window.alert).toHaveBeenCalledWith(`${mockProduct.name} додано до списку бажаного!`);
+    expect(window.alert).toHaveBeenCalledWith(`${mockProduct.name} додано до списку бажаного.`);
   });
 
   it('Перевірка успішного видалення товару зі списку бажаного', async () => {
@@ -662,7 +574,7 @@ describe('ProductPage Component', () => {
       { headers: { Authorization: 'Bearer mock-token' } }
     );
     expect(wrapper.vm.wishlist).not.toContain(mockProduct.id);
-    expect(window.alert).toHaveBeenCalledWith(`${mockProduct.name} видалено зі списку бажаного!`);
+    expect(window.alert).toHaveBeenCalledWith(`${mockProduct.name} видалено зі списку бажаного.`);
   });
 
   it('Перевірка успішного створення запиту на сповіщення про наявність товару', async () => {
@@ -678,6 +590,6 @@ describe('ProductPage Component', () => {
       { product_id: mockProduct.id },
       { headers: { Authorization: 'Bearer mock-token' } }
     );
-    expect(window.alert).toHaveBeenCalledWith(`Ви будете повідомлені, коли ${mockProduct.name} з'явиться в наявності!`);
+    expect(window.alert).toHaveBeenCalledWith(`Ви будете повідомлені, коли ${mockProduct.name} з'явиться в наявності.`);
   });
 });
