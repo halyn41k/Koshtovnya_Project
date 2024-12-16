@@ -17,13 +17,19 @@
 
       <h3 class="subsection-title">Розмір</h3>
       <hr class="divider" />
-      <div class="dropdown-menu">
-        <select v-model="selectedSize" class="dropdown">
-          <option value="">(без фільтра)</option>
-          <option v-for="size in sizeOptions" :key="size" :value="size">
-            {{ size }} см
-          </option>
-        </select>
+      <div class="input-box">
+        <div class="min-box">
+          <input type="number" v-model="sizeRange[0]" :min="sizeOptions.min" :max="sizeOptions.max" step="1" />
+        </div>
+        <div class="input-divider"></div>
+        <div class="max-box">
+          <input type="number" v-model="sizeRange[1]" :min="sizeOptions.min" :max="sizeOptions.max" step="1" />
+        </div>
+      </div>
+      <div class="range-slider">
+        <input type="range" v-model="sizeRange[0]" :min="sizeOptions.min" :max="sizeOptions.max" class="slider" step="1" />
+        <input type="range" v-model="sizeRange[1]" :min="sizeOptions.min" :max="sizeOptions.max" class="slider" step="1" />
+        <div class="slider-track" :style="trackStyle(sizeRange[0], sizeRange[1], sizeOptions.max, sizeOptions.min)"></div>
       </div>
 
       <h3 class="subsection-title">Колір</h3>
@@ -79,7 +85,7 @@
       <div class="range-slider">
         <input type="range" v-model="weightRange[0]" :min="weightOptions.min" :max="weightOptions.max" class="slider" step="1" />
         <input type="range" v-model="weightRange[1]" :min="weightOptions.min" :max="weightOptions.max" class="slider" step="1" />
-        <div class="slider-track" :style="trackStyle(weightRange[0], weightRange[1], weightOptions.max)"></div>
+        <div class="slider-track" :style="trackStyle(weightRange[0], weightRange[1], weightOptions.max, weightOptions.min)"></div>
       </div>
 
       <h3 class="subsection-title">Ціна</h3>
@@ -96,7 +102,7 @@
       <div class="range-slider">
         <input type="range" v-model="priceRange[0]" :min="priceOptions.min" :max="priceOptions.max" class="slider" step="1" />
         <input type="range" v-model="priceRange[1]" :min="priceOptions.min" :max="priceOptions.max" class="slider" step="1" />
-        <div class="slider-track" :style="trackStyle(priceRange[0], priceRange[1], priceOptions.max)"></div>
+        <div class="slider-track" :style="trackStyle(priceRange[0], priceRange[1], priceOptions.max, priceOptions.min)" ></div>
       </div>
 
 
@@ -124,14 +130,15 @@ export default {
   data() {
     return {
       availabilityOptions: [],
-      sizeOptions: [],
+      sizeOptions: { min: 0, max: 100 }, // Adjust max value as needed
+      selectedSize: "", // Remove this as we'll use sizeRange now
+      sizeRange: [0, 100], // New range for size
       colorOptions: [],
       beadTypeOptions: [],
       beadProducerOptions: [],
       weightOptions: { min: 0, max: 1000 },
       priceOptions: { min: 0, max: 10000 },
       selectedAvailability: [],
-      selectedSize: "",
       selectedColor: "",
       selectedBeadTypes: [],
       selectedProducers: [],
@@ -144,50 +151,63 @@ export default {
   },
   methods: {
     async loadFilters() {
-    try {
-      // Перевірка наявності кешованих даних
-      const cachedFilters = localStorage.getItem('filterCache');
-      if (cachedFilters) {
-        const parsedFilters = JSON.parse(cachedFilters);
-        this.updateFilterOptions(parsedFilters);
-        console.log('Фільтри завантажені з кешу');
-        return;
+      try {
+        const cachedFilters = localStorage.getItem('filterCache');
+        if (cachedFilters) {
+          const parsedFilters = JSON.parse(cachedFilters);
+          this.updateFilterOptions(parsedFilters);
+          console.log('Фільтри завантажені з кешу');
+          return;
+        }
+
+        const response = await axios.get("http://26.235.139.202:8080/api/filter");
+        const data = response.data;
+
+        this.updateFilterOptions(data);
+
+        localStorage.setItem('filterCache', JSON.stringify(data));
+        console.log('Фільтри завантажені з сервера та збережені в кеш');
+      } catch (error) {
+        console.error("Помилка завантаження фільтрів:", error);
       }
-
-      // Якщо немає кешу, завантажуємо з сервера
-      const response = await axios.get("http://26.235.139.202:8080/api/filter");
-      const data = response.data;
-
-      // Оновлення даних у компоненті
-      this.updateFilterOptions(data);
-
-      // Збереження даних у кеш
-      localStorage.setItem('filterCache', JSON.stringify(data));
-      console.log('Фільтри завантажені з сервера та збережені в кеш');
-    } catch (error) {
-      console.error("Помилка завантаження фільтрів:", error);
-    }
-  },
-  updateFilterOptions(data) {
-    this.availabilityOptions = data["Доступність"] || [];
-    this.sizeOptions = data["Розмір"] || [];
-    this.colorOptions = data["Колір"] || [];
-    this.beadTypeOptions = data["Тип бісеру"] || [];
-    this.beadProducerOptions = data["Виробник бісеру"] || [];
-    this.weightOptions = data["Вага"] || { min: 0, max: 1000 };
-    this.priceOptions = data["Ціна"] || { min: 0, max: 10000 };
-    this.weightRange = [this.weightOptions.min, this.weightOptions.max];
-    this.priceRange = [this.priceOptions.min, this.priceOptions.max];
-  },
-    trackStyle(min, max, maxRange) {
-      const minPercent = (min / maxRange) * 100;
-      const maxPercent = (max / maxRange) * 100;
-      return {
-        left: `${minPercent}%`,
-        right: `${100 - maxPercent}%`,
-        background: "linear-gradient(to right, #ccc, #6B1F1F, #ccc)",
-      };
     },
+    updateFilterOptions(data) {
+  this.availabilityOptions = data["Доступність"] || [];
+  this.sizeOptions = {
+    min: parseFloat(data["Розмір"].min) || 0,
+    max: parseFloat(data["Розмір"].max) || 100,
+  };
+  this.sizeRange = [this.sizeOptions.min, this.sizeOptions.max];
+  console.log("Розмір із бекенду:", data["Розмір"]);
+
+  this.colorOptions = data["Колір"] || [];
+  this.beadTypeOptions = data["Тип бісеру"] || [];
+  this.beadProducerOptions = data["Виробник бісеру"] || [];
+  this.weightOptions = {
+    min: parseFloat(data["Вага"].min) || 0,
+    max: parseFloat(data["Вага"].max) || 1000,
+  };
+  this.weightRange = [this.weightOptions.min, this.weightOptions.max];
+
+  this.priceOptions = {
+    min: parseFloat(data["Ціна"].min) || 0,
+    max: parseFloat(data["Ціна"].max) || 10000,
+  };
+  this.priceRange = [this.priceOptions.min, this.priceOptions.max];
+},
+
+trackStyle(min, max, maxRange, minRange = 0) {
+  const adjustedMaxRange = maxRange - minRange; // Коригуємо діапазон
+  const minPercent = ((min - minRange) / adjustedMaxRange) * 100; // Відсоток для мінімального значення
+  const maxPercent = ((max - minRange) / adjustedMaxRange) * 100; // Відсоток для максимального значення
+
+  return {
+    left: `${minPercent}%`,
+    right: `${100 - maxPercent}%`,
+    background: "linear-gradient(to right, #ccc, #6B1F1F, #ccc)",
+  };
+},
+
     applyFilters() {
   const filters = {};
 
@@ -200,9 +220,10 @@ export default {
   }
 
   // Додавання інших фільтрів
-  if (this.selectedSize) {
-    filters.size = parseFloat(this.selectedSize);
-  }
+  if (this.sizeRange[0] !== this.sizeOptions.min || this.sizeRange[1] !== this.sizeOptions.max) {
+        filters.size_from = parseFloat(this.sizeRange[0]);
+        filters.size_to = parseFloat(this.sizeRange[1]);
+      }
 
   if (this.selectedColor) {
     filters.color = this.selectedColor;
@@ -245,7 +266,7 @@ export default {
     background-color: #fff7f6;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    max-width: 700px;
+    max-width: 600px;
     font-family: 'Montserrat', sans-serif;
   }
   
@@ -426,25 +447,48 @@ export default {
   input[type="range"]:nth-of-type(2) {
     z-index: 10;
   }
-  
-  .input-box {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px; 
-  }
-  
-  .min-box,
-  .max-box {
-    width: 45%; 
 
-  }
-  
-  .input-divider {
-    width: 10px;
-    height: 1px;
-    background-color: #8a8a8a; 
-  }
+  .input-box {
+  display: flex;
+  justify-content: center; /* Центрує інпути та лінію */
+  align-items: center;
+  gap: 10px; /* Відстань між елементами */
+  margin-top: 20px;
+  max-width: 400px; /* Максимальна ширина для всього блоку */
+  margin-left: auto; /* Центрує блок */
+  margin-right: auto;
+}
+
+.min-box {
+  margin-left: 30px; /* Зсунути мінімальний інпут до центра */
+  width: 100px; /* Ширина інпуту */
+}
+
+.max-box {
+  margin-left: -10px; /* Зсунути максимальний інпут до центра */
+  width: 100px; /* Ширина інпуту */
+}
+
+.min-box input,
+.max-box input {
+  width: 100%; /* Займає весь простір контейнера */
+  height: 20px; /* Висота інпутів */
+  padding: 5px;
+  text-align: center;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+}
+
+.input-divider {
+  z-index: 3;
+  margin-right: 30px;
+  width: 20px; /* Ширина лінії */
+  height: 1px;
+  background-color: #8a8a8a;
+}
+
   
   .double-slider-box {
     padding: 20px;

@@ -1,25 +1,25 @@
 <template>
-    <div class="payment-step">
-      <div 
-        v-for="(option, idx) in paymentOptions" 
-        :key="idx" 
-        class="payment-option"
-      >
-        <input
-          type="radio"
-          :id="`payment-${idx}`"
-          :value="option"
-          v-model="selectedPaymentOption"
-          class="radio-input"
-          @change="validatePaymentInfo"
-        />
-        <label :for="`payment-${idx}`" class="payment-label">
-          {{ option }}
-        </label>
-      </div>
-      <span v-if="error" class="error">{{ error }}</span>
+  <div class="payment-step">
+    <div 
+      v-for="(option, idx) in paymentOptions" 
+      :key="idx" 
+      class="payment-option"
+    >
+      <input
+        type="radio"
+        :id="`payment-${idx}`"
+        :value="option"
+        v-model="selectedPaymentOption"
+        class="radio-input"
+        @change="validatePaymentInfo"
+      />
+      <label :for="`payment-${idx}`" class="payment-label">
+        {{ option }}
+      </label>
     </div>
-  </template>
+    <span v-if="error" class="error">{{ error }}</span>
+  </div>
+</template>
   
   <script>
   export default {

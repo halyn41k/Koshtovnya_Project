@@ -1,4 +1,3 @@
-// PersonalInfoStep.vue
 <template>
   <div class="personal-info-step">
     <div class="input-container">
@@ -36,6 +35,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: 'PersonalInfoStep',
   data() {
@@ -55,32 +56,50 @@ export default {
   },
   methods: {
     validatePersonalInfo() {
-      this.errors = {};
-      let valid = true;
+      let isValid = true;
 
-      if (!this.formData.firstName) {
-        this.errors.firstName = "Ім'я обов'язкове";
-        valid = false;
+      // Validate First Name
+      if (!this.formData.firstName.trim()) {
+        this.errors.firstName = "Ім'я є обов'язковим";
+        isValid = false;
+      } else if (this.formData.firstName.trim().length < 2) {
+        this.errors.firstName = "Ім'я надто коротке";
+        isValid = false;
+      } else {
+        this.errors.firstName = '';
       }
 
-      if (!this.formData.lastName) {
-        this.errors.lastName = "Прізвище обов'язкове";
-        valid = false;
+      // Validate Last Name
+      if (!this.formData.lastName.trim()) {
+        this.errors.lastName = "Прізвище є обов'язковим";
+        isValid = false;
+      } else if (this.formData.lastName.trim().length < 2) {
+        this.errors.lastName = "Прізвище надто коротке";
+        isValid = false;
+      } else {
+        this.errors.lastName = '';
       }
 
-      if (!this.formData.phone) {
-        this.errors.phone = "Номер телефону обов'язковий";
-        valid = false;
+      // Validate Phone Number (basic validation)
+      const phoneRegex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+      if (!this.formData.phone.trim()) {
+        this.errors.phone = "Номер телефону є обов'язковим";
+        isValid = false;
+      } else if (!phoneRegex.test(this.formData.phone)) {
+        this.errors.phone = "Некоректний номер телефону";
+        isValid = false;
+      } else {
+        this.errors.phone = '';
       }
 
-      this.$emit('validation', {
-        data: this.formData,
-        isValid: valid
-      });
+      // Emit validation result and updated data
+      this.$emit('validation', isValid);
+      if (isValid) {
+        this.$emit('update', { ...this.formData });
+      }
 
-      return valid;
+      return isValid;
     },
-
     async fetchProfile() {
       try {
         const token = localStorage.getItem("token");
@@ -100,7 +119,9 @@ export default {
       } catch (error) {
         console.error("Помилка завантаження профілю:", error);
       }
-    }
+    },
+    
+
   },
   created() {
     this.fetchProfile();

@@ -92,66 +92,68 @@ export default {
   },
   methods: {
     async fetchProducts(page = 1, filters = {}) {
-      const params = { page };
+  const params = { page };
 
-      // Перетворення реактивних фільтрів у звичайні значення
-      const processedFilters = toRaw(filters);
+  // Перетворення реактивних фільтрів у звичайні значення
+  const processedFilters = toRaw(filters);
 
-      // Фільтри
-      if (processedFilters.is_available) {
-  params.is_available = Array.isArray(processedFilters.is_available)
-    ? processedFilters.is_available.filter(value => value === '1' || value === '0') // Фільтруємо тільки допустимі значення
-    : [String(processedFilters.is_available)].filter(value => value === '1' || value === '0');
-}
+  // Фільтри
+  if (processedFilters.is_available) {
+    params.is_available = Array.isArray(processedFilters.is_available)
+      ? processedFilters.is_available.filter(value => value === '1' || value === '0') // Фільтруємо тільки допустимі значення
+      : [String(processedFilters.is_available)].filter(value => value === '1' || value === '0');
+  }
 
+  // Обробка розміру (мінімум і максимум)
+  if (processedFilters.size && typeof processedFilters.size === 'object') {
+    const { min, max } = processedFilters.size;
+    params.size_min = parseFloat(min) || 0; // Мінімальний розмір
+    params.size_max = parseFloat(max) || 1000; // Максимальний розмір (встановіть дефолтне значення)
+  }
 
-      if (processedFilters.size) {
-        params.size = parseFloat(processedFilters.size);
-      }
+  if (processedFilters.color) {
+    params.color = processedFilters.color;
+  }
 
-      if (processedFilters.color) {
-        params.color = processedFilters.color;
-      }
+  if (processedFilters.type_of_bead) {
+    params.type_of_bead = processedFilters.type_of_bead;
+  }
 
-      if (processedFilters.type_of_bead) {
-        params.type_of_bead = processedFilters.type_of_bead;
-      }
+  if (processedFilters.bead_producer) {
+    params.bead_producer = processedFilters.bead_producer;
+  }
 
-      if (processedFilters.bead_producer) {
-        params.bead_producer = processedFilters.bead_producer;
-      }
+  if (
+    processedFilters.weight_from !== undefined ||
+    processedFilters.weight_to !== undefined
+  ) {
+    params.weight_from = parseFloat(processedFilters.weight_from) || 0;
+    params.weight_to =
+      parseFloat(processedFilters.weight_to) || this.weightOptions.max;
+  }
 
-      if (
-        processedFilters.weight_from !== undefined ||
-        processedFilters.weight_to !== undefined
-      ) {
-        params.weight_from = parseFloat(processedFilters.weight_from) || 0;
-        params.weight_to =
-          parseFloat(processedFilters.weight_to) || this.weightOptions.max;
-      }
+  if (
+    processedFilters.price_from !== undefined ||
+    processedFilters.price_to !== undefined
+  ) {
+    params.price_from = parseFloat(processedFilters.price_from) || 0;
+    params.price_to =
+      parseFloat(processedFilters.price_to) || this.priceOptions.max;
+  }
 
-      if (
-        processedFilters.price_from !== undefined ||
-        processedFilters.price_to !== undefined
-      ) {
-        params.price_from = parseFloat(processedFilters.price_from) || 0;
-        params.price_to =
-          parseFloat(processedFilters.price_to) || this.priceOptions.max;
-      }
-
-      try {
-        console.log('Відправлені параметри:', params);
-        const response = await axios.get(
-          'http://26.235.139.202:8080/api/categories/6/products?page=${page}',
-          { params }
-        );
-        this.products = response.data.data || [];
-        this.totalPages = response.data.meta.last_page || 1;
-        this.currentPage = response.data.meta.current_page || 1;
-      } catch (error) {
-        console.error('Помилка запиту продуктів:', error.response || error);
-      }
-    },
+  try {
+    console.log('Відправлені параметри:', params);
+    const response = await axios.get(
+      `http://26.235.139.202:8080/api/categories/6/products?page=${page}`,
+      { params }
+    );
+    this.products = response.data.data || [];
+    this.totalPages = response.data.meta.last_page || 1;
+    this.currentPage = response.data.meta.current_page || 1;
+  } catch (error) {
+    console.error('Помилка запиту продуктів:', error.response || error);
+  }
+},
 
 
     

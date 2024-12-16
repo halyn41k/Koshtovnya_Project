@@ -1,4 +1,5 @@
 <template>
+  <div class="delivery-step">
     <div class="input-container">
       <!-- Delivery Type Selection -->
       <select
@@ -10,7 +11,7 @@
         <option value="courier">Кур'єр</option>
         <option value="pickup">Самовивіз</option>
       </select>
-  
+
       <!-- Delivery Method Selection -->
       <select
         v-model="formData.deliveryType"
@@ -27,13 +28,10 @@
           {{ option.name }}
         </option>
       </select>
-      <span
-        v-if="!filteredDeliveryOptions.length"
-        class="error"
-      >
+      <span v-if="!filteredDeliveryOptions.length" class="error">
         Способи доставки не доступні
       </span>
-  
+
       <!-- Dynamic Delivery Inputs -->
       <template v-if="formData.deliveryType && formData.deliveryType.includes('Кур\'єр')">
         <input
@@ -43,7 +41,7 @@
           @input="handleCityInput"
         />
         <span v-if="errors.city" class="error">{{ errors.city }}</span>
-  
+
         <div v-if="cities.length" class="city-suggestions">
           <ul>
             <li v-for="city in cities" :key="city.Ref" @click="selectCity(city)">
@@ -51,15 +49,16 @@
             </li>
           </ul>
         </div>
-  
+
         <input
           class="input-field"
           v-model="formData.streetSearch"
           placeholder="Введіть назву вулиці"
+          :disabled="!formData.city"
           @input="handleStreetSearch"
         />
         <span v-if="errors.street" class="error">{{ errors.street }}</span>
-  
+
         <div v-if="streets.length" class="street-suggestions">
           <ul>
             <li v-for="(street, index) in streets" :key="index" @click="selectStreet(street)">
@@ -69,168 +68,263 @@
         </div>
       </template>
     </div>
-  </template>
+  </div>
+</template>
     
   <script>
+  import axios from "axios";
+
   export default {
-    name: 'PostalOfficeStep',
-    data() {
-      return {
-        selectedDeliveryCategory: '',
-        formData: {
-          deliveryType: '',
-          city: '',
-          cityRef: '',
-          streetSearch: '',
-          street: ''
-        },
-        errors: {
-          deliveryType: '',
-          city: '',
-          street: ''
-        },
-        filteredDeliveryOptions: [],
-        cities: [],
-        streets: [],
-        deliveryTypes: []
-      }
-    },
+  name: "PostalOfficeStep",
+  data() {
+    return {
+      selectedDeliveryCategory: "",
+      formData: {
+        deliveryType: "",
+        city: "",
+        cityRef: "",
+        streetSearch: "",
+        street: "",
+      },
+      errors: {
+        deliveryType: "",
+        city: "",
+        street: "",
+      },
+      filteredDeliveryOptions: [],
+      cities: [],
+      streets: [],
+      deliveryData: {}, // Ensure this is populated correctly
+    };
+  },
     methods: {
       validatePostalInfo() {
-        this.errors = {
-          deliveryType: '',
-          city: '',
-          street: ''
-        };
-  
-        let valid = true;
-  
-        if (!this.formData.deliveryType) {
-          this.errors.deliveryType = "Тип доставки обов'язковий";
+      this.errors = {
+        deliveryType: "",
+        city: "",
+        street: "",
+      };
+
+      let valid = true;
+
+      if (!this.formData.deliveryType) {
+        this.errors.deliveryType = "Тип доставки обов'язковий";
+        valid = false;
+      }
+
+      if (this.selectedDeliveryCategory === "courier") {
+        if (!this.formData.city) {
+          this.errors.city = "Місто обов'язкове";
           valid = false;
         }
-  
-        if (this.selectedDeliveryCategory === 'courier') {
-          if (!this.formData.city) {
-            this.errors.city = "Місто обов'язкове";
-            valid = false;
-          }
-  
-          if (!this.formData.street) {
-            this.errors.street = "Вулиця обов'язкова";
-            valid = false;
-          }
+
+        if (!this.formData.street) {
+          this.errors.street = "Вулиця обов'язкова";
+          valid = false;
         }
-  
-        this.$emit('validation', {
-          data: this.formData,
-          isValid: valid,
-          errors: this.errors
-        });
-  
-        return valid;
-      },
+      }
+
+      this.$emit("validation", {
+        data: this.formData,
+        isValid: valid,
+        errors: this.errors,
+      });
+
+      return valid;
+    },
   
       updateDeliveryOptions() {
-        if (this.selectedDeliveryCategory) {
-          this.filteredDeliveryOptions = this.deliveryTypes[this.selectedDeliveryCategory] || [];
-          this.formData.deliveryType = '';
-          this.validatePostalInfo();
-        } else {
-          this.filteredDeliveryOptions = [];
-        }
-      },
-  
-      async fetchDeliveryTypes() {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-  
+      if (this.selectedDeliveryCategory) {
+        this.filteredDeliveryOptions = this.deliveryData[this.selectedDeliveryCategory];
+      } else {
+        this.filteredDeliveryOptions = [];
+      }
+    },
+
+    async fetchDeliveryTypes() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+
+      this.loading = true;
+      try {
+        const response = await axios.get(
+          "http://26.235.139.202:8080/api/delivery-types",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        console.log("Отримані типи доставки:", response.data.data); 
+        this.deliveryOptions = response.data.data; 
+      } catch (error) {
+        this.handleApiError(error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleCityInput() {
+  console.log("Введене місто:", this.formData.city);
+  if (this.formData.city.length >= 3) {
+    this.fetchCities();
+  }
+},
+
+
+selectCity(city) {
+  this.formData.city = city.city;   // Встановлюємо місто
+  this.formData.cityRef = city.Ref;  // Встановлюємо Ref міста
+  this.cities = [];  // Очищаємо список міст
+  console.log("Вибране місто:", { city: this.formData.city, Ref: this.formData.cityRef });
+  this.fetchWarehouses();  // Запит на відділення після вибору міста
+},
+
+    handleStreetSearch() {
+      clearTimeout(this.streetSearchTimeout);
+      this.streetSearchTimeout = setTimeout(() => {
+        this.fetchStreets(); 
+      }, 300);
+    },
+
+    selectStreet(street) {
+      const streetName = street.street || street.Name; 
+      this.formData.street = streetName;
+      this.formData.streetSearch = streetName; 
+      this.streets = []; 
+      console.log("Вибрана вулиця:", this.formData.street);
+    },
+
+    async fetchCities() {
+  const token = localStorage.getItem("token"); // Define token here
+  console.log("Fetching cities with:", {
+    city: this.formData.city,
+    delivery_type: this.formData.deliveryType,
+  });
+
+  try {
+    const response = await axios.get(
+      "http://26.235.139.202:8080/api/nova-poshta/cities",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          city: this.formData.city,
+          delivery_type: this.formData.deliveryType,
+        },
+      }
+    );
+    console.log("Cities API Response:", response.data);
+
+    if (response.data.success && Array.isArray(response.data.data)) {
+      this.cities = response.data.data;
+    } else {
+      console.error("Incorrect response format:", response.data);
+      this.cities = [];
+    }
+  } catch (error) {
+    console.error("Error fetching cities:", error.response?.data || error.message);
+  }
+},
+selectDeliveryType(type) {
+  this.formData.deliveryType = type;  // Встановлюємо тип доставки
+  console.log("Тип доставки обрано:", this.formData.deliveryType);
+  this.fetchWarehouses();  // Оновлюємо відділення після вибору типу доставки
+},
+
+
+
+    async fetchStreets() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Ви не авторизовані. Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+
+      if (this.formData.streetSearch.length >= 3) {
         try {
-          const response = await this.$axios.get(
-            "http://26.235.139.202:8080/api/delivery-types",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-  
-          this.deliveryTypes = response.data.data;
-        } catch (error) {
-          console.error("Помилка завантаження типів доставки:", error);
-        }
-      },
-  
-      async handleCityInput() {
-        this.formData.city = this.formData.city.trim();
-        
-        if (this.formData.city.length >= 3) {
-          await this.fetchCities();
-        } else {
-          this.cities = [];
-        }
-      },
-  
-      async fetchCities() {
-        const token = localStorage.getItem("token");
-        try {
-          const response = await this.$axios.get(
-            "http://26.235.139.202:8080/api/nova-poshta/cities",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-              params: {
-                city: this.formData.city,
-                delivery_type: this.formData.deliveryType
-              }
-            }
-          );
-  
-          this.cities = response.data.data || [];
-        } catch (error) {
-          console.error("Помилка пошуку міст:", error);
-        }
-      },
-  
-      async handleStreetSearch() {
-        if (this.formData.streetSearch.length >= 3 && this.formData.cityRef) {
-          await this.fetchStreets();
-        } else {
-          this.streets = [];
-        }
-      },
-  
-      async fetchStreets() {
-        const token = localStorage.getItem("token");
-        try {
-          const response = await this.$axios.get(
+          const response = await axios.get(
             "http://26.235.139.202:8080/api/nova-poshta/streets",
             {
               headers: { Authorization: `Bearer ${token}` },
               params: {
-                city: this.formData.cityRef,
-                street: this.formData.streetSearch
-              }
+                Ref: this.formData.cityRef,
+                street: this.formData.streetSearch,
+              },
             }
           );
-  
-          this.streets = response.data.data || [];
+
+          if (response.data && Array.isArray(response.data.data)) {
+            this.streets = response.data.data;
+          } else {
+            console.error("Неправильний формат даних:", response.data);
+            this.streets = [];
+          }
         } catch (error) {
-          console.error("Помилка пошуку вулиць:", error);
+          this.handleApiError(error);
         }
-      },
-  
-      selectCity(city) {
-        this.formData.city = city.city;
-        this.formData.cityRef = city.Ref;
-        this.cities = [];
-        this.streets = []; // Reset streets when city changes
-        this.validatePostalInfo();
-      },
-  
-      selectStreet(street) {
-        this.formData.streetSearch = street.street || street.Name;
-        this.formData.street = street.Ref || street.Name;
-        this.streets = [];
-        this.validatePostalInfo();
       }
+    },
+    async fetchWarehouses() {
+  this.warehouses = []; // Очистити старі дані
+  console.log("Fetching warehouses for city:", this.formData.city, "Ref:", this.formData.cityRef);
+  try {
+    const response = await axios.get(
+      "http://26.235.139.202:8080/api/nova-poshta/ware-houses",
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        params: {
+          city: this.formData.city,
+          Ref: this.formData.cityRef,
+          delivery_type: this.formData.deliveryType,
+        },
+      }
+    );
+
+    console.log("Warehouses response:", response.data);
+
+    if (response.status === 200 && Array.isArray(response.data?.data)) {
+      // Підготувати дані для шаблону
+      this.warehouses = response.data.data.map((item, index) => ({
+        id: index + 1, // Унікальний ID
+        name: item.warehouse, // Текст назви відділення
+      }));
+      console.log("Processed warehouses:", this.warehouses);
+    } else {
+      console.error("No data returned or invalid format");
+    }
+  } catch (error) {
+    console.error("Error fetching warehouses:", error.response?.data || error.message);
+  }
+},
+handleApiError(error) {
+      if (error.response) {
+        console.error("Помилка сервера:", error.response.data);
+        alert(`Сервер повернув помилку: ${error.response.status}`);
+      } else {
+        console.error("Помилка запиту:", error.message);
+        alert("Не вдалося виконати запит. Перевірте ваше з'єднання.");
+      }
+    },
+
+    handlePostalOfficeSearch() {
+      const query = this.formData.postalOfficeSearch.trim().toLowerCase();
+      if (query) {
+        this.warehouses = this.allWarehouses.filter(warehouse =>
+          warehouse.Description.toLowerCase().includes(query)
+        );
+      } else {
+        this.warehouses = [];
+      }
+    },
+
+    selectPostalOffice(warehouse) {
+      this.formData.postalOffice = warehouse.Description; 
+      this.formData.postalOfficeSearch = warehouse.Description; 
+      this.warehouses = []; 
+    },
     },
     created() {
       this.fetchDeliveryTypes();
