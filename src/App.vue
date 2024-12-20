@@ -1,27 +1,33 @@
 <template>
   <div id="app">
-    <HeaderComponent /> 
+    <HeaderComponent />
     <router-view />
-    <FooterComponent />
+    <!-- Показувати футер, якщо це не адмін панель -->
+    <FooterComponent v-if="!isAdminRoute" />
   </div>
 </template>
 
 <script>
-import HeaderComponent from './components/HeaderComponent.vue'
-import FooterComponent from './components/FooterComponent.vue' 
+import HeaderComponent from './components/HeaderComponent.vue';
+import FooterComponent from './components/FooterComponent.vue';
 
 export default {
   name: 'App',
   components: {
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+  },
+  computed: {
+    // Перевірка, чи маршрут веде до адмін панелі
+    isAdminRoute() {
+      return this.$route.path.startsWith('/admin'); 
+    },
   },
   mounted() {
-  const token = localStorage.getItem("token");
-  if (!token && this.$route.name !== "Login") {
-    this.$router.push({ name: "Login" });
-  }
-}
-
-}
+    const token = localStorage.getItem('token');
+    if (!token && this.$route.name !== 'Login') {
+      this.$router.push({ name: 'Login' });
+    }
+  },
+};
 </script>

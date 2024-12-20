@@ -5,7 +5,11 @@
         <h1 class="product-title">Товари</h1>
         <div class="filter-container">
           <span class="filter-text">Фільтр</span>
-          <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Filter icon" class="filter-icon" />
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5"
+            alt="Filter icon"
+            class="filter-icon"
+          />
         </div>
         <form class="search-form" @submit.prevent="handleSearch">
           <label for="searchInput" class="visually-hidden">Пошук</label>
@@ -16,54 +20,77 @@
             class="search-input"
             placeholder="Пошук"
           />
-          <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Search icon" class="search-icon" />
+          <img
+            src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5"
+            alt="Search icon"
+            class="search-icon"
+          />
         </form>
       </div>
-      <button class="add-product-button">
-        <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/b16e6ab49c38393f90f82fabc8bc836adcc3b48eb08a452c5ccea5d5a207d0ea?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Add icon" class="add-icon" />
+      <button class="add-product-button" @click="showAddProduct">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/b16e6ab49c38393f90f82fabc8bc836adcc3b48eb08a452c5ccea5d5a207d0ea?apiKey=c3e46d0a629546c7a48302a5db3297d5"
+          alt="Add icon"
+          class="add-icon"
+        />
         <span>Додати</span>
       </button>
     </header>
 
-    <section v-if="!selectedProduct" class="product-grid">
+    <section v-if="!currentComponent" class="product-grid">
       <ProductCard
         v-for="product in filteredProducts"
         :key="product.id"
         :product="product"
-        @update-product="handleUpdate"
+        @update-product="showUpdateOrders"
         @delete-product="handleDelete"
       />
     </section>
+    <p v-else-if="!products.length">Товари не знайдено.</p>
 
-    <ProductUpdate
-      v-else
-      :product="selectedProduct"
-      @close="closeUpdate"
+    <!-- Динамічний рендер компонентів -->
+    <component
+      v-if="currentComponent"
+      :is="currentComponent"
+      v-bind="currentProps"
+      @close="resetComponent"
     />
+
+    <div class="pagination" v-if="totalPages > 1">
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        @click="changePage(page)"
+        :class="{ active: currentPage === page }"
+      >
+        {{ page }}
+      </button>
+    </div>
   </main>
 </template>
 
 <script>
 import ProductCard from './ProductCard.vue';
-import ProductUpdate from './ProductUpdate.vue';
+import AddProduct from './AddProduct.vue';
+import UpdateOrders from './UpdateOrders.vue';
+import axios from 'axios';
 
 export default {
   name: 'ProductList',
   components: {
     ProductCard,
-    ProductUpdate,
+    AddProduct,
+    UpdateOrders,
   },
   data() {
     return {
       searchQuery: '',
-      products: [
-        { id: 1, name: 'Гердан "Квітка папороті"', price: '1500₴', material: 'Чеський бісер', image: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/ef875de800dadfa860b1f6bfa18a07082dec4f6e1d5931f4104c2dcdab6ea17f?apiKey=c3e46d0a629546c7a48302a5db3297d5&' },
-        { id: 2, name: 'Браслет "Український мотив"', price: '750₴', material: 'Китайський бісер', image: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/2ad8e1ee64a513e03138c9947981841af47801d6937bae9fe8682564b7178f57?apiKey=c3e46d0a629546c7a48302a5db3297d5&' },
-        { id: 3, name: 'Браслет "Українські візерунки"', price: '450₴', material: 'Китайський бісер', image: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/5aa05ca83611f5071fa2da2f00607997bb605923d58ed42913c4abf81fa60c41?apiKey=c3e46d0a629546c7a48302a5db3297d5&' },
-        { id: 4, name: 'Браслет "Розмаїття кольорів"', price: '750₴', material: 'Чешський бісер', image: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/51dce7dc141431de068e877e6e79143c0d633b1fe529be77bab31e8122e93b83?apiKey=c3e46d0a629546c7a48302a5db3297d5&' },
-        { id: 5, name: 'Браслет "Чорно-білий розмай"', price: '650₴', material: 'Чешський бісер', image: 'https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/38dd35b539d5b055a2e4bb30fb23d0927e6104f5357f31bab1164ebc9f4536d5?apiKey=c3e46d0a629546c7a48302a5db3297d5&' },
-      ],
-      selectedProduct: null,
+      products: [],
+      currentPage: 1,
+      totalPages: 1,
+      filters: {},
+      currentComponent: null, // Поточний компонент для відображення
+      currentProps: {}, // Пропси для компонента
     };
   },
   computed: {
@@ -74,18 +101,52 @@ export default {
     },
   },
   methods: {
-    handleUpdate(product) {
-      this.selectedProduct = product;
+
+
+    async fetchProducts(page = 1) {
+      const params = { page, ...this.filters };
+      try {
+        const response = await axios.get(
+          'http://26.235.139.202:8080/api/products',
+          { params }
+        );
+        this.products = response.data.data || [];
+        this.totalPages = response.data.meta.last_page || 1;
+        this.currentPage = response.data.meta.current_page || 1;
+      } catch (error) {
+        console.error('Помилка запиту продуктів:', error.response || error);
+      }
+    },
+    changePage(page) {
+      if (page > 0 && page <= this.totalPages) {
+        this.fetchProducts(page);
+      }
+    },
+    handleSearch() {
+      this.fetchProducts(1);
     },
     handleDelete(productId) {
       this.products = this.products.filter(product => product.id !== productId);
     },
-    closeUpdate() {
-      this.selectedProduct = null;
+    resetComponent() {
+      this.currentComponent = null;
+      this.currentProps = {};
     },
+    showAddProduct() {
+      this.currentComponent = 'AddProduct';
+    },
+    showUpdateOrders(product) {
+      this.currentComponent = 'UpdateOrders';
+      this.currentProps = { product }; // Передача даних продукту
+    },
+  },
+  created() {
+    this.fetchProducts();
   },
 };
 </script>
+
+
 
 <style scoped>
 .product-list {
@@ -211,5 +272,36 @@ export default {
   .product-grid {
     grid-template-columns: 1fr;
   }
+}
+
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  transition: all 0.3s ease;
+}
+
+.pagination button:hover {
+  background-color: #6b1f1f;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.pagination button.active {
+  background-color: #6b1f1f;
+  color: white;
 }
 </style>

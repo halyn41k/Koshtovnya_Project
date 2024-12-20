@@ -3,28 +3,22 @@
     <div class="order-summary">
       <h2 class="summary-title">Сума до оплати</h2>
       <div class="summary-details">
-        <!-- Список товарів -->
         <div class="summary-row" v-for="item in cartItems" :key="item.id">
           <span>{{ item.title }}</span>
           <span class="price">{{ item.price * item.quantity }}₴</span>
         </div>
-        
-        <!-- Вартість доставки -->
         <div class="summary-row">
           <span>Доставка</span>
           <span class="price">{{ localDeliveryCost }}₴</span>
         </div>
-        
-        <!-- Загальна сума -->
         <div class="summary-row total">
-          <span>Загальна сума</span>
-          <span class="price">{{ totalAmountWithDelivery }}₴</span>
-        </div>
-      </div>
+  <span>Загальна сума</span>
+  <span class="price">{{ totalWithDelivery }}₴</span>
+</div>
 
-      <!-- Кнопка оформлення замовлення -->
+      </div>
       <button class="payment-button" @click="submitOrder">
-        <span>Зареєструватися</span>
+        <span>Оформити замовлення</span>
           <img
             src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
             alt=""
@@ -47,6 +41,11 @@ export default {
       default: () => [],
     },
     deliveryCost: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    totalAmount: {
       type: Number,
       required: true,
       default: 0,
@@ -92,85 +91,69 @@ export default {
   data() {
     return {
       localDeliveryCost: this.deliveryCost,
+      localTotalAmount: this.totalAmount,
     };
-  },
-  computed: {
-    // Розрахунок суми товарів
-    cartTotal() {
-      return this.cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      );
-    },
-    // Загальна сума з урахуванням доставки
-    totalAmountWithDelivery() {
-      return this.cartTotal + this.localDeliveryCost;
-    },
   },
   methods: {
     async submitOrder() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Будь ласка, увійдіть у свій обліковий запис.");
-    this.$router.push("/login");
-    return;
-  }
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
 
-  // Перевіряємо, чи всі обов'язкові дані присутні
-  if (
-    !this.customerDetails.first_name ||
-    !this.customerDetails.last_name ||
-    !this.customerDetails.phone_number ||
-    !this.deliveryDetails.delivery_name ||
-    !this.deliveryDetails.address ||
-    !this.paymentMethod
-  ) {
-    alert("Будь ласка, заповніть усі необхідні поля.");
-    return;
-  }
+      try {
+        const orderData = {
+          last_name: this.customerDetails.last_name,
+          first_name: this.customerDetails.first_name,
+          second_name: this.customerDetails.second_name,
+          phone_number: this.customerDetails.phone_number,
+          city: this.cityRef,
+          delivery_name: this.deliveryDetails.delivery_name,
+          delivery_address: this.deliveryDetails.address,
+          payment_method: this.paymentMethod,
+          type_of_card: this.paymentMethod === "Післяоплата" ? "" : this.typeOfCard,
+          delivery_cost: this.localDeliveryCost,
+          cart_cost: this.cartItems.reduce(
+            (total, item) => total + item.price * item.quantity,
+            0
+          ),
+        };
 
-  try {
-    // Формуємо об'єкт замовлення
-    const orderData = {
-      last_name: this.customerDetails.last_name,
-      first_name: this.customerDetails.first_name,
-      second_name: this.customerDetails.second_name,
-      phone_number: this.customerDetails.phone_number,
-      city: this.cityRef, // Місто
-      delivery_name: this.deliveryDetails.delivery_name,
-      delivery_address: this.deliveryDetails.address,
-      payment_method: this.paymentMethod,
-      type_of_card: this.paymentMethod === "Післяоплата" ? "" : this.typeOfCard,
-      delivery_cost: this.localDeliveryCost,
-      cart_cost: this.cartTotal,
-    };
+        console.log("Дані замовлення:", orderData);
 
-    console.log("Дані замовлення:", orderData);
+        await axios.post("http://26.235.139.202:8080/api/orders", orderData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    // Надсилаємо POST-запит
-    await axios.post("http://26.235.139.202:8080/api/orders", orderData, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    alert("Замовлення успішно оформлено!");
-    this.$emit("order-submitted");
-
-    // Очищаємо форму після успіху
-    this.$emit("clear-cart"); // Якщо є логіка очищення корзини
-  } catch (error) {
-    console.log("customerDetails:", this.customerDetails);
-console.log("deliveryDetails:", this.deliveryDetails);
-console.log("paymentMethod:", this.paymentMethod);
-
-    console.error("Помилка оформлення замовлення:", error.message || error);
-    alert("Не вдалося оформити замовлення. Спробуйте ще раз.");
-  }
+        alert("Замовлення успішно оформлено!");
+        this.$emit("order-submitted");
+      } catch (error) {
+        console.error("Помилка оформлення замовлення:", error.message || error);
+        alert("Не вдалося оформити замовлення. Перевірте дані.");
+      }
+    },
+  },
+  watch: {
+  totalAmount(newValue) {
+    this.localTotalAmount = newValue;
+  },
+},
+computed: {
+  totalWithDelivery() {
+    return (
+      this.cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ) + this.deliveryCost
+    );
+  },
 },
 
-
-  },
 };
 </script>
+
 
   
   <style scoped>
@@ -237,21 +220,22 @@ console.log("paymentMethod:", this.paymentMethod);
 }
 
 .payment-button {
-  border-radius: 8px;
-  background-color: rgba(107, 31, 31, 1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #fff;
-  font: 700 12px/1.3 Merriweather, sans-serif;
-  padding: 6px 15px;
-  margin-top: 10px;
-  width: 100%;
-  border: none;
-  cursor: pointer;
-  height: 40px;
+    border-radius: 8px;
+    background-color: rgba(107, 31, 31, 1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font: 700 12px/1.3 Merriweather, sans-serif;
+    padding: 6px 15px;
+    margin-top: 10px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 40px;
     font-size: 15px;
-}
+  }
 
 .button-icon {
   width: 24px;
@@ -265,4 +249,10 @@ console.log("paymentMethod:", this.paymentMethod);
     padding: 15px;
   }
 }
+
+
+.payment-summary {
+  z-index: 5; /* Встановлюємо більш високий пріоритет */
+}
+
 </style>

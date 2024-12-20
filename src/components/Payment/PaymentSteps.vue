@@ -147,15 +147,17 @@
                   <span v-if="errors.street" class="error">{{ errors.street }}</span>
                 </div>
   
-                <!-- House Number Input -->
                 <div v-if="formData.street">
-                  <input
-                    class="input-field"
-                    v-model="formData.houseNumber"
-                    placeholder="Введіть номер будинку"
-                  />
-                  <span v-if="errors.houseNumber" class="error">{{ errors.houseNumber }}</span>
-                </div>
+  <input
+    class="input-field"
+    v-model="formData.houseNumber"
+    placeholder="Введіть номер будинку"
+  />
+  <span v-if="errors.houseNumber" class="error">{{ errors.houseNumber }}</span>
+</div>
+
+
+
   
                 <!-- Store Pickup -->
                 <div v-if="formData.deliveryType === 'Самовивіз з наших магазинів'">
@@ -166,24 +168,25 @@
                 </div>
   
                 <!-- Поштомати -->
-                <div 
-                  v-if="formData.deliveryType === 'Самовивіз з поштоматів Нової Пошти'"
-                >
-                  <select 
-                    v-model="formData.warehouse" 
-                    class="input-field"
-                    @change="fetchWarehouses"
-                  >
-                    <option disabled value="">Оберіть поштомат</option>
-                    <option 
-                      v-for="postomat in postomats" 
-                      :key="postomat.id" 
-                      :value="postomat.id"
-                    >
-                      {{ postomat.name }}
-                    </option>
-                  </select>
-                </div>
+               <!-- Поштомати -->
+<div 
+v-if="formData.deliveryType === 'Самовивіз з поштоматів Нової Пошти'"
+>
+<select 
+  v-model="formData.warehouse" 
+  class="input-field"
+>
+  <option disabled value="">Оберіть поштомат</option>
+  <option 
+    v-for="warehouse in warehouses" 
+    :key="warehouse.id" 
+    :value="warehouse.id"
+  >
+    {{ warehouse.name }}
+  </option>
+</select>
+</div>
+
   
                 <!-- Відділення -->
                 <div v-if="formData.deliveryType === 'Самовивіз з Нової Пошти' || formData.deliveryType === 'Самовивіз з УКРПОШТИ'">
@@ -195,21 +198,14 @@
 </select>
 </div>
 
-<!-- Поштомати -->
-<div v-if="formData.deliveryType === 'Самовивіз з поштоматів Нової Пошти'">
-<select v-model="formData.warehouse" class="input-field">
-  <option disabled value="">Оберіть поштомат</option>
-  <option v-for="postomat in postomats" :key="postomat.id" :value="postomat.id">
-    {{ postomat.name }}
-  </option>
-</select>
-</div>
+
 
               </div>
             </template>
   
             <template v-else-if="step.title === 'Оплата'">
 <div class="payment-options">
+  <!-- Вибір типу оплати -->
   <div 
     v-for="(option, idx) in paymentOptions" 
     :key="idx" 
@@ -225,9 +221,21 @@
     <label :for="`payment-${idx}`" class="payment-label">{{ option }}</label>
   </div>
 
+  <!-- Відображення помилки -->
   <span v-if="errors.paymentOption" class="error">{{ errors.paymentOption }}</span>
 </div>
+
+<!-- Кнопка Далі -->
+<button 
+  :disabled="!selectedPaymentOption" 
+  @click="validateAndProceed" 
+  class="next-button"
+>
+  Далі
+</button>
 </template>
+
+
 
             <!-- Next Step Button -->
             <button 
@@ -451,6 +459,7 @@ this.fetchWarehouses();  // Оновлюємо відділення після �
   async fetchWarehouses() {
 this.warehouses = []; // Очистити старі дані
 console.log("Fetching warehouses for city:", this.formData.city, "Ref:", this.formData.cityRef);
+
 try {
   const response = await axios.get(
     "http://26.235.139.202:8080/api/nova-poshta/ware-houses",
@@ -467,10 +476,10 @@ try {
   console.log("Warehouses response:", response.data);
 
   if (response.status === 200 && Array.isArray(response.data?.data)) {
-    // Підготувати дані для шаблону
+    // Форматування даних
     this.warehouses = response.data.data.map((item, index) => ({
       id: index + 1, // Унікальний ID
-      name: item.warehouse, // Текст назви відділення
+      name: item.warehouse, // Назва поштомату
     }));
     console.log("Processed warehouses:", this.warehouses);
   } else {
@@ -480,6 +489,7 @@ try {
   console.error("Error fetching warehouses:", error.response?.data || error.message);
 }
 },
+
 
 
 
@@ -542,23 +552,32 @@ try {
   },
 
   validateAndProceed() {
-    let isValid = false;
+let isValid = false;
 
-    if (this.currentStep === 0) {
-      isValid = this.validatePersonalInfo();
-    } else if (this.currentStep === 1) {
-      isValid = this.validatePostalInfo();
-    } else if (this.currentStep === 2) {
-      isValid = !!this.selectedPaymentOption;
-      if (!isValid) {
-        this.errors.paymentOption = "Оберіть спосіб оплати";
-      }
-    }
+if (this.currentStep === 0) {
+  isValid = this.validatePersonalInfo();
+} else if (this.currentStep === 1) {
+  isValid = this.validatePostalInfo();
+  // Додайте перевірку полів адреси
+  if (!this.formData.city || !this.formData.street || !this.formData.houseNumber || !this.formData.deliveryType) {
+    this.errors.city = !this.formData.city ? "Введіть місто" : "";
+    this.errors.street = !this.formData.street ? "Виберіть вулицю" : "";
+    this.errors.houseNumber = !this.formData.houseNumber ? "Введіть номер будинку" : "";
+    this.errors.deliveryType = !this.formData.deliveryType ? "Оберіть тип доставки" : "";
+    isValid = false;
+  }
+} else if (this.currentStep === 2) {
+  isValid = !!this.selectedPaymentOption;
+  if (!isValid) {
+    this.errors.paymentOption = "Оберіть спосіб оплати";
+  }
+}
 
-    if (isValid) {
-      this.completeStep();
-    }
-  },
+if (isValid) {
+  this.completeStep();
+}
+},
+
 
   validatePersonalInfo() {
     this.errors = {};
@@ -839,14 +858,15 @@ color: #555;
   width: 12px;
   height: 12px;
   margin-right: 10px;
-  border: 2px solid #9D9292;
-  border-radius: 50%;
+  border: 5px solid #9D9292;
+  border-radius: 30%;
   background-color: transparent;
 }
 
 /* Стиль обраного радіо-доту */
 .radio-input:checked + .payment-label::before {
   background-color: #6B1F1F;
+  border: 4.5px solid #9D9292;
 }
 
 .next-button {

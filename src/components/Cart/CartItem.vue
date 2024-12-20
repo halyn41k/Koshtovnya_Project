@@ -150,6 +150,7 @@ height: 32px;
 display: flex;
 align-items: center;
 justify-content: center;
+font-weight: 600;
 }
 
 .item-controls {

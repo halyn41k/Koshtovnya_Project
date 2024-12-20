@@ -371,36 +371,40 @@ async fetchUserPhoneNumber() {
         this.loading = false;
       }
     },
+    async fetchCities() {
+const token = localStorage.getItem("token"); // Define token here
+console.log("Fetching cities with:", {
+  city: this.formData.city,
+  delivery_type: this.formData.deliveryType,
+});
 
-async fetchCities() {
-  const token = localStorage.getItem("token"); // Define token here
-  console.log("Fetching cities with:", {
-    city: this.formData.city,
-    delivery_type: this.formData.deliveryType,
-  });
-
-  try {
-    const response = await axios.get(
-      "http://26.235.139.202:8080/api/nova-poshta/cities",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          city: this.formData.city,
-          delivery_type: this.formData.deliveryType,
-        },
-      }
-    );
-    console.log("Cities API Response:", response.data);
-
-    if (response.data.success && Array.isArray(response.data.data)) {
-      this.cities = response.data.data;
-    } else {
-      console.error("Incorrect response format:", response.data);
-      this.cities = [];
+try {
+  const response = await axios.get(
+    "http://26.235.139.202:8080/api/nova-poshta/cities",
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        city: this.formData.city,
+        delivery_type: this.formData.deliveryType,
+      },
     }
-  } catch (error) {
-    console.error("Error fetching cities:", error.response?.data || error.message);
+  );
+  console.log("Cities API Response:", response.data);
+
+  if (response.data.success && Array.isArray(response.data.data)) {
+    this.cities = response.data.data;
+  } else {
+    console.error("Incorrect response format:", response.data);
+    this.cities = [];
   }
+} catch (error) {
+  console.error("Error fetching cities:", error.response?.data || error.message);
+}
+},
+selectDeliveryType(type) {
+this.formData.deliveryType = type;  // Встановлюємо тип доставки
+console.log("Тип доставки обрано:", this.formData.deliveryType);
+this.fetchWarehouses();  // Оновлюємо відділення після вибору типу доставки
 },
 
     async fetchDeliveryOptions() {

@@ -42,15 +42,16 @@
                   class="size-dropdown"
                   v-model="selectedSize"
                 >
-                  <option
-                    v-for="variant in product.variants"
-                    :key="variant.size"
-                    :value="variant.size"
-                    :disabled="!variant.is_available"
-                  >
-                    {{ variant.size }} см
-                    <span v-if="!variant.is_available"> (Немає в наявності)</span>
-                  </option>
+              <option
+              v-for="variant in product.variants"
+              :key="variant.size"
+              :value="variant.size"
+              :disabled="!variant.is_available"
+            >
+              {{ variant.size }} см
+              <span v-if="!variant.is_available"> (Немає в наявності)</span>
+            </option>
+
                 </select>
               </div>
 
@@ -76,13 +77,15 @@
                     </button>
                   </div>
                 </div>
-
-                <button
+                <!-- Кнопка "Купити" якщо товар доступний -->
+                <button 
                   v-if="isAvailable"
                   class="buy-button"
                   :disabled="!selectedVariant"
+                  @click="addToCart(product)" 
                 >
                   <span class="buy-text">Купити</span>
+                  <img src="@/assets/miniarrow.png" alt="Arrow icon" class="button-icon" />
                 </button>
 
                 <button
@@ -164,6 +167,7 @@
     </div>
   </main>
 </template>
+
 <script>
 import ViewOtherProduct from "./ViewOtherProduct.vue";
 import ProductReviews from "./ProductReviews.vue";
@@ -199,13 +203,17 @@ export default {
   },
   computed: {
     isAvailable() {
-      return Array.isArray(this.product.variants) && this.product.variants.some((variant) => variant.is_available);
-    },
-    selectedVariant() {
-      return Array.isArray(this.product.variants)
-        ? this.product.variants.find((variant) => variant.size === this.selectedSize)
-        : null;
-    },
+    const available = Array.isArray(this.product.variants) && this.product.variants.some((variant) => variant.is_available);
+    console.log("isAvailable:", available);
+    return available;
+  },
+  selectedVariant() {
+    const variant = Array.isArray(this.product.variants)
+      ? this.product.variants.find((variant) => variant.size === this.selectedSize)
+      : null;
+    console.log("selectedVariant:", variant);
+    return variant;
+  },
     formattedCharacteristics() {
       const excludeKeys = [
         "id",
@@ -293,6 +301,49 @@ export default {
     closeModal() {
       this.isModalOpen = false;
     },
+    async addToCart(item, size = null) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Будь ласка, увійдіть у свій обліковий запис.');
+    this.$router.push('/login');
+    return;
+  }
+
+  try {
+    // Додаємо базові параметри для запиту
+    const cartData = {
+      
+      product_id: item.id,
+      quantity: 1, // Ви можете змінити це значення, залежно від потреб
+    };
+
+    // Додаємо size, якщо передано
+    if (size) {
+      cartData.size = this.selectedSize;
+
+    }
+
+    const response = await axios.post(
+      'http://26.235.139.202:8080/api/cart',
+      cartData,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    console.log('Відповідь після додавання товару:', response.data); // Логування відповіді
+    
+    // Перевірка, чи додавання успішне
+    if (response.data && response.data.message === 'Product added to cart') {
+      alert('Товар успішно додано до кошика.');
+    } else {
+
+      console.error('Товар не був доданий:', response.data);
+      alert('Не вдалося додати товар до кошика.');
+    }
+  } catch (error) {
+    alert('Не вдалося додати товар до кошика.');
+  }
+},
+
     async notifyWhenAvailable() {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -606,6 +657,7 @@ export default {
     border-radius: 8px;
     font-size: 18px;
     font-family: 'Merriweather', serif;
+    z-index: 3;
   }
 
   /* Centered Sections */
@@ -791,6 +843,11 @@ export default {
 
 .notify-button:hover {
   background: #6B1F1F; /* Even darker shade on hover */
+}
+
+.button-icon{
+  width: 15px;
+  height: 12px;
 }
   </style>
   

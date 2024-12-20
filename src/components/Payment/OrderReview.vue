@@ -96,7 +96,31 @@ export default {
         this.loading = false;
       }
     },
- 
+    submitOrder() {
+      alert("Ваше замовлення успішно оформлено!");
+    },
+    validateAndProceed() {
+      const errors = {};
+      if (this.currentStep === 0) {
+        if (!this.formData.firstName) errors.firstName = "Ім'я є обов'язковим";
+        if (!this.formData.lastName) errors.lastName = "Прізвище є обов'язковим";
+        if (!this.formData.phone) errors.phone = "Телефон є обов'язковим";
+      }
+
+      if (Object.keys(errors).length > 0) {
+        this.errors = errors;
+        return;
+      }
+
+      this.errors = {};
+      this.steps[this.currentStep].completed = true;
+      if (this.currentStep < this.steps.length - 1) {
+        this.currentStep++;
+        this.steps[this.currentStep].isExpanded = true;
+      } else {
+        alert("Замовлення успішно підтверджене!");
+      }
+    },
   },
   computed: {
     calculatedTotalAmount() {
@@ -741,4 +765,7 @@ export default {
 .street-suggestions li:hover {
   background-color: #f0f0f0;
 }
+
+
+
 </style>

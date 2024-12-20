@@ -273,7 +273,7 @@ trackStyle(min, max, maxRange, minRange = 0) {
   .pattern-background {
     position: absolute;
     top: -15px;
-    left: 100px;
+    left: 140px;
     transform: translateX(-10%); 
     width: 300px;
     height: 1000px; 
