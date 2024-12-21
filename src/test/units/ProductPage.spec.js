@@ -29,6 +29,10 @@ describe('ProductPage Component', () => {
   beforeEach(() => {
     jest.spyOn(window, 'alert').mockImplementation(() => {}); // Мокаємо alert
     // Мокаємо fetch
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {})
+
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,

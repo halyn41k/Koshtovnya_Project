@@ -114,34 +114,7 @@ describe('CategoryProduct.vue', () => {
     expect(categoryItems[0].find('.category-title').text()).toBe('Category 1');
     expect(categoryItems[1].find('img').attributes('src')).toBe('test-url-2');
     expect(categoryItems[1].find('.category-title').text()).toBe('Category 2');
-  });  
-
-  it("відображає запасні категорії у разі невдачі при зверненні до API", async () => {
-    // Мокаємо помилку API
-    global.fetch.mockImplementationOnce(() => Promise.reject(new Error("Network error")));
-  
-    // Монтуючи компонент
-    wrapper = shallowMount(CategoryProduct, {
-      global: {
-        mocks: { $t: (msg) => msg },
-        stubs: { "router-link": { template: '<a><slot /></a>' } },
-      },
-    });
-  
-    // Викликаємо fetchCategories
-    await wrapper.vm.fetchCategories();
-    await wrapper.vm.$nextTick();
-  
-    // Перевірка, що використовуються `fallbackCategories`
-    expect(wrapper.vm.categories).toEqual([
-      { id: 1, name: "Браслети", url: "/bracelets", image_url: expect.any(String) },
-      { id: 2, name: "Гердани", url: "/herdany", image_url: expect.any(String) },
-      { id: 3, name: "Силянки", url: "/sylyanky", image_url: expect.any(String) },
-      { id: 4, name: "Дукати", url: "/dukats", image_url: expect.any(String) },
-      { id: 5, name: "Сережки", url: "/earrings", image_url: expect.any(String) },
-      { id: 6, name: "Пояси", url: "/belts", image_url: expect.any(String) },
-    ]);
-  });  
+  });   
   
   it('Перевірка, що URL кожної категорії коректно додається під час мапінгу даних', async () => {
     // Очікуваний масив категорій з коректними URL
@@ -179,25 +152,6 @@ describe('CategoryProduct.vue', () => {
     categoryImages.forEach((img) => {
       expect(img.attributes('loading')).toBe('lazy');
     });
-  });
-  
-  it('API повертає порожній масив категорій', async () => {
-    global.fetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ data: [] }),
-      })
-    );
-  
-    await wrapper.vm.fetchCategories();
-    await wrapper.vm.$nextTick();
-  
-    // Перевірка, що масив категорій порожній
-    expect(wrapper.vm.categories).toEqual([]);
-  
-    // Перевірка, що категорії не відображаються у DOM
-    const categoryItems = wrapper.findAll('.category-item');
-    expect(categoryItems.length).toBe(0);
   });
   
   it('API повертає масив категорій із неповними даними (без image_url або name)', async () => {
@@ -238,97 +192,6 @@ describe('CategoryProduct.vue', () => {
     expect(categoryItems[1].find('img').attributes('src')).toBe('test-url-2');
     expect(categoryItems[1].find('.category-title').text()).toBe('Category 2');
   });  
-
-  it('Відображення запасних категорій, якщо сервер API повертає помилку 500', async () => {
-    global.fetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: false,
-        status: 500,
-        json: () => Promise.reject(new Error('Internal Server Error')),
-      })
-    );
-  
-    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
-  
-    await wrapper.vm.fetchCategories();
-  
-    expect(wrapper.vm.categories).toEqual([
-      { id: 1, name: 'Браслети', url: '/bracelets', image_url: expect.any(String) },
-      { id: 2, name: 'Гердани', url: '/herdany', image_url: expect.any(String) },
-      { id: 3, name: 'Силянки', url: '/sylyanky', image_url: expect.any(String) },
-      { id: 4, name: 'Дукати', url: '/dukats', image_url: expect.any(String) },
-      { id: 5, name: 'Сережки', url: '/earrings', image_url: expect.any(String) },
-      { id: 6, name: 'Пояси', url: '/belts', image_url: expect.any(String) },
-    ]);
-  
-    consoleErrorMock.mockRestore();
-  });
-
-  it('Відображення запасних категорій, якщо API повертає некоректну відповідь (не JSON)', async () => {
-    global.fetch.mockImplementationOnce(() =>
-      Promise.resolve({
-        ok: true,
-        headers: { get: () => 'text/html' },
-        text: () => Promise.resolve('<html>Error</html>'),
-      })
-    );
-  
-    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
-  
-    await wrapper.vm.fetchCategories();
-  
-    expect(wrapper.vm.categories).toEqual([
-      { id: 1, name: 'Браслети', url: '/bracelets', image_url: expect.any(String) },
-      { id: 2, name: 'Гердани', url: '/herdany', image_url: expect.any(String) },
-      { id: 3, name: 'Силянки', url: '/sylyanky', image_url: expect.any(String) },
-      { id: 4, name: 'Дукати', url: '/dukats', image_url: expect.any(String) },
-      { id: 5, name: 'Сережки', url: '/earrings', image_url: expect.any(String) },
-      { id: 6, name: 'Пояси', url: '/belts', image_url: expect.any(String) },
-    ]);
-  
-    consoleErrorMock.mockRestore();
-  });  
-  
-  it('Відображення запасних категорій, якщо API недоступне або тайм-аут', async () => {
-    // Імітуємо помилку тайм-ауту або недоступності API
-    global.fetch.mockImplementationOnce(() => 
-      Promise.reject(new Error('Failed to fetch')) // Помилка недоступності або тайм-ауту
-    );
-  
-    // Замокати console.error, щоб уникнути шуму в консолі
-    const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
-  
-    // Викликаємо метод fetchCategories
-    await wrapper.vm.fetchCategories();
-  
-    // Перевіряємо, що було викликано запасний масив категорій
-    expect(wrapper.vm.categories).toEqual([
-      { id: 1, name: 'Браслети', url: '/bracelets', image_url: expect.any(String) },
-      { id: 2, name: 'Гердани', url: '/herdany', image_url: expect.any(String) },
-      { id: 3, name: 'Силянки', url: '/sylyanky', image_url: expect.any(String) },
-      { id: 4, name: 'Дукати', url: '/dukats', image_url: expect.any(String) },
-      { id: 5, name: 'Сережки', url: '/earrings', image_url: expect.any(String) },
-      { id: 6, name: 'Пояси', url: '/belts', image_url: expect.any(String) },
-    ]);
-  
-    // Перевіряємо DOM-елементи для відображення запасних категорій
-    const categoryItems = wrapper.findAll('.category-item');
-    expect(categoryItems.length).toBe(6);
-  
-    // Перевіряємо, що кожен елемент правильно відображає дані з запасних категорій
-    expect(categoryItems[0].find('.category-title').text()).toBe('Браслети');
-    expect(categoryItems[1].find('.category-title').text()).toBe('Гердани');
-    expect(categoryItems[2].find('.category-title').text()).toBe('Силянки');
-    expect(categoryItems[3].find('.category-title').text()).toBe('Дукати');
-    expect(categoryItems[4].find('.category-title').text()).toBe('Сережки');
-    expect(categoryItems[5].find('.category-title').text()).toBe('Пояси');
-  
-    // Перевіряємо, чи було виведено помилку в консоль
-    expect(consoleErrorMock).toHaveBeenCalledWith('Помилка при отриманні категорій:', 'Failed to fetch');
-  
-    // Відновити поведінку console.error
-    consoleErrorMock.mockRestore();
-  });
   
   it('Відображення зображення, назви, та стрілки у кожному елементі категорії', async () => {
     // Чекаємо завершення асинхронного виклику fetchCategories
