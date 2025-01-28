@@ -26,40 +26,38 @@
           </div>
           
           <div v-if="index === currentStep && step.isExpanded" class="step-content">
-            <!-- Personal Information Step -->
             <template v-if="step.title === 'Особиста інформація'">
-              <div class="input-container">
-                <input
-                  class="input-field"
-                  v-model="formData.firstName"
-                  placeholder="Ім'я"
-                />
-                <span v-if="errors.firstName" class="error">{{ errors.firstName }}</span>
-                
-                <input
-                  class="input-field"
-                  v-model="formData.lastName"
-                  placeholder="Прізвище"
-                />
-                <span v-if="errors.lastName" class="error">{{ errors.lastName }}</span>
-                
-                <input
-                  class="input-field"
-                  v-model="formData.secondName"
-                  placeholder="По батькові"
-                />
-                <span v-if="errors.secondName" class="error">{{ errors.secondName }}</span>
-                
-                <input
-                  class="input-field"
-                  v-model="formData.phone"
-                  placeholder="Номер телефону"
-                />
-                <span v-if="errors.phone" class="error">{{ errors.phone }}</span>
-              </div>
-            </template>
-  
-            <!-- Postal Office Step -->
+  <div class="input-container">
+    <input
+      class="input-field"
+      v-model="formData.firstName"
+      placeholder="Ім'я"
+    />
+    <span v-if="errors.firstName" class="error">{{ errors.firstName }}</span>
+
+    <input
+      class="input-field"
+      v-model="formData.lastName"
+      placeholder="Прізвище"
+    />
+    <span v-if="errors.lastName" class="error">{{ errors.lastName }}</span>
+
+    <input
+      class="input-field"
+      v-model="formData.secondName"
+      placeholder="По батькові"
+    />
+    <span v-if="errors.secondName" class="error">{{ errors.secondName }}</span>
+
+    <input
+      class="input-field"
+      v-model="formData.phone"
+      placeholder="Номер телефону"
+    />
+    <span v-if="errors.phone" class="error">{{ errors.phone }}</span>
+  </div>
+</template>
+
             <template v-else-if="step.title === 'Поштове відділення'">
               <div class="input-container">
                 <!-- Delivery Type Selection -->
@@ -168,7 +166,6 @@
                 </div>
   
                 <!-- Поштомати -->
-               <!-- Поштомати -->
 <div 
 v-if="formData.deliveryType === 'Самовивіз з поштоматів Нової Пошти'"
 >
@@ -186,8 +183,6 @@ v-if="formData.deliveryType === 'Самовивіз з поштоматів Но
   </option>
 </select>
 </div>
-
-  
                 <!-- Відділення -->
                 <div v-if="formData.deliveryType === 'Самовивіз з Нової Пошти' || formData.deliveryType === 'Самовивіз з УКРПОШТИ'">
 <select v-model="formData.warehouse" class="input-field">
@@ -197,8 +192,6 @@ v-if="formData.deliveryType === 'Самовивіз з поштоматів Но
   </option>
 </select>
 </div>
-
-
 
               </div>
             </template>
@@ -313,6 +306,24 @@ data() {
   };
 },
 methods: {
+  updateCustomerDetails() {
+    this.$emit('update:customerDetails', {
+      first_name: this.formData.firstName,
+      last_name: this.formData.lastName,
+      second_name: this.formData.secondName,
+      phone_number: this.formData.phone,
+    });
+  },
+
+  nextStep() {
+      // Виконуємо перевірку заповнених полів і передаємо їх на наступний крок
+      if (this.formData.firstName && this.formData.lastName && this.formData.phone) {
+        this.$emit('next', this.formData);
+      } else {
+        alert('Будь ласка, заповніть всі поля!');
+      }
+    },
+
   toggleStep(index) {
     if (this.currentStep !== index) {
       this.steps[this.currentStep].isExpanded = false;
