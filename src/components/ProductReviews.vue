@@ -34,11 +34,12 @@
 
         <!-- Відповіді -->
         <ul v-if="review.replies?.length" class="reply-list">
-          <li v-for="reply in review.replies" :key="reply.id" class="reply-item">
-            <h5>{{ reply.user_first_name }} {{ reply.user_last_name }}</h5>
-            <p class="reply-date">{{ formatReviewDate(reply.date) }}</p>
-            <p class="reply-comment">{{ reply.comment }}</p>
-          </li>
+         <li v-for="reply in review.replies" :key="reply.id" class="reply-item">
+  <h5>{{ reply.user_first_name ? `${reply.user_first_name} ${reply.user_last_name}` : 'Адміністратор' }}</h5>
+  <p class="reply-date">{{ formatReviewDate(reply.date) }}</p>
+  <p class="reply-comment">{{ reply.comment }}</p>
+</li>
+
         </ul>
       </li>
     </ul>

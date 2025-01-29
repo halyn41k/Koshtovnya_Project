@@ -25,12 +25,12 @@
                 <h1 class="product-title">{{ product.name }}</h1>
                 <hr class="divider" />
                 <p class="product-price">{{ product.price }}₴</p>
-                <div
-                  class="availability-badge"
-                  :class="{ 'available': isAvailable, 'unavailable': !isAvailable }"
-                >
-                  <span>{{ isAvailable ? 'В наявності' : 'Немає в наявності' }}</span>
-                </div>
+                   <div
+                class="availability-badge"
+                :class="{ 'available': isAvailable, 'unavailable': !isAvailable }"
+              >
+                <span>{{ isAvailable ? 'В наявності' : 'Немає в наявності' }}</span>
+              </div>
                 <p class="delivery-time">Приблизний час доставки: 1-7 днів</p>
               </div>
               <hr class="thin-divider" />
@@ -214,36 +214,39 @@ export default {
     console.log("selectedVariant:", variant);
     return variant;
   },
-    formattedCharacteristics() {
-      const excludeKeys = [
-        "id",
-        "name",
-        "price",
-        "image_url",
-        "is_available",
-        "quantity",
-        "is_in_wishlist",
-        "is_in_cart",
-        "notify_when_available",
-      ];
+  formattedCharacteristics() {
+  const excludeKeys = [
+    "id",
+    "name",
+    "price",
+    "image_url",
+    "is_available",
+    "quantity",
+    "is_in_wishlist",
+    "is_in_cart",
+    "notify_when_available",
+  ];
 
-      const result = {};
-      Object.entries(this.product)
-        .filter(([key]) => !excludeKeys.includes(key))
-        .forEach(([key, value]) => {
-          const translatedKey = this.translations[key] || key;
+  const result = {};
+  Object.entries(this.product)
+    .filter(([key]) => !excludeKeys.includes(key))
+    .forEach(([key, value]) => {
+      const translatedKey = this.translations[key] || key;
 
-          if (key === "colors" && Array.isArray(value)) {
-            result[translatedKey] = value.join(", ");
-          } else if (key === "variants") {
-            result[this.translations.size] = value.map((v) => v.size).join(", ");
-          } else {
-            result[translatedKey] = value || "Немає";
-          }
-        });
+      if (key === "colors" && Array.isArray(value)) {
+        result[translatedKey] = value.join(", ");
+      } else if (key === "variants") {
+        result[this.translations.size] = value.map((v) => v.size).join(", ");
+      } else if (key === "type_of_fitting" && Array.isArray(value)) {
+        result[translatedKey] = value.join(", "); // Фурнітура без []
+      } else {
+        result[translatedKey] = value || "Немає";
+      }
+    });
 
-      return result;
-    },
+  return result;
+},
+
   },
   methods: {
     async fetchWishlist() {
@@ -374,7 +377,23 @@ export default {
         this.quantity--;
       }
     },
+  
   },
+
+watch: {
+  'product.variants': {
+    handler(newVariants) {
+      if (newVariants.length > 0 && !this.selectedSize) {
+        const firstAvailableVariant = newVariants.find(variant => variant.is_available);
+        if (firstAvailableVariant) {
+          this.selectedSize = firstAvailableVariant.size;
+        }
+      }
+    },
+    immediate: true // Виконати одразу після завантаження компонента
+  }
+},
+
   created() {
     const productIdFromRoute = this.$route.params.id;
     if (productIdFromRoute) {
@@ -584,17 +603,25 @@ export default {
   }
   
   .availability-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #3C6B1F;
-    color: #FFF;
-    font-size: 15px;
-    font-family: 'Merriweather', serif;
-    border-radius: 8px;
-    padding: 10px 15px;
-    margin-top: 10px;
-  }
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #FFF;
+  font-size: 15px;
+  font-family: 'Merriweather', serif;
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: 10px;
+}
+
+.available {
+  background: #3C6B1F; /* Зелений для товару в наявності */
+}
+
+.unavailable {
+  background: #8B0000; /* Темно-червоний для відсутнього товару */
+}
+
   
   .size-label {
     font-family: 'Montserrat', sans-serif;
