@@ -14,17 +14,22 @@
           Ваш кошик порожній.
         </div>
         <CartItem
-          v-for="(item, index) in cartItems"
-          :key="item.id"
-          :id="item.id"
-          :itemNumber="index + 1"
-          :imageSrc="item.image"
-          :title="item.title"
-          :price="item.price"
-          :quantity="item.quantity"
-          @change-quantity="updateCartItem"
-          @remove-item="removeItem"
-        />
+  v-for="(item, index) in cartItems"
+  :key="item.id"
+  :id="item.id"
+  :itemNumber="index + 1"
+  :imageSrc="item.image"
+  :title="item.title"
+  :price="item.price"
+  :quantity="item.quantity"
+  :selectedSize="item.selectedSize"
+  :variants="item.variants"
+  @change-quantity="updateCartItem"
+  @remove-item="removeItem"
+  @change-size="updateCartItem" 
+/>
+
+
       </section>
       <Summary v-if="cartItems.length > 0" :cartItems="cartItems" />
     </div>
@@ -67,19 +72,20 @@ export default {
 
     // Оновлюємо cartItems, включаючи нові поля
     this.cartItems = response.data.products.map(item => ({
-      id: item.id,
-      image: item.image_url,
-      title: item.name,
-      price: item.price,
-      quantity: item.quantity,
-      isAvailable: item.is_available,
-      selectedSize: item.selected_size, // Додаємо вибраний розмір
-      variants: item.variants.map(variant => ({
-        size: variant.size,
-        quantity: variant.quantity,
-        isAvailable: variant.is_available,
-      })), // Додаємо всі доступні варіанти розмірів
-    }));
+  id: item.id,
+  image: item.image_url,
+  title: item.name,
+  price: item.price,
+  quantity: item.quantity,
+  isAvailable: item.is_available,
+  selectedSize: item.selected_size || item.variants[0]?.size || '', // Вибираємо перший доступний розмір
+  variants: item.variants.map(variant => ({
+    size: variant.size,
+    quantity: variant.quantity,
+    isAvailable: variant.is_available,
+  })),
+}));
+
 
     // Обробка помилок (якщо є недоступні товари)
     if (response.data.errors && response.data.errors.length > 0) {
@@ -107,12 +113,11 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
   }
 
   try {
-    // Формуємо тіло запиту залежно від дії
-    const data = size 
+    const data = size
       ? { size } // Якщо змінюємо розмір
       : { operation, quantity }; // Якщо змінюємо кількість
 
-    const response = await axios.patch(
+    await axios.patch(
       `http://26.235.139.202:8080/api/cart/${id}`,
       data,
       { headers: { Authorization: `Bearer ${token}` } }
@@ -121,10 +126,8 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
     const itemIndex = this.cartItems.findIndex(item => item.id === id);
     if (itemIndex !== -1) {
       if (size) {
-        // Оновлюємо розмір товару в локальному стані
-        this.cartItems[itemIndex].selectedSize = size;
+        this.cartItems[itemIndex].selectedSize = size; // Оновлюємо локально
       } else if (quantity !== null) {
-        // Оновлюємо кількість товару в локальному стані
         this.cartItems[itemIndex].quantity = quantity;
       }
     }
@@ -135,6 +138,7 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
     alert(error.response?.data?.message || "Не вдалося оновити товар у кошику.");
   }
 },
+
 
 
     async removeItem(id) {

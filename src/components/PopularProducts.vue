@@ -88,19 +88,6 @@ export default {
   methods: {
     async fetchProducts() {
       try {
-        const cachedData = localStorage.getItem('popularProducts');
-        const cachedPageData = JSON.parse(localStorage.getItem('popularProductsPages')) || {};
-
-        if (cachedData && cachedPageData[1]) {
-          this.products = JSON.parse(cachedData);
-          this.totalPages = cachedPageData.totalPages;
-          this.updateVisibleProducts();
-          await this.fetchWishlist(); // Оновлюємо стан wishlist
-          this.isLoading = false;
-          console.log('Дані завантажені з кешу');
-          return;
-        }
-
         const response = await fetch("http://26.235.139.202:8080/api/popular-products?page=1");
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
 
@@ -109,16 +96,9 @@ export default {
         this.totalPages = data.totalPages || Math.ceil(this.products.length / this.productsPerPage);
         this.updateVisibleProducts();
 
-        // Кешуємо дані
-        localStorage.setItem('popularProducts', JSON.stringify(this.products));
-        localStorage.setItem('popularProductsPages', JSON.stringify({ 1: true, totalPages: this.totalPages }));
-
-        await this.fetchWishlist(); // Оновлюємо стан wishlist
-        console.log('Дані кешовано (popular products)');
+        await this.fetchWishlist();
       } catch (error) {
         console.error("Error fetching popular products:", error.message);
-      } finally {
-        this.isLoading = false;
       }
     },
 

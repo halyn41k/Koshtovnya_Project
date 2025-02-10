@@ -18,14 +18,16 @@
       <h3 class="subsection-title">Розмір</h3>
       <hr class="divider" />
       <div class="input-box">
-        <div class="min-box">
-          <input type="number" v-model="sizeRange[0]" :min="sizeOptions.min" :max="sizeOptions.max" step="1" />
-        </div>
-        <div class="input-divider"></div>
-        <div class="max-box">
-          <input type="number" v-model="sizeRange[1]" :min="sizeOptions.min" :max="sizeOptions.max" step="1" />
-        </div>
-      </div>
+  <div class="min-box">
+    <input type="number" v-model="sizeRange[0]" :min="sizeOptions.min" :max="sizeOptions.max" step="1" />
+    <span class="unit-label">см</span> <!-- Одиниця виміру -->
+  </div>
+  <div class="input-divider"></div>
+  <div class="max-box">
+    <input type="number" v-model="sizeRange[1]" :min="sizeOptions.min" :max="sizeOptions.max" step="1" />
+    <span class="unit-label">см</span> <!-- Одиниця виміру -->
+  </div>
+</div>
       <div class="range-slider">
         <input type="range" v-model="sizeRange[0]" :min="sizeOptions.min" :max="sizeOptions.max" class="slider" step="1" />
         <input type="range" v-model="sizeRange[1]" :min="sizeOptions.min" :max="sizeOptions.max" class="slider" step="1" />
@@ -74,14 +76,16 @@
       <h3 class="subsection-title">Вага</h3>
       <hr class="divider" />
       <div class="input-box">
-        <div class="min-box">
-          <input type="number" v-model="weightRange[0]" :min="weightOptions.min" :max="weightOptions.max" step="1" />
-        </div>
-        <div class="input-divider"></div>
-        <div class="max-box">
-          <input type="number" v-model="weightRange[1]" :min="weightOptions.min" :max="weightOptions.max" step="1" />
-        </div>
-      </div>
+  <div class="min-box">
+    <input type="number" v-model="weightRange[0]" :min="weightOptions.min" :max="weightOptions.max" step="1" />
+    <span class="unit-label">г</span> <!-- Одиниця виміру -->
+  </div>
+  <div class="input-divider"></div>
+  <div class="max-box">
+    <input type="number" v-model="weightRange[1]" :min="weightOptions.min" :max="weightOptions.max" step="1" />
+    <span class="unit-label">г</span> <!-- Одиниця виміру -->
+  </div>
+</div>
       <div class="range-slider">
         <input type="range" v-model="weightRange[0]" :min="weightOptions.min" :max="weightOptions.max" class="slider" step="1" />
         <input type="range" v-model="weightRange[1]" :min="weightOptions.min" :max="weightOptions.max" class="slider" step="1" />
@@ -91,14 +95,16 @@
       <h3 class="subsection-title">Ціна</h3>
       <hr class="divider" />
       <div class="input-box">
-        <div class="min-box">
-          <input type="number" v-model="priceRange[0]" :min="priceOptions.min" :max="priceOptions.max" step="1" />
-        </div>
-        <div class="input-divider"></div>
-        <div class="max-box">
-          <input type="number" v-model="priceRange[1]" :min="priceOptions.min" :max="priceOptions.max" step="1" />
-        </div>
-      </div>
+  <div class="min-box">
+    <input type="number" v-model="priceRange[0]" :min="priceOptions.min" :max="priceOptions.max" step="1" />
+    <span class="unit-label">грн</span> <!-- Одиниця виміру -->
+  </div>
+  <div class="input-divider"></div>
+  <div class="max-box">
+    <input type="number" v-model="priceRange[1]" :min="priceOptions.min" :max="priceOptions.max" step="1" />
+    <span class="unit-label">грн</span> <!-- Одиниця виміру -->
+  </div>
+</div>
       <div class="range-slider">
         <input type="range" v-model="priceRange[0]" :min="priceOptions.min" :max="priceOptions.max" class="slider" step="1" />
         <input type="range" v-model="priceRange[1]" :min="priceOptions.min" :max="priceOptions.max" class="slider" step="1" />
@@ -460,7 +466,7 @@ trackStyle(min, max, maxRange, minRange = 0) {
 }
 
 .min-box {
-  margin-left: 30px; /* Зсунути мінімальний інпут до центра */
+  margin-left: 20px; /* Зсунути мінімальний інпут до центра */
   width: 100px; /* Ширина інпуту */
 }
 
@@ -542,6 +548,20 @@ trackStyle(min, max, maxRange, minRange = 0) {
   justify-content: center; /* Центрує кнопку по горизонталі */
   width: 100%; /* Забезпечує, що контейнер займає всю ширину */
   margin-top: 20px; /* Відступ від інших елементів */
+}
+.unit-label {
+  margin-left: 5px;
+  font-size: 0.9rem;
+  color: #555;
+}
+.input-box {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.input-divider {
+  flex: 0 0 auto;
+  width: 10px;
 }
 
   

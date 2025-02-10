@@ -12,28 +12,39 @@
           <span class="price">{{ localDeliveryCost }}₴</span>
         </div>
         <div class="summary-row total">
-  <span>Загальна сума</span>
-  <span class="price">{{ totalWithDelivery }}₴</span>
-</div>
-
+          <span>Загальна сума</span>
+          <span class="price">{{ totalWithDelivery }}₴</span>
+        </div>
       </div>
       <button class="payment-button" @click="submitOrder">
         <span>Оформити замовлення</span>
-          <img
-            src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-            alt=""
-            class="login-icon"
-          />
-        </button>
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
+          alt=""
+          class="login-icon"
+        />
+      </button>
     </div>
   </section>
 </template>
 
 <script>
-import axios from "axios";
+import axios from "axios"; 
 
 export default {
   name: "PaymentSummary",
+  data() {
+    return {
+      formData: {
+        firstName: '',
+        lastName: '',
+        secondName: '',
+        phone: ''
+      },
+      localDeliveryCost: this.deliveryCost,
+      localTotalAmount: this.totalAmount,
+    };
+  },
   props: {
     cartItems: {
       type: Array,
@@ -55,29 +66,6 @@ export default {
       required: true,
       default: "",
     },
-    deliveryType: {
-      type: String,
-      required: true,
-      default: "",
-    },
-    customerDetails: {
-      type: Object,
-      required: true,
-      default: () => ({
-        first_name: "",
-        last_name: "",
-        second_name: "",
-        phone_number: "",
-      }),
-    },
-    deliveryDetails: {
-      type: Object,
-      required: true,
-      default: () => ({
-        address: "",
-        delivery_name: "",
-      }),
-    },
     paymentMethod: {
       type: String,
       required: true,
@@ -88,12 +76,6 @@ export default {
       default: "",
     },
   },
-  data() {
-    return {
-      localDeliveryCost: this.deliveryCost,
-      localTotalAmount: this.totalAmount,
-    };
-  },
   methods: {
     async submitOrder() {
       const token = localStorage.getItem("token");
@@ -103,54 +85,62 @@ export default {
         return;
       }
 
+      const orderData = {
+        last_name: this.formData.lastName,
+        first_name: this.formData.firstName,
+        second_name: this.formData.secondName,
+        phone_number: this.formData.phone,
+        city: this.cityRef,
+        payment_method: this.paymentMethod,
+        type_of_card: this.paymentMethod === "Післяоплата" ? "" : this.typeOfCard,
+        delivery_cost: this.localDeliveryCost,
+        cart_cost: this.cartItems.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ),
+      };
+
+      // Додаємо валідацію перед відправкою
+      const requiredFields = [
+        'first_name', 
+        'last_name', 
+        'phone_number',
+        'city',
+        'payment_method'
+      ];
+
+      const missingFields = requiredFields.filter(field => !orderData[field]);
+
+      if (missingFields.length > 0) {
+        alert(`Відсутні обов'язкові поля: ${missingFields.join(', ')}`);
+        return;
+      }
+
       try {
-        const orderData = {
-          last_name: this.customerDetails.last_name,
-          first_name: this.customerDetails.first_name,
-          second_name: this.customerDetails.second_name,
-          phone_number: this.customerDetails.phone_number,
-          city: this.cityRef,
-          delivery_name: this.deliveryDetails.delivery_name,
-          delivery_address: this.deliveryDetails.address,
-          payment_method: this.paymentMethod,
-          type_of_card: this.paymentMethod === "Післяоплата" ? "" : this.typeOfCard,
-          delivery_cost: this.localDeliveryCost,
-          cart_cost: this.cartItems.reduce(
-            (total, item) => total + item.price * item.quantity,
-            0
-          ),
-        };
-
-        console.log("Дані замовлення:", orderData);
-
-        await axios.post("http://26.235.139.202:8080/api/orders", orderData, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.post(
+          "http://26.235.139.202:8080/api/orders", 
+          orderData,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         alert("Замовлення успішно оформлено!");
-        this.$emit("order-submitted");
       } catch (error) {
-        console.error("Помилка оформлення замовлення:", error.message || error);
         alert("Не вдалося оформити замовлення. Перевірте дані.");
       }
     },
   },
-  watch: {
-  totalAmount(newValue) {
-    this.localTotalAmount = newValue;
+  computed: {
+    totalWithDelivery() {
+      return (
+        this.cartItems.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        ) + this.deliveryCost
+      );
+    },
   },
-},
-computed: {
-  totalWithDelivery() {
-    return (
-      this.cartItems.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0
-      ) + this.deliveryCost
-    );
-  },
-},
-
 };
 </script>
 

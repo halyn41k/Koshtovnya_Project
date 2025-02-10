@@ -87,40 +87,20 @@ export default {
   },
   methods: {
     async fetchProducts() {
-  try {
-    const cachedData = localStorage.getItem('newArrivals');
-    const cachedPageData = JSON.parse(localStorage.getItem('newArrivalsPages')) || {};
+      try {
+        const response = await fetch("http://26.235.139.202:8080/api/new-arrivals?page=1");
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
 
-    if (cachedData && cachedPageData[1]) {
-      this.products = JSON.parse(cachedData);
-      this.totalPages = cachedPageData.totalPages;
-      this.updateVisibleProducts();
-      await this.fetchWishlist();
-      this.isLoading = false;
-      console.log('Дані завантажені з кешу (new arrivals)');
-      return;
-    }
+        const data = await response.json();
+        this.products = data.data;
+        this.totalPages = data.totalPages || Math.ceil(this.products.length / this.productsPerPage);
+        this.updateVisibleProducts();
 
-    const response = await fetch("http://26.235.139.202:8080/api/new-arrivals?page=1");
-    if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-
-    const data = await response.json();
-    this.products = data.data;
-    this.totalPages = data.totalPages || Math.ceil(this.products.length / this.productsPerPage);
-    this.updateVisibleProducts();
-
-    localStorage.setItem('newArrivals', JSON.stringify(this.products));
-    localStorage.setItem('newArrivalsPages', JSON.stringify({ 1: true, totalPages: this.totalPages }));
-
-    await this.fetchWishlist();
-    console.log('Дані кешовано (new arrivals)');
-  } catch (error) {
-    console.error("Error fetching new arrivals:", error.message);
-  } finally {
-    this.isLoading = false;
-  }
-},
-
+        await this.fetchWishlist();
+      } catch (error) {
+        console.error("Error fetching popular products:", error.message);
+      }
+    },
     async fetchWishlist() {
       const token = localStorage.getItem('token');
       if (!token) {

@@ -31,7 +31,6 @@ export default {
   components: {
     OrderReview,
     DeliveryAddress,
-    PaymentSummary,
     PaymentSteps,
   },
   data() {
@@ -56,6 +55,10 @@ watch: {
   deliveryCost: "calculateTotalAmount",
 },
 methods: {
+  updateCustomerDetails(updatedDetails) {
+  this.customerDetails = { ...this.customerDetails, ...updatedDetails };
+},
+
   calculateTotalAmount() {
     this.totalAmount = this.cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
