@@ -81,17 +81,8 @@ export default {
     };
   },
   methods: {
-    // Метод для отримання категорій із API
     async fetchCategories() {
   try {
-    // Перевіряємо, чи є дані в localStorage
-    const cachedCategories = localStorage.getItem("categories");
-    if (cachedCategories) {
-      this.categories = JSON.parse(cachedCategories);
-      return;
-    }
-
-    // Якщо кеша немає, робимо запит до API
     const response = await fetch("http://26.235.139.202:8080/api/categories");
 
     if (!response.ok) {
@@ -112,21 +103,18 @@ export default {
       '/belts',
     ];
 
-    // Форматуємо дані
     this.categories = data.data.map((category, index) => ({
       id: category.id,
       name: category.name,
       image_url: category.image_url,
       url: fixedUrls[index] || '#',
     }));
-
-    // Зберігаємо дані в localStorage
-    localStorage.setItem("categories", JSON.stringify(this.categories));
   } catch (error) {
     console.error("Помилка при отриманні категорій:", error.message);
     this.categories = this.fallbackCategories;
   }
 },
+
   },
   // Викликаємо fetchCategories одразу після монтуння компонента
   mounted() {

@@ -367,7 +367,7 @@ export default {
   
   .form-labels {
     display: flex;
-    gap: 30px;
+    gap: 40px;
     flex-direction: column;
     color: var(--Grays-Black, #000);
     white-space: nowrap;

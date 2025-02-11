@@ -3,19 +3,16 @@
     <header class="about-us__header">
       <h1 class="section-title-container">
         <div class="line"></div>
-        <span class="main-title">Про нас</span>
+        <span class="main-title">{{ $t('titleAboutUs') }}</span>
         <div class="line"></div>
       </h1>
     </header>
     
     <section class="about-us__content">
       <div class="about-us__text-section">
-        <h2 class="section-title fade-in">Історія заснування "Коштовня"</h2>
+        <h2 class="section-title fade-in">{{ $t('historyOpen') }}</h2>
         <p class="about-us__text fade-in">
-          У 2015 році зародилася ідея, яка почалася з простого захоплення — створення традиційних герданів із бісеру.
-            Спочатку це було заняттям для душі, відтворюючи автентичні візерунки та орнаменти. Кожен виріб випромінював
-            свою унікальну енергію, об'єднуючи традиційні українські мотиви з сучасними елементами. Це дозволяло
-            створювати прикраси, які мали не лише естетичну цінність, але й несли в собі глибокий символізм.
+          {{ $t('aboutUsDescription') }}
         </p>
       </div>
       <div class="about-us__image-wrapper fade-in">
@@ -29,9 +26,7 @@
       </div>
       <div class="about-us__text-content fade-in">
         <p class="about-us__description fade-in">
-          Із часом прикраси почали привертати увагу друзів, знайомих, а потім і ширшого кола людей. Інтерес до виробів
-            ручної роботи зростав, і це стало поштовхом до розвитку маленького бізнесу. Тоді стало зрозуміло, що це більше,
-            ніж просто хобі, і цей проект має потенціал вирости в щось більше.
+          {{ $t('aboutUsDescription') }}
         </p>
       </div>
       <div class="about-us__process-image-container">

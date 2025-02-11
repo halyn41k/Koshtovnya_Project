@@ -12,10 +12,10 @@
           <div class="review-details">
             <div class="review-rating">
               <span
-                v-for="star in 5"
-                :key="star"
-                class="star"
-                :class="{ filled: star <= review.rating }"
+                v-for="n in 5"
+                :key="n"
+                class="star static-star"
+                :class="{ 'filled': n <= review.rating }"
               >
                 &#9733;
               </span>
@@ -26,7 +26,13 @@
         <p class="review-comment">{{ review.comment }}</p>
         <button class="reply-button" @click="replyToReview(review.id)">Відповісти</button>
 
-        <!-- Форма для відповіді -->
+
+
+        <div v-if="replyTo === review.id" class="reply-form">
+          <textarea v-model="replyText" placeholder="Напишіть відповідь..." required></textarea>
+          <button class="reply-submit" @click="submitReply">Відправити</button>
+        </div>
+
         <div v-if="replyTo === review.id" class="reply-form">
           <textarea v-model="replyText" placeholder="Напишіть відповідь..." required></textarea>
           <button class="reply-submit" @click="submitReply">Відправити</button>
@@ -34,43 +40,41 @@
 
         <!-- Відповіді -->
         <ul v-if="review.replies?.length" class="reply-list">
-         <li v-for="reply in review.replies" :key="reply.id" class="reply-item">
-  <h5>{{ reply.user_first_name ? `${reply.user_first_name} ${reply.user_last_name}` : 'Адміністратор' }}</h5>
-  <p class="reply-date">{{ formatReviewDate(reply.date) }}</p>
-  <p class="reply-comment">{{ reply.comment }}</p>
-</li>
-
+          <li v-for="reply in review.replies" :key="reply.id" class="reply-item">
+            <h5>{{ reply.user_first_name ? `${reply.user_first_name} ${reply.user_last_name}` : 'Адміністратор' }}</h5>
+            <p class="reply-date">{{ formatReviewDate(reply.date) }}</p>
+            <p class="reply-comment">{{ reply.comment }}</p>
+          </li>
         </ul>
       </li>
     </ul>
 
     <p v-else class="no-reviews">Немає відгуків для цього товару.</p>
-
-    <!-- Форма для нового відгуку -->
+    
     <button class="review-button" @click="toggleReviewForm">Додати відгук</button>
+    
     <div v-if="showReviewForm" class="review-form">
-      <h3>Напишіть відгук</h3>
-      <div class="rating-selector">
-        <label for="rating">Рейтинг:</label>
-        <div class="rating-stars">
-          <span
-            v-for="n in 5"
-            :key="n"
-            class="star"
-            :class="{ filled: n <= newReview.rating }"
-            @mouseover="hoverRating(n)"
-            @mouseleave="resetRating"
-            @click="setRating(n)"
-          >
-            &#9733;
-          </span>
-        </div>
+    <h3>Напишіть відгук</h3>
+    <div class="rating-selector">
+      <label for="rating">Рейтинг:</label>
+      <div class="rating-stars">
+        <span
+          v-for="n in 5"
+          :key="n"
+          class="star interactive-star"
+          :class="{ filled: n <= (hoverRatingValue || newReview.rating) }" 
+          @mouseover="hoverRating(n)"
+          @mouseleave="resetRating"
+          @click="setRating(n)"
+        >
+          &#9733;
+        </span>
       </div>
-      <textarea v-model="newReview.comment" placeholder="Ваш коментар" required></textarea>
-      <button @click="submitReview" class="review-submit">Відправити</button>
     </div>
+    <textarea v-model="newReview.comment" placeholder="Ваш коментар" required></textarea>
+    <button @click="submitReview" class="review-submit">Відправити</button>
+  </div>
 
-    <!-- Пагінація -->
     <div class="pagination">
       <button :disabled="currentPage === 1" @click="goToPage(currentPage - 1)" class="page-button">&lt;</button>
       <button
@@ -101,7 +105,7 @@ export default {
       showReviewForm: false,
       newReview: {
         comment: "",
-        rating: 5,
+        rating: null,
       },
       replyTo: null,
       replyText: "",
@@ -312,10 +316,6 @@ export default {
   },
 };
 </script>
-
-
-
-
 
 <style scoped>
 .specifications-title {
@@ -606,21 +606,43 @@ export default {
   gap: 3px;
 }
 
+/* Нові стилі для зірок */
 .star {
-  font-size: 30px;
-  color: #ccc;
-  cursor: pointer;
+  font-size: 1.5em;
+  color: #d3d3d3;
 }
 
-.star.filled,
-.star:hover {
-  color: #ffcc00;
+/* Статичні зірки у відгуках */
+.static-star {
+  pointer-events: none; /* Відключаємо всі події миші */
+  user-select: none;
 }
+
+.static-star.filled {
+  color: gold;
+}
+
+/* Інтерактивні зірки у формі створення відгуку */
+.interactive-star {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.interactive-star.filled {
+  color: gold;
+}
+
+.interactive-star:hover {
+  color: gold;
+}
+
 .pagination {
   display: flex;
   justify-content: center;
   gap: 5px;
+  margin-top: 50px; /* Було 30px, збільшено на 20px */
 }
+
 
 .page-button {
   padding: 8px 16px;

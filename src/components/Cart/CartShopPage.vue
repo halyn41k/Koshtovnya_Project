@@ -186,14 +186,15 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 30px;
   margin-bottom: 40px;
 }
 
 .line {
   flex: 1;
-  height: 1px;
+  height: 2px;
   background-color: grey;
+  width: 45%;
 }
 
 .main-title {
@@ -203,6 +204,7 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
   letter-spacing: -1.2px;
   text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
   text-align: center;
+  
 }
 
 .cart-content {

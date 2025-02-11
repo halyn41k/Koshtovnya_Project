@@ -31,10 +31,28 @@
               >
                 <span>{{ isAvailable ? 'В наявності' : 'Немає в наявності' }}</span>
               </div>
+              
+              <div class="rating-container"> 
+                  <span class="stars">
+                    <template v-for="index in 5" :key="index">
+                      <i
+                        class="star-icon"
+                        :class="{
+                          'filled-star': index <= Math.floor(product.average_rating),
+                          'half-star': index === Math.ceil(product.average_rating) && product.average_rating % 1 !== 0,
+                          'empty-star': index > product.average_rating
+                        }"
+                      >★</i>
+                    </template>
+
+
+                  </span>
+                  <span class="review-count">({{ product.review_count }})</span>
+                </div>
+                <hr class="thin-divider" />
                 <p class="delivery-time">Приблизний час доставки: 1-7 днів</p>
               </div>
-              <hr class="thin-divider" />
-              <!-- Розмір -->
+              
               <label for="size-select" class="size-label">Розмір</label>
               <div class="size-selector">
                 <select
@@ -42,15 +60,15 @@
                   class="size-dropdown"
                   v-model="selectedSize"
                 >
-              <option
-              v-for="variant in product.variants"
-              :key="variant.size"
-              :value="variant.size"
-              :disabled="!variant.is_available"
-            >
-              {{ variant.size }} см
-              <span v-if="!variant.is_available"> (Немає в наявності)</span>
-            </option>
+                <option
+                    v-for="variant in product.variants"
+                    :key="variant.size"
+                    :value="variant.size"
+                    :disabled="!variant.is_available"
+                  >
+                    {{ variant.size }} см 
+                    {{ !variant.is_available ? ' (Немає в наявності)' : '' }}
+                  </option>
 
                 </select>
               </div>
@@ -182,6 +200,8 @@ export default {
     return {
       isModalOpen: false,
       product: {
+        review_count: 0, // Кількість відгуків
+        average_rating: 0, // Середній рейтинг (від 0 до 5)
         variants: [],
         colors: [],
       },
@@ -225,6 +245,9 @@ export default {
     "is_in_wishlist",
     "is_in_cart",
     "notify_when_available",
+    "review_count",      // Додаємо це
+    "average_rating",     // І це
+    "rating"
   ];
 
   const result = {};
@@ -267,7 +290,28 @@ export default {
       } catch (error) {
         console.error("Помилка завантаження списку бажаного:", error);
       }
-    },
+    }, 
+    async fetchReviews() {
+  try {
+    const response = await axios.get(`http://26.235.139.202:8080/api/products/${this.productId}`);
+    console.log("Відповідь API:", response.data); // Логування всієї відповіді
+
+    const { rating, review_count } = response.data.data; // Доступ до data.data (оскільки дані містяться в об'єкті data)
+    console.log("Рейтинг:", rating); // Перевірка наявності рейтингу
+    console.log("Кількість відгуків:", review_count); // Перевірка наявності кількості відгуків
+
+    this.product.average_rating = rating || 0;
+    this.product.review_count = review_count || 0;
+  } catch (error) {
+    console.error('Помилка при завантаженні відгуків:', error);
+  }
+},
+
+
+
+
+
+
     async toggleWishlist(product) {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -396,20 +440,19 @@ watch: {
 
   created() {
     const productIdFromRoute = this.$route.params.id;
-    if (productIdFromRoute) {
-      this.productId = productIdFromRoute;
-      axios
-        .get(`http://26.235.139.202:8080/api/products/${this.productId}`)
-        .then((response) => {
-          this.product = response.data.data || {};
-        })
-        .catch((error) => {
-          console.error("Помилка при завантаженні продукту:", error);
-        });
-
-      this.fetchWishlist();
-    }
-  },
+  if (productIdFromRoute) {
+    this.productId = productIdFromRoute;
+    axios.get(`http://26.235.139.202:8080/api/products/${this.productId}`)
+      .then((response) => {
+        this.product = response.data.data || {};
+        this.fetchReviews(); // Завантаження відгуків
+      })
+      .catch((error) => {
+        console.error("Помилка при завантаженні продукту:", error);
+      });
+    this.fetchWishlist();
+  }
+},
 };
 </script>
 
@@ -605,13 +648,13 @@ watch: {
   .availability-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0px;
   color: #FFF;
   font-size: 15px;
   font-family: 'Merriweather', serif;
   border-radius: 8px;
   padding: 10px 15px;
-  margin-top: 10px;
+  margin-top: 0px;
 }
 
 .available {
@@ -876,5 +919,61 @@ watch: {
   width: 15px;
   height: 12px;
 }
+
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.rating-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  gap: 5px;                
+  margin-bottom: 10px;  
+  margin-top: 10px;  
+}
+
+.review-count {
+  font-size: 14px;
+  color: #555;
+}
+
+.star-icon {
+  font-size: 20px; /* Розмір зірок */
+  color: lightgray; /* Колір для порожніх зірок */
+  margin-right: 2px;
+  font-style: normal; /* Вимикаємо курсив */
+}
+
+
+.filled-star {
+  color: gold; /* Золотий колір для заповнених зірок */
+}
+
+.half-star {
+  position: relative;
+  display: inline-block;
+  color: lightgray; /* Колір для неактивної частини */
+}
+
+.half-star::before {
+  content: '★';
+  position: absolute;
+  left: 0;
+  width: 50%;
+  overflow: hidden;
+  color: gold; /* Колір для заповненої частини */
+}
+
+.empty-star {
+  color: lightgray; /* Сірий для порожніх */
+}
+
+
+
   </style>
   
