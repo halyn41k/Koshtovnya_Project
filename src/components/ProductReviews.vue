@@ -11,12 +11,7 @@
           </div>
           <div class="review-details">
             <div class="review-rating">
-              <span
-                v-for="n in 5"
-                :key="n"
-                class="star static-star"
-                :class="{ 'filled': n <= review.rating }"
-              >
+              <span v-for="n in 5" :key="n" class="star static-star" :class="{ 'filled': n <= review.rating }">
                 &#9733;
               </span>
             </div>
@@ -25,13 +20,6 @@
         </div>
         <p class="review-comment">{{ review.comment }}</p>
         <button class="reply-button" @click="replyToReview(review.id)">Відповісти</button>
-
-
-
-        <div v-if="replyTo === review.id" class="reply-form">
-          <textarea v-model="replyText" placeholder="Напишіть відповідь..." required></textarea>
-          <button class="reply-submit" @click="submitReply">Відправити</button>
-        </div>
 
         <div v-if="replyTo === review.id" class="reply-form">
           <textarea v-model="replyText" placeholder="Напишіть відповідь..." required></textarea>
@@ -50,43 +38,33 @@
     </ul>
 
     <p v-else class="no-reviews">Немає відгуків для цього товару.</p>
-    
+
     <button class="review-button" @click="toggleReviewForm">Додати відгук</button>
-    
+
     <div v-if="showReviewForm" class="review-form">
-    <h3>Напишіть відгук</h3>
-    <div class="rating-selector">
-      <label for="rating">Рейтинг:</label>
-      <div class="rating-stars">
-        <span
-          v-for="n in 5"
-          :key="n"
-          class="star interactive-star"
-          :class="{ filled: n <= (hoverRatingValue || newReview.rating) }" 
-          @mouseover="hoverRating(n)"
-          @mouseleave="resetRating"
-          @click="setRating(n)"
-        >
-          &#9733;
-        </span>
+      <h3>Напишіть відгук</h3>
+      <div class="rating-selector">
+        <label for="rating">Рейтинг:</label>
+        <div class="rating-stars">
+          <span v-for="n in 5" :key="n" class="star interactive-star"
+            :class="{ filled: n <= (hoverRatingValue || newReview.rating) }" @mouseover="hoverRating(n)"
+            @mouseleave="resetRating" @click="setRating(n)">
+            &#9733;
+          </span>
+        </div>
       </div>
+      <textarea v-model="newReview.comment" placeholder="Ваш коментар" required></textarea>
+      <button @click="submitReview" class="review-submit">Відправити</button>
     </div>
-    <textarea v-model="newReview.comment" placeholder="Ваш коментар" required></textarea>
-    <button @click="submitReview" class="review-submit">Відправити</button>
-  </div>
 
     <div class="pagination">
       <button :disabled="currentPage === 1" @click="goToPage(currentPage - 1)" class="page-button">&lt;</button>
-      <button
-        v-for="page in pagesArray"
-        :key="page"
-        :class="{ active: page === currentPage }"
-        @click="goToPage(page)"
-        class="page-button"
-      >
+      <button v-for="page in pagesArray" :key="page" :class="{ active: page === currentPage }" @click="goToPage(page)"
+        class="page-button">
         {{ page }}
       </button>
-      <button :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)" class="page-button">&gt;</button>
+      <button :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)"
+        class="page-button">&gt;</button>
     </div>
   </section>
 </template>
@@ -336,7 +314,8 @@ export default {
   width: 45%;
   height: 2px;
   background: grey;
-  transform: translateY(-50%); /* Це вирівнює лінії по вертикалі */
+  transform: translateY(-50%);
+  /* Це вирівнює лінії по вертикалі */
 }
 
 .specifications-title::before {
@@ -446,7 +425,7 @@ export default {
   font-size: 16px;
   color: #555;
   margin: 10px 0;
-  
+
 }
 
 .review-date {
@@ -473,8 +452,10 @@ export default {
   font-size: 18px;
   font-family: 'Merriweather', sans-serif;
   cursor: pointer;
-  margin-left: 0; /* Кнопка переміститься до лівого краю */
-  margin-bottom: 20px; /* Додаємо відступ знизу */
+  margin-left: 0;
+  /* Кнопка переміститься до лівого краю */
+  margin-bottom: 20px;
+  /* Додаємо відступ знизу */
   margin-left: 135px;
 }
 
@@ -482,7 +463,7 @@ export default {
 .review-button:hover,
 .review-submit:hover {
   background: #a01212;
-  
+
 }
 
 .review-form {
@@ -537,12 +518,14 @@ export default {
   line-height: 1.6;
   color: #444;
 }
+
 .reply-form {
   margin-top: 10px;
   padding: 10px;
   background: #f1f1f1;
   border-radius: 8px;
-  font-family: 'Montserrat', sans-serif; /* Шрифт Montserrat для відповіді */
+  font-family: 'Montserrat', sans-serif;
+  /* Шрифт Montserrat для відповіді */
 }
 
 .reply-form textarea {
@@ -552,7 +535,8 @@ export default {
   border: 1px solid #ddd;
   border-radius: 4px;
   resize: vertical;
-  font-family: 'Montserrat', sans-serif; /* Шрифт Montserrat для тексту */
+  font-family: 'Montserrat', sans-serif;
+  /* Шрифт Montserrat для тексту */
   font-size: 16px;
   color: #444;
 }
@@ -564,7 +548,8 @@ export default {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-family: 'Merriweather', sans-serif; /* Шрифт Merriweather для кнопки */
+  font-family: 'Merriweather', sans-serif;
+  /* Шрифт Merriweather для кнопки */
 }
 
 .reply-submit:hover {
@@ -579,7 +564,8 @@ export default {
 
 .reply-item {
   margin-bottom: 10px;
-  font-family: 'Montserrat', sans-serif; /* Шрифт Montserrat для відгуків */
+  font-family: 'Montserrat', sans-serif;
+  /* Шрифт Montserrat для відгуків */
   font-size: 16px;
   color: #444;
 }
@@ -614,7 +600,8 @@ export default {
 
 /* Статичні зірки у відгуках */
 .static-star {
-  pointer-events: none; /* Відключаємо всі події миші */
+  pointer-events: none;
+  /* Відключаємо всі події миші */
   user-select: none;
 }
 
@@ -640,7 +627,8 @@ export default {
   display: flex;
   justify-content: center;
   gap: 5px;
-  margin-top: 50px; /* Було 30px, збільшено на 20px */
+  margin-top: 50px;
+  /* Було 30px, збільшено на 20px */
 }
 
 
@@ -675,6 +663,4 @@ export default {
   cursor: not-allowed;
   opacity: 0.6;
 }
-
-
 </style>

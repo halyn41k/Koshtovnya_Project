@@ -27,19 +27,21 @@ export default {
 
 
 <style scoped>
+.order-details {
+  gap: 13px;
+  margin: 10px 0 0 18.67px;
+  max-width: 1108px;
+}
 
-
-  .order-details {
-    gap: 13px;
-    margin: 10px 0 0 18.67px;
-    max-width: 1108px;
-  }
-
-  .order-items {
-  max-height: 500px; /* Встановлюємо максимальну висоту */
-  overflow-y: auto; /* Додаємо вертикальний скрол */
-  margin-top: 20px; /* Відступ зверху */
-  padding-right: 10px; /* Для естетики скролбару */
+.order-items {
+  max-height: 500px;
+  /* Встановлюємо максимальну висоту */
+  overflow-y: auto;
+  /* Додаємо вертикальний скрол */
+  margin-top: 20px;
+  /* Відступ зверху */
+  padding-right: 10px;
+  /* Для естетики скролбару */
 }
 
 /* Налаштування для скролбару */
@@ -92,31 +94,31 @@ export default {
 
 
 .address-title {
-  margin-left: 25.33px; 
+  margin-left: 25.33px;
 }
 
 .address-divider {
-  margin-top: 13.33px; 
+  margin-top: 13.33px;
 }
 
 .address-details {
-  margin: 10.67px 0 0 25.33px; 
+  margin: 10.67px 0 0 25.33px;
 }
 
-  
-  @media (max-width: 991px) {
-    .delivery-address {
-      max-width: 100%;
-      margin-top: 40px;
-    }
-  
-    .address-title,
-    .address-details {
-      margin-left: 10px;
-    }
+
+@media (max-width: 991px) {
+  .delivery-address {
+    max-width: 100%;
+    margin-top: 40px;
   }
 
-  .delivery-address {
+  .address-title,
+  .address-details {
+    margin-left: 10px;
+  }
+}
+
+.delivery-address {
   padding: 20px;
   font: 16px/1.3 Merriweather, sans-serif;
   margin-top: 20px;
@@ -131,15 +133,14 @@ export default {
 
 .address-box {
   background-color: #fff;
-  border: 1px solid #d3d3d3; 
-  border-radius: 8px; 
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
   padding: 20px;
   color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .address-box p {
   margin: 5px 0;
 }
-
 </style>

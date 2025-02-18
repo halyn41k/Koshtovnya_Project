@@ -11,19 +11,11 @@
       <div class="account-sidebar">
         <nav class="profile-menu">
           <ul class="menu-list">
-            <li
-              class="menu-item"
-              v-for="(menuItem, index) in menuItems"
-              :key="index"
-              @click="selectTab(index)"
-              :class="{ active: activeTab === index }"
-            >
-              <img
-                :src="menuItem.icon"
-                class="menu-icon"
+            <li class="menu-item" v-for="(menuItem, index) in menuItems" :key="index" @click="selectTab(index)"
+              :class="{ active: activeTab === index }">
+              <img :src="menuItem.icon" class="menu-icon"
                 :class="{ 'user-icon': menuItem.title === 'Інформація', 'heart-icon': menuItem.title === 'Список бажаного' }"
-                alt="Icon"
-              />
+                alt="Icon" />
               <h2 class="section-title">{{ menuItem.title }}</h2>
             </li>
             <li v-if="index < menuItems.length - 1" class="divider"></li>
@@ -32,13 +24,8 @@
       </div>
 
       <div class="account-details">
-        <component
-  :is="activeTabContent"
-  :first_name="first_name"
-  :last_name="last_name"
-  :email="email"
-  :second_name="second_name" 
-/>
+        <component :is="activeTabContent" :first_name="first_name" :last_name="last_name" :email="email"
+          :second_name="second_name" />
       </div>
     </section>
 
@@ -187,157 +174,156 @@ export default {
 
 
 
-  
-  <style scoped>
-  @font-face {
-    font-family: 'KyivType Titling';
-    src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-  }
-  
-  * {
-    font-family: 'Merriweather', sans-serif;
-  }
-  
-  .account-header {
-    text-align: center;
-  }
-  
-  .account-title-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 30px;
-  }
-  
-  .line {
-    flex: 1;
-    height: 2px;
-    background-color: grey;
-    margin: 0 10px;
-    margin-top: 150px;
-  }
-  
-  .account-title {
-    color: #333;
-    font-family: 'KyivType Titling', sans-serif;
-    font-weight: 900;
-    text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
-    letter-spacing: -2px;
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 30px;
-    margin-top: 170px;
-  }
-  
-  .account-page {
-    display: flex;
-    flex-direction: column;
-    max-width: 1300px;
-    margin: 0 auto;
-    height: 650px;
-    background-color: #FFF7F6;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    background-image: url('@/assets/accountpattern.png');
-    background-position: right;
-    background-repeat: no-repeat;
-    background-size: 50%;
-  }
-  
-  .account-content {
-    display: flex;
-    margin-top: 20px;
-  }
-  
-  .account-sidebar {
-    border-right: 1px solid #ddd;
-    padding: 20px;
-    width: 250px;
-  }
-  
-  .profile-menu {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .menu-list {
-    align-items: left;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .menu-item {
-    margin: 15px 0;
-    align-items: center;
-    display: flex;
-    padding: 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .menu-item.active {
-    background-color: #F6E7E7;
-  }
-  
-  .menu-item:hover {
-    background-color: #F6E7E7;
-  }
-  
-  .menu-icon {
-    margin-right: 10px;
-    width: 30px;
-    height: 30px;
-  }
-  
-  .user-icon {
-    width: 23px;
-    transform: translate(3px, 2px);
-    margin-left: 3px;
-  }
-  
-  .heart-icon {
-    filter: brightness(0);
-  }
-  
-  .section-title {
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0;
-    cursor: pointer;
-    color: #040404;
-  }
-  
-  .account-details {
-    width: calc(100% - 250px);
-    padding-left: 20px;
-    padding-bottom: 50px;
-  }
 
-  .divider {
-  height: 1px;
-  background-color: #ddd; 
-  margin: 5px 0; 
+<style scoped>
+@font-face {
+  font-family: 'KyivType Titling';
+  src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
 }
 
-  
-  @media (max-width: 768px) {
-    .account-content {
-      flex-direction: column;
-    }
-  
-    .account-sidebar,
-    .account-details {
-      width: 100%;
-      padding: 0;
-    }
-  
-    .account-page {
-      background-size: cover;
-      background-position: center;
-    }
+* {
+  font-family: 'Merriweather', sans-serif;
+}
+
+.account-header {
+  text-align: center;
+}
+
+.account-title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.line {
+  flex: 1;
+  height: 2px;
+  background-color: grey;
+  margin: 0 10px;
+  margin-top: 150px;
+}
+
+.account-title {
+  color: #333;
+  font-family: 'KyivType Titling', sans-serif;
+  font-weight: 900;
+  text-shadow: 0 4px 4px rgba(99, 2, 2, 0.22);
+  letter-spacing: -2px;
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 30px;
+  margin-top: 170px;
+}
+
+.account-page {
+  display: flex;
+  flex-direction: column;
+  max-width: 1300px;
+  margin: 0 auto;
+  height: 650px;
+  background-color: #FFF7F6;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-image: url('@/assets/accountpattern.png');
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: 50%;
+}
+
+.account-content {
+  display: flex;
+  margin-top: 20px;
+}
+
+.account-sidebar {
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  width: 250px;
+}
+
+.profile-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-list {
+  align-items: left;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-item {
+  margin: 15px 0;
+  align-items: center;
+  display: flex;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-item.active {
+  background-color: #F6E7E7;
+}
+
+.menu-item:hover {
+  background-color: #F6E7E7;
+}
+
+.menu-icon {
+  margin-right: 10px;
+  width: 30px;
+  height: 30px;
+}
+
+.user-icon {
+  width: 23px;
+  transform: translate(3px, 2px);
+  margin-left: 3px;
+}
+
+.heart-icon {
+  filter: brightness(0);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  cursor: pointer;
+  color: #040404;
+}
+
+.account-details {
+  width: calc(100% - 250px);
+  padding-left: 20px;
+  padding-bottom: 50px;
+}
+
+.divider {
+  height: 1px;
+  background-color: #ddd;
+  margin: 5px 0;
+}
+
+
+@media (max-width: 768px) {
+  .account-content {
+    flex-direction: column;
   }
-  </style>
-  
+
+  .account-sidebar,
+  .account-details {
+    width: 100%;
+    padding: 0;
+  }
+
+  .account-page {
+    background-size: cover;
+    background-position: center;
+  }
+}
+</style>

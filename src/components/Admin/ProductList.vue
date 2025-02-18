@@ -7,62 +7,36 @@
           <span class="filter-text">Фільтр</span>
           <img
             src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5"
-            alt="Filter icon"
-            class="filter-icon"
-          />
+            alt="Filter icon" class="filter-icon" />
         </div>
         <form class="search-form" @submit.prevent="handleSearch">
           <label for="searchInput" class="visually-hidden">Пошук</label>
-          <input
-            type="text"
-            v-model="searchQuery"
-            id="searchInput"
-            class="search-input"
-            placeholder="Пошук"
-          />
+          <input type="text" v-model="searchQuery" id="searchInput" class="search-input" placeholder="Пошук" />
           <img
             src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/d5c4873b11c69bccf0067abe1ce038edad573eb5f56d874777e45978e309d1df?apiKey=c3e46d0a629546c7a48302a5db3297d5"
-            alt="Search icon"
-            class="search-icon"
-          />
+            alt="Search icon" class="search-icon" />
         </form>
       </div>
       <button class="add-product-button" @click="showAddProduct">
         <img
           src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/b16e6ab49c38393f90f82fabc8bc836adcc3b48eb08a452c5ccea5d5a207d0ea?apiKey=c3e46d0a629546c7a48302a5db3297d5"
-          alt="Add icon"
-          class="add-icon"
-        />
+          alt="Add icon" class="add-icon" />
         <span>Додати</span>
       </button>
     </header>
 
     <section v-if="!currentComponent" class="product-grid">
-      <ProductCard
-        v-for="product in filteredProducts"
-        :key="product.id"
-        :product="product"
-        @update-product="showUpdateOrders"
-        @delete-product="handleDelete"
-      />
+      <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product"
+        @update-product="showUpdateOrders" @delete-product="handleDelete" />
     </section>
     <p v-else-if="!products.length">Товари не знайдено.</p>
 
     <!-- Динамічний рендер компонентів -->
-    <component
-      v-if="currentComponent"
-      :is="currentComponent"
-      v-bind="currentProps"
-      @close="resetComponent"
-    />
+    <component v-if="currentComponent" :is="currentComponent" v-bind="currentProps" @close="resetComponent" />
 
     <div class="pagination" v-if="totalPages > 1">
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        @click="changePage(page)"
-        :class="{ active: currentPage === page }"
-      >
+      <button v-for="page in totalPages" :key="page" @click="changePage(page)"
+        :class="{ active: currentPage === page }">
         {{ page }}
       </button>
     </div>
@@ -159,7 +133,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 32px; 
+  margin-bottom: 32px;
 }
 
 .product-title-container {
@@ -171,7 +145,7 @@ export default {
   font-size: 40px;
   font-weight: 700;
   color: #000;
-  margin-bottom: 16px; 
+  margin-bottom: 16px;
 }
 
 .filter-container {
@@ -202,7 +176,7 @@ export default {
 }
 
 .search-icon {
-  width: 30px; 
+  width: 30px;
   height: 30px;
   margin-left: 8px;
 }
@@ -217,7 +191,7 @@ export default {
   padding: 12px 18px;
   cursor: pointer;
   font-family: Montserrat, sans-serif;
-  font-size: 15px; 
+  font-size: 15px;
   color: #000;
   width: 150px;
   height: 45px;
@@ -225,19 +199,19 @@ export default {
   margin-top: 155px;
 }
 
-.filter-text{
+.filter-text {
   font-size: 25px;
 }
 
 .add-icon {
   width: 36px;
-  height: 36px; 
+  height: 36px;
 }
 
 .product-grid {
   margin-top: -100px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 10px;
 }
 
@@ -264,7 +238,7 @@ export default {
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px; 
+    gap: 16px;
   }
 }
 

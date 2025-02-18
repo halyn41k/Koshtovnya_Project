@@ -40,12 +40,7 @@
     <div class="separator"></div>
     <div class="main-header">
       <div class="search-bar">
-        <input
-          type="text"
-          v-model="searchQuery"
-          :placeholder="$t('searchPlaceholder')" 
-          @keyup.enter="startSearch"
-        />
+        <input type="text" v-model="searchQuery" :placeholder="$t('searchPlaceholder')" @keyup.enter="startSearch" />
         <div class="search-icon" @click="startSearch">
           <img src="@/assets/magnifying-glass-svgrepo-com.svg" alt="Search Icon" />
         </div>
@@ -134,13 +129,13 @@ export default {
       this.isCurrencyDropdownOpen = true; // Закриваємо меню після вибору
     },
     toggleLanguageDropdown() {
-    console.log("Language dropdown toggled:", this.isLanguageDropdownOpen);
-    this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
-  },
-  toggleCurrencyDropdown() {
-    console.log("Currency dropdown toggled:", this.isCurrencyDropdownOpen);
-    this.isCurrencyDropdownOpen = !this.isCurrencyDropdownOpen;
-  },
+      console.log("Language dropdown toggled:", this.isLanguageDropdownOpen);
+      this.isLanguageDropdownOpen = !this.isLanguageDropdownOpen;
+    },
+    toggleCurrencyDropdown() {
+      console.log("Currency dropdown toggled:", this.isCurrencyDropdownOpen);
+      this.isCurrencyDropdownOpen = !this.isCurrencyDropdownOpen;
+    },
   },
   mounted() {
     this.fetchCartCount();
@@ -177,8 +172,8 @@ body {
 .language-currency select,
 .search-bar input {
   font-family: 'Montserrat', serif;
-  font-weight: 400; 
-  font-size: 14px; 
+  font-weight: 400;
+  font-size: 14px;
 }
 
 .search-bar {
@@ -199,21 +194,21 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 15px; 
+  padding: 5px 15px;
   background-color: white;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 15px; 
+  gap: 15px;
 }
 
 .nav-links a {
   text-decoration: none;
   color: #333;
   font-weight: bold;
-  font-size: 14px; 
+  font-size: 14px;
 }
 
 .language-currency {
@@ -222,7 +217,8 @@ body {
   gap: 30px;
 }
 
-.language, .currency {
+.language,
+.currency {
   display: flex;
   align-items: center;
   position: relative;
@@ -299,7 +295,7 @@ body {
 .wishlist {
   text-decoration: none;
   color: #333;
-  font-size: 14px; 
+  font-size: 14px;
 }
 
 .separator {
@@ -314,16 +310,16 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px; 
-  margin-top: 5px; 
+  padding: 10px 15px;
+  margin-top: 5px;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
   position: relative;
-  width: 250px; 
-  background-color:white;
+  width: 250px;
+  background-color: white;
 }
 
 .search-bar input {
@@ -332,7 +328,7 @@ body {
   padding-right: 25px;
   border-radius: 5px;
   background-color: #F1E6E6;
-  border: none; 
+  border: none;
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
 }
@@ -345,23 +341,23 @@ body {
 }
 
 .search-icon img {
-  width: 15px; 
+  width: 15px;
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: -230px; 
+  margin-left: -230px;
   text-decoration: none;
 }
 
 .logo img {
-  width: 60px; 
+  width: 60px;
 }
 
 .logo h1 {
-  color:#111111;
+  color: #111111;
   font-size: 20px;
   font-family: 'KyivType Titling', sans-serif;
   font-weight: 900;
@@ -369,18 +365,18 @@ body {
 
 .user-cart {
   display: flex;
-  gap: 10px; 
+  gap: 10px;
   position: relative;
 }
 
 .user-cart .icon {
-  width: 30px; 
+  width: 30px;
 }
 
 .nav-menu {
   background-color: rgba(107, 31, 31, 0.09);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 10px 0; 
+  padding: 10px 0;
 }
 
 .nav-menu ul {
@@ -400,10 +396,10 @@ body {
   color: #6B1F1F;
   font-family: 'KyivType Titling', sans-serif;
   font-weight: bold;
-  padding: 8px 10px; 
-  font-size: 14px; 
+  padding: 8px 10px;
+  font-size: 14px;
   border-bottom: 3px solid transparent;
-  transition: border-bottom 0.3s ease, background-color 0.3s ease; 
+  transition: border-bottom 0.3s ease, background-color 0.3s ease;
 }
 
 .nav-menu a:hover {
@@ -417,20 +413,20 @@ body {
   top: 100%;
   left: 0;
   width: 250px;
-  background-color: #FFF7F6; 
+  background-color: #FFF7F6;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
   z-index: 1000;
   max-height: 300px;
   overflow-y: auto;
-  padding: 10px; 
+  padding: 10px;
 }
 
 .search-results h2 {
-  margin: 0 0 10px; 
-  text-align: center; 
+  margin: 0 0 10px;
+  text-align: center;
   font-family: 'Montserrat', sans-serif;
-  font-weight: bold; 
+  font-weight: bold;
 }
 
 .search-results ul {
@@ -457,8 +453,8 @@ body {
 }
 
 .product-details {
-  flex-grow: 1; 
-  text-align: center; 
+  flex-grow: 1;
+  text-align: center;
 }
 
 .product-name {
@@ -468,16 +464,16 @@ body {
 
 .product-price {
   font-family: 'Montserrat', sans-serif;
-  font-weight: normal; 
+  font-weight: normal;
 }
 
 .search-results::-webkit-scrollbar {
-  width: 6px; 
+  width: 6px;
 }
 
 .search-results::-webkit-scrollbar-thumb {
-  background: #ccc; 
-  border-radius: 10px; 
+  background: #ccc;
+  border-radius: 10px;
 }
 
 .search-results::-webkit-scrollbar-track {
@@ -505,50 +501,75 @@ body {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
+
+  75% {
+    transform: translateX(-5px);
+  }
 }
 
 
 @keyframes bounce {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
 }
+
 .nav-links a,
 .wishlist {
-    color: #333; /* Основний колір тексту */
-    text-decoration: none; /* Прибрали підкреслення */
-    position: relative; /* Для створення псевдоелементів */
-    display: inline-block;
-    transition: color 0.3s ease;
+  color: #333;
+  /* Основний колір тексту */
+  text-decoration: none;
+  /* Прибрали підкреслення */
+  position: relative;
+  /* Для створення псевдоелементів */
+  display: inline-block;
+  transition: color 0.3s ease;
 }
 
-.nav-links a::after, 
+.nav-links a::after,
 .wishlist::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -2px; /* Відступ від тексту */
-    width: 0;
-    height: 1.5px; /* Товщина лінії */
-    background: linear-gradient(90deg, #420d0d, #e17f7f); /* Градієнт */
-    transition: width 0.3s ease;
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  /* Відступ від тексту */
+  width: 0;
+  height: 1.5px;
+  /* Товщина лінії */
+  background: linear-gradient(90deg, #420d0d, #e17f7f);
+  /* Градієнт */
+  transition: width 0.3s ease;
 }
 
-.nav-links a:hover, 
+.nav-links a:hover,
 .wishlist:hover {
-    color: #6B1F1F; /* Зміна кольору тексту */
+  color: #6B1F1F;
+  /* Зміна кольору тексту */
 }
 
-.nav-links a:hover::after, 
+.nav-links a:hover::after,
 .wishlist:hover::after {
-    width: 100%; /* Розтягування лінії під текстом */
+  width: 100%;
+  /* Розтягування лінії під текстом */
 }
 
 .dropdown-container {
@@ -583,6 +604,7 @@ body {
   overflow: hidden;
   z-index: 1000;
 }
+
 .arrow {
   position: absolute;
   top: 5px;
@@ -606,5 +628,4 @@ select {
   -moz-appearance: none;
   appearance: none;
 }
-
 </style>

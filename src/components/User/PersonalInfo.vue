@@ -4,7 +4,7 @@
     <div class="info-details">
       <p><strong>Ім’я:</strong> {{ first_name }}</p>
       <p><strong>Прізвище:</strong> {{ last_name }}</p>
-      <p><strong>По батькові:</strong> {{ second_name }}</p> 
+      <p><strong>По батькові:</strong> {{ second_name }}</p>
       <p><strong>Email:</strong> {{ email }}</p>
     </div>
     <button class="change-password-button" @click="changePassword">Змінити пароль</button>
@@ -24,7 +24,7 @@ export default {
     },
     second_name: {
       type: String,
-      default: 'По батькові', 
+      default: 'По батькові',
     },
     email: {
       type: String,
@@ -61,7 +61,7 @@ export default {
 .personal-info-card p {
   font-size: 16px;
   color: #555;
-  margin: 16px 0; 
+  margin: 16px 0;
 }
 
 .change-password-button {

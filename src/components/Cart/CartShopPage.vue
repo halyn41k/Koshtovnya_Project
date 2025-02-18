@@ -13,21 +13,10 @@
         <div v-else-if="cartItems.length === 0" class="empty-cart">
           Ваш кошик порожній.
         </div>
-        <CartItem
-  v-for="(item, index) in cartItems"
-  :key="item.id"
-  :id="item.id"
-  :itemNumber="index + 1"
-  :imageSrc="item.image"
-  :title="item.title"
-  :price="item.price"
-  :quantity="item.quantity"
-  :selectedSize="item.selectedSize"
-  :variants="item.variants"
-  @change-quantity="updateCartItem"
-  @remove-item="removeItem"
-  @change-size="updateCartItem" 
-/>
+        <CartItem v-for="(item, index) in cartItems" :key="item.id" :id="item.id" :itemNumber="index + 1"
+          :imageSrc="item.image" :title="item.title" :price="item.price" :quantity="item.quantity"
+          :selectedSize="item.selectedSize" :variants="item.variants" @change-quantity="updateCartItem"
+          @remove-item="removeItem" @change-size="updateCartItem" />
 
 
       </section>
@@ -40,7 +29,7 @@
 import axios from "axios";
 import CartItem from './CartItem.vue';
 import Summary from './Summary.vue';
-import Loader from '../Loader.vue';  
+import Loader from '../Loader.vue';
 
 
 export default {
@@ -58,86 +47,86 @@ export default {
   },
   methods: {
     async fetchCartItems() {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Будь ласка, увійдіть у свій обліковий запис.");
-    this.$router.push("/login");
-    return;
-  }
-  this.loading = true;
-  try {
-    const response = await axios.get("http://26.235.139.202:8080/api/cart", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    // Оновлюємо cartItems, включаючи нові поля
-    this.cartItems = response.data.products.map(item => ({
-  id: item.id,
-  image: item.image_url,
-  title: item.name,
-  price: item.price,
-  quantity: item.quantity,
-  isAvailable: item.is_available,
-  selectedSize: item.selected_size || item.variants[0]?.size || '', // Вибираємо перший доступний розмір
-  variants: item.variants.map(variant => ({
-    size: variant.size,
-    quantity: variant.quantity,
-    isAvailable: variant.is_available,
-  })),
-}));
-
-
-    // Обробка помилок (якщо є недоступні товари)
-    if (response.data.errors && response.data.errors.length > 0) {
-      response.data.errors.forEach(error => {
-        const itemIndex = this.cartItems.findIndex(item => item.title === error.product_name);
-        if (itemIndex !== -1) {
-          this.cartItems[itemIndex].isAvailable = false;
-          this.cartItems[itemIndex].errorMessage = error.message;
-        }
-      });
-    }
-  } catch (error) {
-    console.error("Помилка завантаження кошика:", error);
-    alert("Не вдалося завантажити кошик.");
-  } finally {
-    this.loading = false;
-  }
-},
-async updateCartItem({ id, quantity = null, operation = null, size = null }) {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    alert("Будь ласка, увійдіть у свій обліковий запис.");
-    this.$router.push("/login");
-    return;
-  }
-
-  try {
-    const data = size
-      ? { size } // Якщо змінюємо розмір
-      : { operation, quantity }; // Якщо змінюємо кількість
-
-    await axios.patch(
-      `http://26.235.139.202:8080/api/cart/${id}`,
-      data,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    const itemIndex = this.cartItems.findIndex(item => item.id === id);
-    if (itemIndex !== -1) {
-      if (size) {
-        this.cartItems[itemIndex].selectedSize = size; // Оновлюємо локально
-      } else if (quantity !== null) {
-        this.cartItems[itemIndex].quantity = quantity;
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
       }
-    }
+      this.loading = true;
+      try {
+        const response = await axios.get("http://26.235.139.202:8080/api/cart", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-    alert("Товар успішно оновлено.");
-  } catch (error) {
-    console.error("Помилка оновлення товару в кошику:", error.response?.data || error.message);
-    alert(error.response?.data?.message || "Не вдалося оновити товар у кошику.");
-  }
-},
+        // Оновлюємо cartItems, включаючи нові поля
+        this.cartItems = response.data.products.map(item => ({
+          id: item.id,
+          image: item.image_url,
+          title: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          isAvailable: item.is_available,
+          selectedSize: item.selected_size || item.variants[0]?.size || '', // Вибираємо перший доступний розмір
+          variants: item.variants.map(variant => ({
+            size: variant.size,
+            quantity: variant.quantity,
+            isAvailable: variant.is_available,
+          })),
+        }));
+
+
+        // Обробка помилок (якщо є недоступні товари)
+        if (response.data.errors && response.data.errors.length > 0) {
+          response.data.errors.forEach(error => {
+            const itemIndex = this.cartItems.findIndex(item => item.title === error.product_name);
+            if (itemIndex !== -1) {
+              this.cartItems[itemIndex].isAvailable = false;
+              this.cartItems[itemIndex].errorMessage = error.message;
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Помилка завантаження кошика:", error);
+        alert("Не вдалося завантажити кошик.");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateCartItem({ id, quantity = null, operation = null, size = null }) {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Будь ласка, увійдіть у свій обліковий запис.");
+        this.$router.push("/login");
+        return;
+      }
+
+      try {
+        const data = size
+          ? { size } // Якщо змінюємо розмір
+          : { operation, quantity }; // Якщо змінюємо кількість
+
+        await axios.patch(
+          `http://26.235.139.202:8080/api/cart/${id}`,
+          data,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        const itemIndex = this.cartItems.findIndex(item => item.id === id);
+        if (itemIndex !== -1) {
+          if (size) {
+            this.cartItems[itemIndex].selectedSize = size; // Оновлюємо локально
+          } else if (quantity !== null) {
+            this.cartItems[itemIndex].quantity = quantity;
+          }
+        }
+
+        alert("Товар успішно оновлено.");
+      } catch (error) {
+        console.error("Помилка оновлення товару в кошику:", error.response?.data || error.message);
+        alert(error.response?.data?.message || "Не вдалося оновити товар у кошику.");
+      }
+    },
 
 
 
@@ -178,7 +167,8 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
   flex-direction: column;
   padding: 0 46.67px;
   margin-top: 180px;
-  background-image: url('@/assets/cartpattern.png'); /* Додаємо фон */
+  background-image: url('@/assets/cartpattern.png');
+  /* Додаємо фон */
   background-size: cover;
 }
 
@@ -204,7 +194,7 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
   letter-spacing: -1.2px;
   text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
   text-align: center;
-  
+
 }
 
 .cart-content {
@@ -216,8 +206,10 @@ async updateCartItem({ id, quantity = null, operation = null, size = null }) {
 .cart-items {
   width: 50%;
   height: 500px;
-  overflow-y: auto; /* Тонкий скрол */
-  scrollbar-width: thin; /* Для Firefox */
+  overflow-y: auto;
+  /* Тонкий скрол */
+  scrollbar-width: thin;
+  /* Для Firefox */
 }
 
 /* Стиль для скроллбару */

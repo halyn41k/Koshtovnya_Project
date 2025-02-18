@@ -122,25 +122,25 @@ export default {
   display: flex;
   align-items: center;
   gap: 20px;
-  text-decoration: none; 
+  text-decoration: none;
 }
 
 .logo-image {
   margin-top: -40px;
   margin-left: -30px;
-  width: 140px;  
-  height: 160px; 
+  width: 140px;
+  height: 160px;
 }
 
 .logo-title {
   margin-top: -20px;
   margin-left: -20px;
   font-family: 'KyivType Titling', sans-serif;
-  font-weight: 900; 
+  font-weight: 900;
   font-size: 30px;
   color: black;
   transition: transform 0.3s ease;
-  text-decoration: none; 
+  text-decoration: none;
 }
 
 .logo-wrapper:hover .logo-title {
@@ -153,8 +153,8 @@ export default {
   margin-top: 10px;
   font-family: 'Montserrat', serif;
   text-align: left;
-  line-height: 1.6; 
-  
+  line-height: 1.6;
+
 }
 
 .footer-links {
@@ -170,7 +170,7 @@ export default {
 }
 
 .nav-title {
-  color:black;
+  color: black;
   font-size: 18px;
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
@@ -240,7 +240,7 @@ export default {
 }
 
 .social-links {
-  margin-left:45px;
+  margin-left: 45px;
   display: flex;
   gap: 15px;
 }

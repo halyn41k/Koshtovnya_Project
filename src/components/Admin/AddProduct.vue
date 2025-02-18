@@ -26,20 +26,21 @@
         <div class="form-group">
           <label for="beadProducer" class="form-label">Виробник бісеру</label>
           <select id="beadProducer" v-model="form.bead_producer" class="form-input" required>
-            <option v-for="producer in formData.bead_producers" :key="producer" :value="producer">{{ producer }}</option>
+            <option v-for="producer in formData.bead_producers" :key="producer" :value="producer">{{ producer }}
+            </option>
           </select>
         </div>
         <div class="form-group">
           <label for="countryOfManufacture" class="form-label">Країна виробництва</label>
           <select id="countryOfManufacture" v-model="form.country_of_manufacture" class="form-input" required>
-  <option v-for="country in formData.countries" :key="country" :value="country">{{ country }}</option>
-</select>
+            <option v-for="country in formData.countries" :key="country" :value="country">{{ country }}</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="typeOfBead" class="form-label">Тип бісеру</label>
           <select id="typeOfBead" v-model="form.type_of_bead" class="form-input" required>
-  <option v-for="type in formData.types_of_bead" :key="type" :value="type">{{ type }}</option>
-</select>
+            <option v-for="type in formData.types_of_bead" :key="type" :value="type">{{ type }}</option>
+          </select>
         </div>
         <div class="form-group">
           <label for="productWeight" class="form-label">Вага</label>
@@ -48,8 +49,8 @@
         <div class="form-group">
           <label for="productColors" class="form-label">Кольори</label>
           <select id="productColors" @change="onColorsChange" multiple class="form-input" required>
-  <option v-for="color in formData.colors" :key="color" :value="color">{{ color }}</option>
-</select>
+            <option v-for="color in formData.colors" :key="color" :value="color">{{ color }}</option>
+          </select>
 
         </div>
         <div class="form-group">
@@ -112,23 +113,23 @@ export default {
   },
   methods: {
     async fetchFormData() {
-  try {
-    const response = await fetch('http://26.235.139.202:8080/api/products/form-data');
-    if (!response.ok) {
-      throw new Error(`HTTP помилка: ${response.status}`);
-    }
-    const result = await response.json();
-    console.log(result.data); // Перевіряємо ключі
-    this.formData = {
-      ...result.data,
-      countries: result.data.countries_of_manufacture,
-      types_of_bead: result.data.type_of_bead,
-    };
-  } catch (error) {
-    console.error('Помилка під час отримання даних:', error);
-    alert('Не вдалося завантажити дані форми. Перевірте зʼєднання з сервером.');
-  }
-},
+      try {
+        const response = await fetch('http://26.235.139.202:8080/api/products/form-data');
+        if (!response.ok) {
+          throw new Error(`HTTP помилка: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log(result.data); // Перевіряємо ключі
+        this.formData = {
+          ...result.data,
+          countries: result.data.countries_of_manufacture,
+          types_of_bead: result.data.type_of_bead,
+        };
+      } catch (error) {
+        console.error('Помилка під час отримання даних:', error);
+        alert('Не вдалося завантажити дані форми. Перевірте зʼєднання з сервером.');
+      }
+    },
     onImageChange(event) {
       this.image = event.target.files[0];
     },
@@ -145,60 +146,60 @@ export default {
       this.form.fittings.splice(index, 1);
     },
     async addProduct() {
-  const formData = new FormData();
-  formData.append('image', this.image);
-  formData.append('name', this.form.name);
-  formData.append('category', this.form.category);
-  formData.append('price', this.form.price);
-  formData.append('bead_producer', this.form.bead_producer);
-  formData.append('country_of_manufacture', this.form.country_of_manufacture);
-  formData.append('type_of_bead', this.form.type_of_bead);
-  formData.append('weight', this.form.weight);
+      const formData = new FormData();
+      formData.append('image', this.image);
+      formData.append('name', this.form.name);
+      formData.append('category', this.form.category);
+      formData.append('price', this.form.price);
+      formData.append('bead_producer', this.form.bead_producer);
+      formData.append('country_of_manufacture', this.form.country_of_manufacture);
+      formData.append('type_of_bead', this.form.type_of_bead);
+      formData.append('weight', this.form.weight);
 
-  // Додаємо кольори
-  this.form.colors.forEach(color => {
-    formData.append('colors[]', color);
-  });
+      // Додаємо кольори
+      this.form.colors.forEach(color => {
+        formData.append('colors[]', color);
+      });
 
-  // Додаємо розміри
-  this.form.sizes.forEach((size, index) => {
-    formData.append(`sizes[${index}][size]`, size.size);
-    formData.append(`sizes[${index}][quantity]`, size.quantity);
-  });
+      // Додаємо розміри
+      this.form.sizes.forEach((size, index) => {
+        formData.append(`sizes[${index}][size]`, size.size);
+        formData.append(`sizes[${index}][quantity]`, size.quantity);
+      });
 
-  // Додаємо фурнітуру
-  this.form.fittings.forEach((fitting, index) => {
-    formData.append(`fittings[${index}][fitting]`, fitting.fitting);
-    formData.append(`fittings[${index}][material]`, fitting.material);
-    formData.append(`fittings[${index}][quantity]`, fitting.quantity);
-  });
+      // Додаємо фурнітуру
+      this.form.fittings.forEach((fitting, index) => {
+        formData.append(`fittings[${index}][fitting]`, fitting.fitting);
+        formData.append(`fittings[${index}][material]`, fitting.material);
+        formData.append(`fittings[${index}][quantity]`, fitting.quantity);
+      });
 
-  console.log([...formData.entries()]); // Дебаг: перевіряємо, що дані надсилаються коректно
+      console.log([...formData.entries()]); // Дебаг: перевіряємо, що дані надсилаються коректно
 
-  try {
-    const response = await fetch('http://26.235.139.202:8080/api/products', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
+      try {
+        const response = await fetch('http://26.235.139.202:8080/api/products', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
 
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      console.error('Помилка сервера:', errorResponse);
-      throw new Error('Failed to add product');
-    }
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          console.error('Помилка сервера:', errorResponse);
+          throw new Error('Failed to add product');
+        }
 
-    const data = await response.json();
-    console.log('Продукт додано:', data);
-    alert('Продукт успішно додано!');
-    this.resetForm();
-  } catch (error) {
-    console.error('Error adding product:', error);
-    alert('Не вдалося додати продукт. Перевірте дані.');
-  }
-},
+        const data = await response.json();
+        console.log('Продукт додано:', data);
+        alert('Продукт успішно додано!');
+        this.resetForm();
+      } catch (error) {
+        console.error('Error adding product:', error);
+        alert('Не вдалося додати продукт. Перевірте дані.');
+      }
+    },
 
     resetForm() {
       this.form = {
@@ -354,7 +355,7 @@ export default {
 
 select[multiple] {
   height: auto;
-  min-height: 100px; /* Зроби список візуально зручним */
+  min-height: 100px;
+  /* Зроби список візуально зручним */
 }
-
 </style>

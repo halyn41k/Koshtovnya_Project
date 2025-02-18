@@ -18,7 +18,9 @@
       </div>
       <div class="filter">
         <span class="filter-text">Фільтр</span>
-        <img src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5" alt="Filter icon" class="filter-icon" />
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets/c3e46d0a629546c7a48302a5db3297d5/4b09284ab367fa70a05a4a4f59e91721443ad7e8e783dfd2c26fb681ebacd30f?apiKey=c3e46d0a629546c7a48302a5db3297d5"
+          alt="Filter icon" class="filter-icon" />
       </div>
     </section>
 
@@ -290,7 +292,7 @@ export default {
   margin-bottom: 20px;
 }
 
-.report-summary{
-  align-items:flex-end; 
+.report-summary {
+  align-items: flex-end;
 }
 </style>

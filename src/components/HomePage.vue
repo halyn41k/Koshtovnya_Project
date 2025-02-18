@@ -30,66 +30,66 @@
     </div>
 
     <section>
-      <PopularProducts fade-in/>
+      <PopularProducts fade-in />
     </section>
 
     <section>
-      <NewArrivals fade-in/>
+      <NewArrivals fade-in />
     </section>
 
     <div class="instagram-section fade-in">
-  <div class="instagram-text-container fade-in">
-    <img src="@/assets/instapattern.png" alt="Instagram pattern" class="insta-pattern-image fade-in" />
-    <p class="follow-text">
-      {{ $t('followInsta') }}<br /> <!-- Використовуємо <br /> для переходу на новий рядок -->
-      {{ $t('dontMissTheMost') }} <!-- Текст на другому рядку -->
-    </p>
-    <p class="instagram-handle fade-in">
-      <span class="instagram-handle-link fade-in">@koshtovnya_jewelry</span>
-    </p>
-  </div>
+      <div class="instagram-text-container fade-in">
+        <img src="@/assets/instapattern.png" alt="Instagram pattern" class="insta-pattern-image fade-in" />
+        <p class="follow-text">
+          {{ $t('followInsta') }}<br /> <!-- Використовуємо <br /> для переходу на новий рядок -->
+          {{ $t('dontMissTheMost') }} <!-- Текст на другому рядку -->
+        </p>
+        <p class="instagram-handle fade-in">
+          <span class="instagram-handle-link fade-in">@koshtovnya_jewelry</span>
+        </p>
+      </div>
 
-  <div class="instagram-grid fade-in">
-    <div class="instagram-image">
-      <img src="@/assets/pic1.png" alt="Instagram Image 1" />
+      <div class="instagram-grid fade-in">
+        <div class="instagram-image">
+          <img src="@/assets/pic1.png" alt="Instagram Image 1" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic2.png" alt="Instagram Image 2" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic3.png" alt="Instagram Image 3" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic4.png" alt="Instagram Image 4" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic5.png" alt="Instagram Image 5" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic6.png" alt="Instagram Image 6" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic7.png" alt="Instagram Image 7" />
+        </div>
+        <div class="instagram-image">
+          <img src="@/assets/pic8.png" alt="Instagram Image 8" />
+        </div>
+      </div>
     </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic2.png" alt="Instagram Image 2" />
-    </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic3.png" alt="Instagram Image 3" />
-    </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic4.png" alt="Instagram Image 4" />
-    </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic5.png" alt="Instagram Image 5" />
-    </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic6.png" alt="Instagram Image 6" />
-    </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic7.png" alt="Instagram Image 7" />
-    </div>
-    <div class="instagram-image">
-      <img src="@/assets/pic8.png" alt="Instagram Image 8" />
-    </div>
-  </div>
-</div>
     <CategoryProduct fade-in />
   </div>
 </template>
 
 <script>
-import PopularProducts from "@/components/PopularProducts.vue"; 
-import NewArrivals from "@/components/NewArrivals.vue"; 
-import CategoryProduct from "@/components/CategoryProduct.vue"; 
+import PopularProducts from "@/components/PopularProducts.vue";
+import NewArrivals from "@/components/NewArrivals.vue";
+import CategoryProduct from "@/components/CategoryProduct.vue";
 
 export default {
   components: {
-    PopularProducts, 
-    NewArrivals, 
-    CategoryProduct, 
+    PopularProducts,
+    NewArrivals,
+    CategoryProduct,
   },
   mounted() {
     this.fetchPopularProducts(); // Завантаження популярних продуктів при монтуванні компонента
@@ -98,85 +98,85 @@ export default {
 
   },
   data() {
-  return {
-    products: [], // Дані з API
-    newArrivals: [], // Дані з API
-    visibleProducts: [],
-    visibleNewArrivals: [],
-    currentPage: 0,
-    newArrivalsPage: 0,
-    productsPerPage: 3,
-    testPopularProducts: [
-      {
-        id: 1,
-        name: "Браслет",
-        price: 250,
-        image_url: "@/assets/testpicture.png",
-        bead_producer_name: "Чешський бісер",
-      },
-      {
-        id: 2,
-        name: "Гердан",
-        price: 450,
-        image_url: "@/assets/testpicture.png",
-        bead_producer_name: "Чешський бісер",
-      },
-      {
-        id: 3,
-        name: "Сережки",
-        price: 200,
-        image_url: "@/assets/testpicture.png",
-        bead_producer_name: "Чешський бісер",
-      },
-    ],
-    testNewArrivals: [
-      {
-        id: 4,
-        name: "Силянка",
-        price: 300,
-        image_url: "@/assets/testpicture.png",
-        bead_producer_name: "Чешський бісер",
-      },
-      {
-        id: 5,
-        name: "Дукати",
-        price: 550,
-        image_url: "@/assets/testpicture.png",
-        bead_producer_name: "Чешський бісер",
-      },
-      {
-        id: 6,
-        name: "Пояс",
-        price: 600,
-        image_url: "@/assets/testpicture.png",
-        bead_producer_name: "Чешський бісер",
-      },
-    ],
-  };
-},
+    return {
+      products: [], // Дані з API
+      newArrivals: [], // Дані з API
+      visibleProducts: [],
+      visibleNewArrivals: [],
+      currentPage: 0,
+      newArrivalsPage: 0,
+      productsPerPage: 3,
+      testPopularProducts: [
+        {
+          id: 1,
+          name: "Браслет",
+          price: 250,
+          image_url: "@/assets/testpicture.png",
+          bead_producer_name: "Чешський бісер",
+        },
+        {
+          id: 2,
+          name: "Гердан",
+          price: 450,
+          image_url: "@/assets/testpicture.png",
+          bead_producer_name: "Чешський бісер",
+        },
+        {
+          id: 3,
+          name: "Сережки",
+          price: 200,
+          image_url: "@/assets/testpicture.png",
+          bead_producer_name: "Чешський бісер",
+        },
+      ],
+      testNewArrivals: [
+        {
+          id: 4,
+          name: "Силянка",
+          price: 300,
+          image_url: "@/assets/testpicture.png",
+          bead_producer_name: "Чешський бісер",
+        },
+        {
+          id: 5,
+          name: "Дукати",
+          price: 550,
+          image_url: "@/assets/testpicture.png",
+          bead_producer_name: "Чешський бісер",
+        },
+        {
+          id: 6,
+          name: "Пояс",
+          price: 600,
+          image_url: "@/assets/testpicture.png",
+          bead_producer_name: "Чешський бісер",
+        },
+      ],
+    };
+  },
   methods: {
     observeElements() {
-    const elements = document.querySelectorAll('.fade-in');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('show');
-            observer.unobserve(entry.target); // Зупинити спостереження після появи
-          }
-        });
-      },
-      { threshold: 0.1 } // Показувати при 10% видимості
-    );
+      const elements = document.querySelectorAll('.fade-in');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('show');
+              observer.unobserve(entry.target); // Зупинити спостереження після появи
+            }
+          });
+        },
+        { threshold: 0.1 } // Показувати при 10% видимості
+      );
 
-    elements.forEach((el) => observer.observe(el));
-  },
+      elements.forEach((el) => observer.observe(el));
+    },
     async fetchPopularProducts() { // Завантаження популярних товарів з API
       try {
         const response = await fetch("http://26.235.139.202:8080/api/popular-products"); // Запит до API
         if (!response.ok) throw new Error(`HTTP error: ${response.status}`); // Обробка помилки відповіді
         const data = await response.json();
-        
+
         // Очищення та збереження отриманих даних
         this.products = data.data.map(product => ({
           ...product,
@@ -218,18 +218,18 @@ export default {
 };
 </script>
 
-  
-  <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Podkova:wght@400..800&family=Inter:wght@600&display=swap');
-  
-  @font-face {
-    font-family: 'KyivType Titling';
-    src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-  }
-  
-  .main-container {
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Podkova:wght@400..800&family=Inter:wght@600&display=swap');
+
+@font-face {
+  font-family: 'KyivType Titling';
+  src: url('@/assets/fonts/KyivType2020-14-12/KyivType-NoVariable/TTF/KyivTypeTitling-Heavy2.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+.main-container {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -238,21 +238,21 @@ export default {
   overflow: hidden;
   margin-top: 180px;
 }
-  
-  .welcome-image {
+
+.welcome-image {
   width: 100%;
   height: 510px;
   background: url(@/assets/welcome.png) no-repeat center;
   background-size: cover;
 }
-  
-  .text-container {
+
+.text-container {
   position: relative;
   margin-top: -450px;
   padding: 100px;
   text-align: left;
 }
-  
+
 .handmade-beaded-products,
 .exclusive-necklaces-bracelets-earrings {
   color: #F6F8F6;
@@ -264,7 +264,7 @@ export default {
 
 .handmade-beaded-products {
   font-size: 45px;
-  margin-top: -50px; 
+  margin-top: -50px;
 }
 
 .exclusive-necklaces-bracelets-earrings {
@@ -275,69 +275,69 @@ export default {
 .button-container {
   margin-top: 550px;
 }
-  
-  .content-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 40px;
-    align-items: center;
-  }
-  
-  .left-image-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .girl-image {
-    width: 350px;
-    height: 450px;
-    background: url(@/assets/girl.png) no-repeat left;
-    background-size: cover;
-    border-radius: 140px;
-    margin-left: 200px;
-    margin-top: 150px;
-    z-index: 1;
-  }
-  
-  .pattern-image {
-    width: 200px;
-    height: 450px;
-    background: url(@/assets/patern_ethno.png) no-repeat center;
-    background-size: cover;
-    opacity: 0.5;
-    margin-left: -100px;
-    margin-top: 150px;
-  }
-  
-  .right-text-container {
-    max-width: 600px;
-    margin-top: 100px;
-    margin-right: 150px;
-  }
-  
-  .quote-text {
-    text-align: left;
-    margin-left: -50px;
-  }
-  
-  .ukrainian-heritage {
-    font-family: 'Podkova', sans-serif;
-    font-size: 28px;
-    font-weight: 400;
-    line-height: 1.3;
-    color: #000;
-  }
-  
-  .gnat-khotkevich {
-    font-family: 'Podkova', sans-serif;
-    font-size: 30px;
-    font-weight: 700;
-    margin-top: 20px;
-    color: #000;
-    margin-left: 350px;
-  }
 
-  .view-products-button {
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  align-items: center;
+}
+
+.left-image-container {
+  display: flex;
+  align-items: center;
+}
+
+.girl-image {
+  width: 350px;
+  height: 450px;
+  background: url(@/assets/girl.png) no-repeat left;
+  background-size: cover;
+  border-radius: 140px;
+  margin-left: 200px;
+  margin-top: 150px;
+  z-index: 1;
+}
+
+.pattern-image {
+  width: 200px;
+  height: 450px;
+  background: url(@/assets/patern_ethno.png) no-repeat center;
+  background-size: cover;
+  opacity: 0.5;
+  margin-left: -100px;
+  margin-top: 150px;
+}
+
+.right-text-container {
+  max-width: 600px;
+  margin-top: 100px;
+  margin-right: 150px;
+}
+
+.quote-text {
+  text-align: left;
+  margin-left: -50px;
+}
+
+.ukrainian-heritage {
+  font-family: 'Podkova', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: #000;
+}
+
+.gnat-khotkevich {
+  font-family: 'Podkova', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin-top: 20px;
+  color: #000;
+  margin-left: 350px;
+}
+
+.view-products-button {
   font-family: 'Merriweather', sans-serif;
   color: #fff;
   background-color: #6B1F1F;
@@ -346,14 +346,14 @@ export default {
   border-radius: 8px;
   cursor: pointer;
   font-size: 18px;
-  margin-top: 50px; 
+  margin-top: 50px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 
 }
 
 .view-products-button:hover {
-    background-color: #a01212;
-  }
+  background-color: #a01212;
+}
 
 .instagram-section {
   display: flex;
@@ -388,7 +388,7 @@ export default {
 .insta-pattern-image {
   width: 680px;
   height: 90px;
-  margin-left: 560px; 
+  margin-left: 560px;
   margin-bottom: -130px;
 }
 
@@ -447,20 +447,21 @@ export default {
 }
 
 
-  @media (max-width: 991px) {
-    .product-row {
-      flex-direction: column;
-    }
-  
-    .product-column {
-      width: 100%;
-    }
-  
-    .product-card {
-      margin-top: 15px;
-    }
+@media (max-width: 991px) {
+  .product-row {
+    flex-direction: column;
   }
-  .fade-in {
+
+  .product-column {
+    width: 100%;
+  }
+
+  .product-card {
+    margin-top: 15px;
+  }
+}
+
+.fade-in {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.8s ease-out, transform 0.8s ease-out;
@@ -470,5 +471,4 @@ export default {
   opacity: 1;
   transform: translateY(0);
 }
-
 </style>

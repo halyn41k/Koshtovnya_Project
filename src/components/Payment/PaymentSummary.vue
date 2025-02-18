@@ -20,16 +20,14 @@
         <span>Оформити замовлення</span>
         <img
           src="https://cdn.builder.io/api/v1/image/assets/TEMP/436b738744905f60c6a542e2cd314f5694db20045d36b8991f8dab9a31b316a0?placeholderIfAbsent=true&apiKey=c3e46d0a629546c7a48302a5db3297d5"
-          alt=""
-          class="login-icon"
-        />
+          alt="" class="login-icon" />
       </button>
     </div>
   </section>
 </template>
 
 <script>
-import axios from "axios"; 
+import axios from "axios";
 
 export default {
   name: "PaymentSummary",
@@ -102,8 +100,8 @@ export default {
 
       // Додаємо валідацію перед відправкою
       const requiredFields = [
-        'first_name', 
-        'last_name', 
+        'first_name',
+        'last_name',
         'phone_number',
         'city',
         'payment_method'
@@ -118,7 +116,7 @@ export default {
 
       try {
         const response = await axios.post(
-          "http://26.235.139.202:8080/api/orders", 
+          "http://26.235.139.202:8080/api/orders",
           orderData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -145,22 +143,21 @@ export default {
 </script>
 
 
-  
-  <style scoped>
 
-    @media (max-width: 991px) {
-   
-      .payment-steps,
-      .payment-summary,
-      .order-items,
-      .delivery-address {
-        width: 100%;
-      }
-  
-    }
-    
-  .order-summary {
-  position:absolute;
+<style scoped>
+@media (max-width: 991px) {
+
+  .payment-steps,
+  .payment-summary,
+  .order-items,
+  .delivery-address {
+    width: 100%;
+  }
+
+}
+
+.order-summary {
+  position: absolute;
   top: 300px;
   right: 100px;
   z-index: 100;
@@ -171,14 +168,14 @@ export default {
   border: 1px solid rgba(230, 230, 230, 1);
   max-height: 400px;
   overflow-y: auto;
-  transition: position 0.3s ease; 
+  transition: position 0.3s ease;
   z-index: 10;
 }
 
 .order-summary.sticky {
   position: absolute;
   top: auto;
-  bottom: 00px; 
+  bottom: 00px;
 }
 
 .summary-title {
@@ -210,22 +207,22 @@ export default {
 }
 
 .payment-button {
-    border-radius: 8px;
-    background-color: rgba(107, 31, 31, 1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #fff;
-    font: 700 12px/1.3 Merriweather, sans-serif;
-    padding: 6px 15px;
-    margin-top: 10px;
-    width: 100%;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    height: 40px;
-    font-size: 15px;
-  }
+  border-radius: 8px;
+  background-color: rgba(107, 31, 31, 1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  font: 700 12px/1.3 Merriweather, sans-serif;
+  padding: 6px 15px;
+  margin-top: 10px;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  height: 40px;
+  font-size: 15px;
+}
 
 .button-icon {
   width: 24px;
@@ -242,7 +239,7 @@ export default {
 
 
 .payment-summary {
-  z-index: 5; /* Встановлюємо більш високий пріоритет */
+  z-index: 5;
+  /* Встановлюємо більш високий пріоритет */
 }
-
 </style>

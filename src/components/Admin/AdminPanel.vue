@@ -4,13 +4,8 @@
       <h1 class="sidebar-title">Адмін панель</h1>
       <nav class="sidebar-nav">
         <ul class="nav-list">
-          <li
-            class="nav-item"
-            v-for="(menuItem, index) in menuItems"
-            :key="index"
-            @click="selectTab(index)"
-            :class="{ active: activeTab === index }"
-          >
+          <li class="nav-item" v-for="(menuItem, index) in menuItems" :key="index" @click="selectTab(index)"
+            :class="{ active: activeTab === index }">
             <img :src="menuItem.icon" alt="" class="nav-icon" />
             <span class="nav-text">{{ menuItem.title }}</span>
           </li>
@@ -92,7 +87,7 @@ export default {
   flex-direction: column;
   padding: 40px 20px;
   width: 20%;
-  position:fixed;
+  position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
@@ -144,7 +139,8 @@ export default {
 
 /* Content section styling */
 .content {
-  margin-left: 20%; /* Offset by sidebar width */
+  margin-left: 20%;
+  /* Offset by sidebar width */
   padding: 40px;
   width: 80%;
   overflow-y: auto;

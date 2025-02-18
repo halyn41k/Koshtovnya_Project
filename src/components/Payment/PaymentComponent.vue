@@ -5,15 +5,12 @@
       <span class="main-title">Оплата</span>
       <div class="header-line"></div>
     </header>
-    <main
-      class="payment-content"
-      :style="{ backgroundImage: `url(${require('@/assets/paymentpattern.png')})` }"
-    >
+    <main class="payment-content" :style="{ backgroundImage: `url(${require('@/assets/paymentpattern.png')})` }">
       <PaymentSteps :currentStep="currentStep" />
       <OrderReview :cartItems="cartItems" :deliveryCost="deliveryCost" />
       <DeliveryAddress :formData="formData" />
 
-     
+
     </main>
   </section>
 </template>
@@ -34,49 +31,48 @@ export default {
     PaymentSteps,
   },
   data() {
-  return {
-    cartItems: [],
-    formData: {
-      cityRef: "", // Початкове значення
-      deliveryType: "", // Початкове значення
-    },
-    deliveryCost: 0,
-    totalAmount: 0,
-  };
-},
-
-watch: {
-  cartItems: {
-    handler(newValue) {
-      this.calculateTotalAmount();
-    },
-    deep: true,
+    return {
+      cartItems: [],
+      formData: {
+        cityRef: "", // Початкове значення
+        deliveryType: "", // Початкове значення
+      },
+      deliveryCost: 0,
+      totalAmount: 0,
+    };
   },
-  deliveryCost: "calculateTotalAmount",
-},
-methods: {
-  updateCustomerDetails(updatedDetails) {
-  this.customerDetails = { ...this.customerDetails, ...updatedDetails };
-},
 
-  calculateTotalAmount() {
-    this.totalAmount = this.cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    ) + this.deliveryCost;
+  watch: {
+    cartItems: {
+      handler(newValue) {
+        this.calculateTotalAmount();
+      },
+      deep: true,
+    },
+    deliveryCost: "calculateTotalAmount",
   },
-},
-mounted() {
-  this.calculateTotalAmount();
-},
+  methods: {
+    updateCustomerDetails(updatedDetails) {
+      this.customerDetails = { ...this.customerDetails, ...updatedDetails };
+    },
+
+    calculateTotalAmount() {
+      this.totalAmount = this.cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ) + this.deliveryCost;
+    },
+  },
+  mounted() {
+    this.calculateTotalAmount();
+  },
 
 };
 </script>
 
 
 
-  <style scoped>
-
+<style scoped>
 .city-suggestions {
   max-height: 150px;
   overflow-y: auto;
@@ -98,74 +94,79 @@ mounted() {
 .city-suggestions li:hover {
   background-color: #f0f0f0;
 }
-  .payment-header {
-    margin-top: 200px;
-    display: flex;
-    align-items: center;
-    gap: 26.67px;
-    font: 840 26.67px/1.3 'KyivType Titling', -apple-system, Roboto, Helvetica, sans-serif;
-    letter-spacing: -1.33px;
-  }
-  
-  
-  .header-line {
-    flex: 1;
-    height: 2px;
-    background-color: grey;
-    margin: 0 10px;
-  }
-  
-  .main-title {
-    font-family: 'KyivType Titling', sans-serif;
-    font-size: 34px;
-    font-weight: 900;
-    letter-spacing: -1.2px;
-    text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
-    text-align: center;
-  }
-  
-  .payment-content {
-  background-image: url('@/assets/paymentpattern.png'); 
+
+.payment-header {
+  margin-top: 200px;
+  display: flex;
+  align-items: center;
+  gap: 26.67px;
+  font: 840 26.67px/1.3 'KyivType Titling', -apple-system, Roboto, Helvetica, sans-serif;
+  letter-spacing: -1.33px;
+}
+
+
+.header-line {
+  flex: 1;
+  height: 2px;
+  background-color: grey;
+  margin: 0 10px;
+}
+
+.main-title {
+  font-family: 'KyivType Titling', sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -1.2px;
+  text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
+  text-align: center;
+}
+
+.payment-content {
+  background-image: url('@/assets/paymentpattern.png');
   background-attachment: fixed;
   background-size: cover;
   padding: 0 46.67px;
   margin-top: 28px;
 }
-  
-  .payment-notice {
-    font: 700 16.67px/22px Merriweather, sans-serif;
-    margin: 148.67px 0 0 18.67px;
 
-  }
-  
-  .order-details {
-    gap: 13px;
-    margin: 10px 0 0 18.67px;
-    max-width: 1108px;
-  }
+.payment-notice {
+  font: 700 16.67px/22px Merriweather, sans-serif;
+  margin: 148.67px 0 0 18.67px;
 
-  
-  @media (max-width: 991px) {
-    .payment-header {
-      white-space: initial;
-    }
-  
-    .payment-content {
-      max-width: 100%;
-      margin-top: 40px;
-      padding: 0 20px;
-    }
-  
-    .payment-columns {
-      flex-direction: column;
-    }
+}
+
+.order-details {
+  gap: 13px;
+  margin: 10px 0 0 18.67px;
+  max-width: 1108px;
+}
+
+
+@media (max-width: 991px) {
+  .payment-header {
+    white-space: initial;
   }
 
-  .order-items {
-  max-height: 500px; /* Встановлюємо максимальну висоту */
-  overflow-y: auto; /* Додаємо вертикальний скрол */
-  margin-top: 20px; /* Відступ зверху */
-  padding-right: 10px; /* Для естетики скролбару */
+  .payment-content {
+    max-width: 100%;
+    margin-top: 40px;
+    padding: 0 20px;
+  }
+
+  .payment-columns {
+    flex-direction: column;
+  }
+}
+
+.order-items {
+  max-height: 500px;
+  /* Встановлюємо максимальну висоту */
+  overflow-y: auto;
+  /* Додаємо вертикальний скрол */
+  margin-top: 20px;
+  /* Відступ зверху */
+  padding-right: 10px;
+  /* Для естетики скролбару */
 }
 
 /* Налаштування для скролбару */
@@ -216,185 +217,186 @@ mounted() {
   color: #555;
 }
 
-    .payment-header {
-      margin-top: 200px;
-      display: flex;
-      align-items: center;
-      gap: 26.67px;
-      font: 840 26.67px/1.3 'KyivType Titling', -apple-system, Roboto, Helvetica, sans-serif;
-      letter-spacing: -1.33px;
-    }
-    
-    
-    .header-line {
-      flex: 1;
-      height: 2px;
-      background-color: grey;
-      margin: 0 10px;
-    }
-    
-    .main-title {
-      font-family: 'KyivType Titling', sans-serif;
-      font-size: 34px;
-      font-weight: 900;
-      letter-spacing: -1.2px;
-      text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
-      text-align: center;
-    }
-    
-    .payment-content {
-    background-image: url('@/assets/paymentpattern.png');
-    background-attachment: fixed;
-    background-size: cover;
-    padding: 0 46.67px;
-    margin-top: 28px;
+.payment-header {
+  margin-top: 200px;
+  display: flex;
+  align-items: center;
+  gap: 26.67px;
+  font: 840 26.67px/1.3 'KyivType Titling', -apple-system, Roboto, Helvetica, sans-serif;
+  letter-spacing: -1.33px;
+}
+
+
+.header-line {
+  flex: 1;
+  height: 2px;
+  background-color: grey;
+  margin: 0 10px;
+}
+
+.main-title {
+  font-family: 'KyivType Titling', sans-serif;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -1.2px;
+  text-shadow: 0 2px 3px rgba(99, 2, 2, 0.22);
+  text-align: center;
+}
+
+.payment-content {
+  background-image: url('@/assets/paymentpattern.png');
+  background-attachment: fixed;
+  background-size: cover;
+  padding: 0 46.67px;
+  margin-top: 28px;
+}
+
+.payment-notice {
+  font: 700 16.67px/22px Merriweather, sans-serif;
+  margin: 148.67px 0 0 18.67px;
+}
+
+.order-details {
+  gap: 13px;
+  margin: 10px 0 0 18.67px;
+  max-width: 1108px;
+}
+
+
+@media (max-width: 991px) {
+  .payment-header {
+    white-space: initial;
   }
-    
-    .payment-notice {
-      font: 700 16.67px/22px Merriweather, sans-serif;
-      margin: 148.67px 0 0 18.67px;
-    }
-    
-    .order-details {
-      gap: 13px;
-      margin: 10px 0 0 18.67px;
-      max-width: 1108px;
-    }
-  
-    
-    @media (max-width: 991px) {
-      .payment-header {
-        white-space: initial;
-      }
-    
-      .payment-content {
-        max-width: 100%;
-        margin-top: 40px;
-        padding: 0 20px;
-      }
-    
-      .payment-columns {
-        flex-direction: column;
-      }
-    
-      .payment-steps,
-      .payment-summary,
-      .order-items,
-      .delivery-address {
-        width: 100%;
-      }
-  
-  
-      .payment-notice {
-        max-width: 100%;
-        margin-top: 40px;
-      }
-    
-      .order-details {
-        flex-direction: column;
-        max-width: 100%;
-      }
-    }
-    .delivery-steps {
-    font: 700 20px/1.3 Merriweather, sans-serif;
-    color: #9d9292;
+
+  .payment-content {
+    max-width: 100%;
+    margin-top: 40px;
+    padding: 0 20px;
   }
-  
-  .step {
-    display: flex;
+
+  .payment-columns {
     flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
   }
-  
-  .step.completed .step-text {
-    color: #a6a6a6;
+
+  .payment-steps,
+  .payment-summary,
+  .order-items,
+  .delivery-address {
+    width: 100%;
   }
-  
-  .step-header {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 10px;
+
+
+  .payment-notice {
+    max-width: 100%;
+    margin-top: 40px;
   }
-  
-  .step-text {
-    font-weight: bold;
-    color: #040404;
-  }
-  
-  .step-icon {
-    width: 34px;
-    height: 32px;
-  }
-  
-  .step-divider {
-    width: 300px;
-    height: 1px;
-    background-color: #9d9292;
-    margin: 10px 0;
-  }
-  
-  .input-container {
-    display: flex;
+
+  .order-details {
     flex-direction: column;
-    gap: 10px;
-    width: 200px;
+    max-width: 100%;
   }
-  
-  .input-field {
-    border: 1px solid #9D9292;
-    padding: 8px;
-    color: #6B1F1F;
-    font-family: 'Montserrat', sans-serif;
-    border-radius: 4px;
-  }
-  
-  .payment-option {
-    display: flex;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
-  .payment-label {
-    color: #040404;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .radio-input {
-    display: none;
-  }
-  
-  .radio-input + .payment-label::before {
-    content: '';
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-right: 10px;
-    border: 2px solid #9D9292;
-    border-radius: 50%;
-    background-color: transparent;
-  }
-  
-  /* Стиль обраного радіо-доту */
-  .radio-input:checked + .payment-label::before {
-    background-color: #6B1F1F;
-  }
-  
-  .next-button {
-    padding: 10px 20px;
-    background-color: #6B1F1F;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    font-family: 'Montserrat', sans-serif;
-  }
-  
-  .order-summary {
-  position:absolute;
+}
+
+.delivery-steps {
+  font: 700 20px/1.3 Merriweather, sans-serif;
+  color: #9d9292;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.step.completed .step-text {
+  color: #a6a6a6;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+}
+
+.step-text {
+  font-weight: bold;
+  color: #040404;
+}
+
+.step-icon {
+  width: 34px;
+  height: 32px;
+}
+
+.step-divider {
+  width: 300px;
+  height: 1px;
+  background-color: #9d9292;
+  margin: 10px 0;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 200px;
+}
+
+.input-field {
+  border: 1px solid #9D9292;
+  padding: 8px;
+  color: #6B1F1F;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 4px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.payment-label {
+  color: #040404;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.radio-input {
+  display: none;
+}
+
+.radio-input+.payment-label::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 10px;
+  border: 2px solid #9D9292;
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+/* Стиль обраного радіо-доту */
+.radio-input:checked+.payment-label::before {
+  background-color: #6B1F1F;
+}
+
+.next-button {
+  padding: 10px 20px;
+  background-color: #6B1F1F;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.order-summary {
+  position: absolute;
   top: 300px;
   right: 100px;
   z-index: 100;
@@ -405,14 +407,14 @@ mounted() {
   border: 1px solid rgba(230, 230, 230, 1);
   max-height: 400px;
   overflow-y: auto;
-  transition: position 0.3s ease; 
+  transition: position 0.3s ease;
   z-index: 10;
 }
 
 .order-summary.sticky {
   position: absolute;
   top: auto;
-  bottom: 00px; 
+  bottom: 00px;
 }
 
 .summary-title {
@@ -473,7 +475,7 @@ mounted() {
 
 .order-items {
   border: 1px solid rgba(0, 0, 0, 0.5);
-  padding: 21px 25px; 
+  padding: 21px 25px;
   background-color: #fff;
   width: 750px;
   margin-left: 50px;
@@ -481,10 +483,10 @@ mounted() {
 
 .item {
   display: flex;
-  gap: 13px; 
+  gap: 13px;
   border-radius: 16px;
   background-color: rgba(255, 247, 246, 1);
-  padding: 13px; 
+  padding: 13px;
   border: 1.33px solid rgba(230, 230, 230, 1);
   margin-bottom: 25px;
   width: 700px;
@@ -492,78 +494,79 @@ mounted() {
 }
 
 .item-image {
-  width: 115px; 
-  height: 106px; 
+  width: 115px;
+  height: 106px;
   object-fit: contain;
 }
 
 .item-details {
-  font: 700 13.33px/1.3 Merriweather, sans-serif; 
+  font: 700 13.33px/1.3 Merriweather, sans-serif;
 }
 
 .item-title {
   color: var(--Grays-Black, #000);
-  margin-bottom: 2.67px; 
+  margin-bottom: 2.67px;
 }
 
 .item-price {
   color: rgba(160, 18, 18, 1);
   font-family: Inter, sans-serif;
   font-weight: 600;
-  margin-bottom: 17.33px; 
+  margin-bottom: 17.33px;
 }
 
 .item-quantity {
   color: rgba(160, 18, 18, 0.5);
 }
 
-  
-  @media (max-width: 991px) {
-    .order-items {
-      max-width: 100%;
-      padding: 20px;
-    }
-  
-    .item {
-      flex-direction: column;
-    }
-  
-    .item-image {
-      width: 100%;
-      height: auto;
-    }
+
+@media (max-width: 991px) {
+  .order-items {
+    max-width: 100%;
+    padding: 20px;
   }
-  .delivery-address {
-  padding: 23.33px 0; 
-  font: 16.67px/1.3 Merriweather, sans-serif; 
+
+  .item {
+    flex-direction: column;
+  }
+
+  .item-image {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.delivery-address {
+  padding: 23.33px 0;
+  font: 16.67px/1.3 Merriweather, sans-serif;
 }
 
 .address-title {
-  margin-left: 25.33px; 
+  margin-left: 25.33px;
 }
 
 .address-divider {
-  margin-top: 13.33px; 
+  margin-top: 13.33px;
 }
 
 .address-details {
-  margin: 10.67px 0 0 25.33px; 
+  margin: 10.67px 0 0 25.33px;
 }
 
-  
-  @media (max-width: 991px) {
-    .delivery-address {
-      max-width: 100%;
-      margin-top: 40px;
-    }
-  
-    .address-title,
-    .address-details {
-      margin-left: 10px;
-    }
+
+@media (max-width: 991px) {
+  .delivery-address {
+    max-width: 100%;
+    margin-top: 40px;
   }
 
-  .delivery-address {
+  .address-title,
+  .address-details {
+    margin-left: 10px;
+  }
+}
+
+.delivery-address {
   padding: 20px;
   font: 16px/1.3 Merriweather, sans-serif;
   margin-top: 20px;
@@ -578,11 +581,11 @@ mounted() {
 
 .address-box {
   background-color: #fff;
-  border: 1px solid #d3d3d3; 
-  border-radius: 8px; 
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
   padding: 20px;
   color: #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .address-box p {
@@ -600,6 +603,7 @@ mounted() {
     margin-left: 10px;
   }
 }
+
 .city-dropdown {
   position: absolute;
   background: white;
@@ -624,6 +628,7 @@ mounted() {
 .city-dropdown li:hover {
   background-color: #f0f0f0;
 }
+
 .office-suggestions {
   position: absolute;
   z-index: 1000;
@@ -649,31 +654,38 @@ mounted() {
 .office-suggestions li:hover {
   background-color: #f0f0f0;
 }
+
 .input-container {
   margin-bottom: 20px;
 }
+
 .input-field {
   width: 100%;
   padding: 10px;
   margin-bottom: 10px;
 }
+
 .error {
   color: red;
   font-size: 12px;
 }
+
 .city-suggestions {
   border: 1px solid #ccc;
   max-height: 200px;
   overflow-y: auto;
 }
+
 .city-suggestions ul {
   list-style-type: none;
   padding: 0;
 }
+
 .city-suggestions li {
   padding: 5px;
   cursor: pointer;
 }
+
 .city-suggestions li:hover {
   background-color: #f0f0f0;
 }
